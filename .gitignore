@@ -1,0 +1,5 @@
+covers/
+node_modules/
+*.jpg
+*png
+ffmpeg/

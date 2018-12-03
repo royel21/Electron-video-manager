@@ -1,0 +1,66 @@
+
+.clock {
+    font-family: 'Share Tech Mono', monospace;
+    text-align: center;
+    position: fixed;
+    right: 15px;
+    bottom: 50px;
+    border: 1px solid;
+    font-weight: 600;
+}
+
+.clock .time {
+    display: inline-block;
+    letter-spacing: 0.05em;
+    font-size: 12px;
+    padding: 5px;
+    border-radius: 5px;
+}
+
+
+.metal {
+    color: hsla(0, 0%, 20%, 1);
+    text-shadow: hsla(0, 0%, 40%, 0.5) 0 -1px 0, hsla(0, 0%, 100%, 0.6) 0 2px 1px;
+    background-color: hsl(0, 0%, 90%);
+    transition: color 0.2s;
+  }
+  
+  /* Linear ------------------------- */
+  
+  .metal.linear {
+    background-image: -webkit-repeating-linear-gradient(
+        left,
+        hsla(0, 0%, 100%, 0) 0%,
+        hsla(0, 0%, 100%, 0) 6%,
+        hsla(0, 0%, 100%, 0.1) 7.5%
+      ),
+      -webkit-repeating-linear-gradient(left, hsla(0, 0%, 0%, 0) 0%, hsla(
+              0,
+              0%,
+              0%,
+              0
+            )
+            4%, hsla(0, 0%, 0%, 0.03) 4.5%),
+      -webkit-repeating-linear-gradient(left, hsla(0, 0%, 100%, 0) 0%, hsla(
+              0,
+              0%,
+              100%,
+              0
+            )
+            1.2%, hsla(0, 0%, 100%, 0.15) 2.2%),
+      linear-gradient(
+        180deg,
+        hsl(0, 0%, 78%) 0%,
+        hsl(0, 0%, 90%) 47%,
+        hsl(0, 0%, 78%) 53%,
+        hsl(0, 0%, 70%)100%
+      );
+  }
+
+  body:-webkit-full-screen .clock{
+    bottom: 5px;
+  }
+
+  body:-webkit-full-screen .clock-50up{
+    bottom: 50px;
+  }

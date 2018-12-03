@@ -1,0 +1,235 @@
+.modal-body {
+    padding: 0 .2rem;
+}
+
+#modal-list-file {
+    display: none;
+    height: calc(80% - 90px);
+    border-radius: 0;
+    max-height: 800px;
+    bottom: 46px;
+    font-size: 14px;
+    border-radius: 1%;
+}
+
+body:-webkit-full-screen #modal-list-file {
+    top: 0;
+    bottom: 0;
+    height: 100%;
+    z-index: 99;
+}
+
+#scan-list-show {
+    align-self: center;
+    margin: 0 10px;
+}
+
+#list-file-show i, #scan-list-show .fa-clipboard {
+    position: relative;
+}
+
+#scan-list-show .fa-folder {
+    position: absolute;
+    font-size: 12px;
+    top: 11px;
+    left: 4.6px;
+    transform: initial
+}
+
+.list-group-item {
+    white-space: nowrap;
+    padding: 5px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.list-file-content {
+    overflow-y: auto;
+    text-align: left;
+}
+
+.list-footer {
+    padding: 5px;
+}
+
+.list-footer .input-group {
+    height: 35px;
+    margin: 3px 0;
+}
+
+.list-file-content::-webkit-scrollbar {
+    width: 20px;
+}
+
+.list-file-content::-webkit-scrollbar-track {
+    margin: 0;
+}
+
+.list-file-content::-webkit-scrollbar-thumb {
+    border-radius: 0px;
+    margin: 3px 0;
+}
+
+#file-found {
+    margin: 0;
+    font-weight: bold;
+}
+
+.list-group-item:hover {
+    opacity: .85;
+    cursor: pointer;
+}
+
+.list-group-item:active {
+    opacity: .95;
+}
+
+.list-footer .input-group-text {
+    padding: 0.375rem 0 0.375rem 0.;
+    border-top-left-radius: .25rem;
+    border-bottom-left-radius: .25rem;
+}
+
+.fa-search {
+    margin-right: 9px;
+}
+
+.input-group-text span i {
+    font-size: 30px;
+    padding: 0 5px;
+}
+
+#current-page {
+    font-weight: bolder;
+    font-size: 18px;
+    margin-bottom: 5px;
+}
+
+#delete-list {
+    font-size: 1.3em;
+    padding: 0 5px;
+}
+
+.list-group-item {
+    pointer-events: all;
+}
+
+.list-group-item span.list-text {
+    pointer-events: none;
+    color: red
+}
+
+.list-group li .fa-trash-alt {
+    font-size: 20px;
+    cursor: pointer;
+}
+.modal span i{
+    font-size: 25px;
+}
+.btn-hide, #list-add-folder, #list-sync-folder{
+    position: absolute;
+    left: 10px;
+    top: 10px;
+}
+#list-sync-folder{
+    left: 45px;
+}
+.btn-hide {
+    left: inherit;
+    right: 10px;
+}
+#list-file-header{
+    min-height: 44px;
+    border-bottom: 1px solid;
+}
+
+#list-file-header label:not(.active) {
+    margin: 0;
+    cursor: pointer;
+}
+
+#list-file-header label:active {
+    opacity: 0.97;
+}
+
+.nav-tabs {
+    border-bottom: initial;
+}
+
+.list-item-empty {
+    display: none;
+}
+
+.list-item-empty:only-child {
+    display: block;
+    text-align: center;
+    pointer-events: none;
+}
+
+ul, label {
+    margin: 0;
+    padding: 0;
+}
+
+#list-file li:nth-child(2) {
+    border: 0;
+}
+
+.list-footer .select-list
+{
+    font-weight: 700;
+    height: 35px !important;
+}
+
+.list-text,
+.modal .title{
+    pointer-events: none;
+    min-height: 350px;
+    min-width: 400px;
+}
+
+#folder-reloading {
+    z-index: 9;
+    color: white;
+    position: fixed;
+    bottom: 42px;
+    left: 4px;
+    pointer-events: none;
+}
+
+#folder-reloading i{
+    font-size: 2rem;
+    position: relative;
+}
+#folder-reloading .fa-sync {
+    position: absolute;
+    font-size: 1rem;
+    color: red;    
+    top: 10px;
+    left: 6px;
+}
+
+.form-control{
+    margin-right: 4px;
+    border-radius: 5px;
+}
+
+#btn-search-clear{
+    position: absolute;
+    top: 8px;
+    right: 10px;
+     z-index: 99;
+}
+#btn-search-clear i{
+    font-size: 20px;
+    color:lightslategray;
+}
+
+
+#files-filter + span{
+    display: none;
+}
+/*empty input*/
+#files-filter:valid + span{
+    display:inline-block;
+}

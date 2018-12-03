@@ -1,0 +1,53 @@
+#footer-toolbar span i.fa-folder {
+    transform: translateY(0);
+}
+
+#popup {
+    display: none;
+    position: absolute;
+    max-width: 250px;
+    z-index: 9999;
+    color: white;
+    background-color: black;
+    padding: 5px 10px;
+    border-radius: 10px;
+    font-size: 14px;
+    pointer-events: none;
+}
+
+#popup:after {
+    content: " ";
+    position: absolute;
+    height: 12px;
+    width: 12px;
+    top: -6px;
+    right: calc(100%/2);
+    transform: rotate(45deg);
+    background-color: black;
+}
+
+#popup.popup-top:after {
+    top: auto;
+    bottom: -6px
+}
+
+#modal-scan-folder {
+    display: none;
+}
+
+.dialog-header {
+    position: relative;
+    top: 0;
+    font-size: 18px;
+    min-height: 30px;
+    border-bottom: 1px solid rgba(0, 0, 0, .125);
+    padding: 8px 0;
+    cursor: -webkit-grab;
+}
+.dialog-header:active{
+    cursor: -webkit-grabbing;
+}
+
+.modal .card-body{
+    height: 70%;
+}

@@ -1,0 +1,36 @@
+<div id="modal-scan-folder" class="modal card bg-dark resize">
+    <div id="scan-body" class="modal-body">
+        <div id="scan-list-header" class="dialog-header text-center position-relative move">
+            <span id="list-add-folder" class="float-left">
+                <i class="fas fa-plus-square"></i>
+            </span>
+            <span id="list-sync-folder" class="float-left">
+                <i class="fas fa-sync"></i>
+            </span>
+            <span class="title">Scan Folder List</span>
+            <span id="close-modal" class="btn-hide"><i class="far fa-times-circle"></i></span>
+        </div>
+        <div id="file-browser-config" class="p-2 list-file-content">
+            <ul id="scan-list" class="list-group text-dark  bg-primary">
+                <li class="list-group-item list-item-empty">Empty</li>
+            </ul>
+        </div>
+        <div id="scan-footer" class="list-footer text-center">
+            <div class="input-group">
+                <div class="input-group-text mx-1 px-1">
+                    <span id="add-filter">
+                        <i class="fas fa-plus-square"></i>
+                    </span>
+                    <span id="remove-filter">
+                        <i class="fas fa-trash-alt"></i>
+                    </span>
+                </div>
+                <div class="input-group-prepend">
+                    <div class="input-group-text">Filters: </div>
+                </div>
+                <select id="filter-select" class="form-control select-list">
+                </select>
+            </div>
+        </div>
+    </div>
+</div>

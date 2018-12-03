@@ -1,0 +1,11 @@
+.resize:after{
+    content: " ";
+    position: absolute;
+    bottom: 0;
+    right: 0;
+    border-top: 6px solid transparent;
+    border-left: 6px solid transparent;
+    border-bottom: 6px solid;
+    border-right: 6px solid;
+    cursor: se-resize;
+}

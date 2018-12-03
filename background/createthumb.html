@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="en">
+<script type="text/javascript">
+    const ipc = require('electron').ipcRenderer;
+    const BrowserWindow = require('electron').remote.BrowserWindow;
+    const fs = require('fs-extra');
+    const path = require('path');
+    const sharp = require('sharp');
+    const app = require('electron').remote.app
+    const WinDrive = require('win-explorer');
+    const db = require(path.join(path.dirname(__dirname), './webcontent/entity/models'));
+
+    let basedir;
+    var count = 0;
+
+    var startTime, endTime;
+
+    ipc.on('remove-files', function (event, data, fromWindowId) {
+        let fromWindow = BrowserWindow.fromId(fromWindowId)
+        fs.removeSync(data.dir);
+        fromWindow.webContents.send('files-removed', data.index);
+        fromWindow.webContents.send('finish-proc');
+        window.close();
+    });
+    var timer = 0;
+    ipc.on('reload-Db', function (event, data, fromWindowId) {
+        let fromWindow = BrowserWindow.fromId(fromWindowId);
+
+        scanOneDir = async (f) => {
+            var fis = WinDrive.ListFilesRO(f.dir);
+            await PopulateDB(f.dir, fis);
+        }
+
+        scanDirs = async () => {
+            timer = new Date();
+            for (var f of data.folders) {
+                await scanOneDir(f);
+            }
+            fromWindow.webContents.send('error', "Scan Done: " + (new Date() - timer));
+            window.close();
+        }
+
+        PopulateDB = async (folder, files) => {
+            var fis = files.filter((f) => {
+                return f.isDirectory || data.filters.indexOf(f.extension.toLocaleLowerCase()) >
+                    -1
+            });
+
+            var f1 = await db.Folder.findOrCreate({
+                where: {
+                    Name: folder
+                }
+            });
+            var files = [];
+            var foundFiles = [];
+            for (var f of fis) {
+                var file = undefined;
+                try {
+                    if (!f.isDirectory) {
+                        file = await db.VideoFile.findOne({
+                            where: {
+                                Name: f.FileName
+                            }
+                        });
+                        if (file == null) {
+                            files.push({
+                                Name: f.FileName,
+                                CurrentPos: 0,
+                                Size: f.Size,
+                                folderId: f1[0].Id
+                            });
+                        } else {
+                            if (f.Size != file.Size) {
+                                file.updateAttributes({
+                                    Size: f.Size
+                                })
+                            }
+
+                            if (file.folderId != f1[0].Id) {
+                                foundFiles.push(file);
+                            }
+                        }
+                    } else {
+                        await PopulateDB(f.FileName, f.Files);
+                    }
+                } catch (error) {
+                    fromWindow.webContents.send('error', f1[0].Name);
+                    fromWindow.webContents.send('error', error);
+                    console.log(error)
+                }
+            }
+            if (files.length > 0) await db.VideoFile.bulkCreate(files);
+            if (foundFiles.length > 0) await f1.addFiles(foundFiles);
+        }
+
+        scanDirs();
+    });
+
+    ipc.on('create-cover', function (event, data, fromWindowId) {
+        createThumb(data, fromWindowId);
+    });
+
+    createThumb = async (data, fromWindowId) => {
+        let fromWindow = BrowserWindow.fromId(fromWindowId)
+        try {
+            for (const file of data.files) {
+                //var coverP = path.join(app.getAppPath(), 'covers', file.name + ".jpg");
+                var coverP = path.resolve("./", 'covers', file.name + ".jpg");
+                var state;
+                switch (String(file.name).split('.').pop().toLocaleLowerCase()) {
+                    case "zip":
+                        {
+                            state = await ZipCover(file.name, coverP, data.basedir);
+                            break;
+                        }
+                    case "rar":
+                        {
+                            state = await RarCover(file.name, coverP, data.basedir);
+                            break;
+                        }
+                }
+                if (state) {
+                    fromWindow.webContents.send('thumb-create', file.index);
+                }
+            }
+            fromWindow.webContents.send("error", 'Thumbnail Create');
+            window.close();
+        } catch (error) {
+            fromWindow.webContents.send("error", error);
+        }
+    }
+
+    function RarCover(filename, coverP, basedir) {
+        
+    }
+
+    function ZipCover(filename, coverP, basedir) {
+        
+    }
+</script>
+
+</html>

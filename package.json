@@ -1,0 +1,37 @@
+{
+  "name": "mangaviewer",
+  "version": "1.0.0",
+  "description": "A Manga Viewer",
+  "main": "main.js",
+  "scripts": {
+    "start": "electron main.js",
+    "rebuild": "./node_modules/.bin/electron-rebuild -f -w sharp",
+    "dist": "electron-packager . --platform=win32 --overwrite --arch=x64 MangaView"
+  },
+  "author": "Royel Consoro",
+  "license": "MIT",
+  "dependencies": {
+    "electron-reload": "^1.2.5",
+    "ffmpeg": "0.0.4",
+    "ffmpeg-binaries": "^4.0.0",
+    "ffmpeg-extract-frames": "^2.0.1",
+    "ffmpeg-generate-video-preview": "^1.0.3",
+    "ffmpeg-static": "^2.3.0",
+    "fs-extra": "^7.0.0",
+    "sequelize": "^4.39.1",
+    "sharp": "^0.20.8",
+    "sqlite3": "^4.0.2",
+    "win-explorer": "file:../local_modules/win-explorer"
+  },
+  "build": {
+    "appId": "rc.manga.download",
+    "win": {
+      "target": "nsis"
+    }
+  },
+  "devDependencies": {
+    "electron": "^3.0.7",
+    "electron-rebuild": "^1.8.2",
+    "node-abi": "^2.4.4"
+  }
+}
