@@ -3,12 +3,16 @@
 <script type="text/javascript">
     const ipc = require('electron').ipcRenderer;
     const BrowserWindow = require('electron').remote.BrowserWindow;
+    const StreamZip = require('node-stream-zip');
     const fs = require('fs-extra');
+    var zipper = require('zip-local');
     const path = require('path');
     const sharp = require('sharp');
+    const rcunrar = require('rcunrar');
     const app = require('electron').remote.app
     const WinDrive = require('win-explorer');
     const db = require(path.join(path.dirname(__dirname), './webcontent/entity/models'));
+    var images = ['png', 'gif', 'jpg', 'jpeg', 'webp'];
 
     let basedir;
     var count = 0;
@@ -40,24 +44,23 @@
             window.close();
         }
 
-        PopulateDB = async (folder, files) => {
+        PopulateDB = async (folder, files, id) => {
             var fis = files.filter((f) => {
-                return f.isDirectory || data.filters.indexOf(f.extension.toLocaleLowerCase()) >
-                    -1
+                return f.isDirectory || data.filters.includes(f.extension.toLocaleLowerCase())
             });
 
             var f1 = await db.Folder.findOrCreate({
-                where: {
-                    Name: folder
-                }
+                where: { Name: folder }
             });
+            f1[0].updateAttributes({ folderId: id });
+
             var files = [];
             var foundFiles = [];
             for (var f of fis) {
                 var file = undefined;
                 try {
                     if (!f.isDirectory) {
-                        file = await db.VideoFile.findOne({
+                        file = await db.File.findOne({
                             where: {
                                 Name: f.FileName
                             }
@@ -65,7 +68,7 @@
                         if (file == null) {
                             files.push({
                                 Name: f.FileName,
-                                CurrentPos: 0,
+                                CurrentPage: 0,
                                 Size: f.Size,
                                 folderId: f1[0].Id
                             });
@@ -73,7 +76,7 @@
                             if (f.Size != file.Size) {
                                 file.updateAttributes({
                                     Size: f.Size
-                                })
+                                });
                             }
 
                             if (file.folderId != f1[0].Id) {
@@ -81,7 +84,7 @@
                             }
                         }
                     } else {
-                        await PopulateDB(f.FileName, f.Files);
+                        await PopulateDB(f.FileName, f.Files, f1[0].Id);
                     }
                 } catch (error) {
                     fromWindow.webContents.send('error', f1[0].Name);
@@ -89,8 +92,8 @@
                     console.log(error)
                 }
             }
-            if (files.length > 0) await db.VideoFile.bulkCreate(files);
-            if (foundFiles.length > 0) await f1.addFiles(foundFiles);
+            if (files.length > 0) await db.File.bulkCreate(files);
+            if (foundFiles.length > 0) await f1[0].addFiles(foundFiles);
         }
 
         scanDirs();
@@ -104,23 +107,23 @@
         let fromWindow = BrowserWindow.fromId(fromWindowId)
         try {
             for (const file of data.files) {
-                //var coverP = path.join(app.getAppPath(), 'covers', file.name + ".jpg");
-                var coverP = path.resolve("./", 'covers', file.name + ".jpg");
+
+                var coverP = path.resolve("./", 'covers', file.FileName + ".jpg");
                 var state;
-                switch (String(file.name).split('.').pop().toLocaleLowerCase()) {
+                switch (file.extension.toLocaleLowerCase()) {
                     case "zip":
                         {
-                            state = await ZipCover(file.name, coverP, data.basedir);
+                            state = await ZipCover(file.FileName, coverP, data.basedir);
                             break;
                         }
                     case "rar":
                         {
-                            state = await RarCover(file.name, coverP, data.basedir);
+                            state = await RarCover(file.FileName, coverP, data.basedir);
                             break;
                         }
                 }
                 if (state) {
-                    fromWindow.webContents.send('thumb-create', file.index);
+                    fromWindow.webContents.send('thumb-create', file.FileName);
                 }
             }
             fromWindow.webContents.send("error", 'Thumbnail Create');
@@ -131,11 +134,77 @@
     }
 
     function RarCover(filename, coverP, basedir) {
-        
+        var p = path.join(basedir, filename)
+        let rar = new rcunrar(p);
+        var list = rar.ListFiles().sort((a, b) => {
+            return String(a.Name).localeCompare(String(b.Name));
+        });
+
+        var firstImg = list.find(e => {
+            return images.includes(e.Extension.toLocaleLowerCase()) && e.Size > 1024 *
+                30
+        });
+
+        if (firstImg == undefined) return false;
+
+        var data = rar.ExtractFile(firstImg);
+        return new Promise((resolve, reject) => {
+            sharp(data).resize(240).jpeg({
+                quality: 80
+            }).toFile(coverP, (error) => {
+                resolve(coverP);
+            });
+        });
     }
 
     function ZipCover(filename, coverP, basedir) {
-        
+        var zip = new StreamZip({
+            file: path.join(basedir, filename),
+            storeEntries: true
+        });
+        return new Promise((resolve, reject) => {
+            zip.on('ready', () => {
+
+                var entries = Object.values(zip.entries()).sort((a, b) => {
+                    return String(a.name).localeCompare(String(b.name))
+                });
+
+                var firstImg = entries.find(e => {
+                    return images.includes(e.name.toLocaleLowerCase().split(
+                        '.').pop()) &&
+                        e.size > 1024 * 30
+                });
+
+                if (firstImg == undefined) {
+                    resolve(false);
+                } else {
+                    sharp(zip.entryDataSync(firstImg)).jpeg({
+                        quality: 80
+                    }).resize(240).toFile(coverP, (error) => {
+                        resolve(coverP);
+                    });
+                }
+            });
+        });
+    }
+
+    ipc.on('zip-file', (e, data, id) => {
+        var fromWindow = BrowserWindow.fromId(id);
+        if (!fs.existsSync(data.dir + '.zip')) {
+            zip(data, fromWindow);
+        } else {
+            fromWindow.webContents.send('zip-exist', path.dirname(data.dir) + ".zip");
+            window.close();
+        }
+    });
+
+    zip = async (data, fromWindow) => {
+        zipper.sync.zip(data.dir).compress().save(data.dir + '.zip');
+        //fs.removeSync(data.dir);
+        fromWindow.webContents.send('zip-done',
+            {file: WinDrive.ListFiles(path.dirname(data.dir))
+                .find((f) => f.FileName === path.basename(data.dir) + '.zip'), dir: data.dir });
+        window.close();
     }
 </script>
 

@@ -1,0 +1,27 @@
+#modal-details{
+    z-index: 9999;
+    min-height: 25px;
+    min-width: 100px;
+    max-height: 380px;
+    width: 250px;
+}
+#details-body{
+    user-select: text;
+    padding: 5px 10px;
+    overflow-y: auto;
+}
+
+#details-body div{
+    padding: 3px 0px;
+    font-weight:100;
+    border-bottom: 1px solid;
+}
+
+#details-body div:last-child{
+    border-bottom: initial;
+}
+
+#details-body div span{
+    font-weight:bold;
+    user-select: none;
+}

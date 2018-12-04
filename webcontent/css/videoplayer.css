@@ -2,7 +2,6 @@
     width: 100%;
     height: 100%;
     object-fit: fill;
-    border-radius: 1em;
 }
 
 #v-controls{
@@ -11,8 +10,8 @@
     left: 0;
     right: 0;
     -webkit-app-region: drag;
-    cursor: grab;
-    margin: 2px;
+    border-radius: 0 0 1rem 1rem;
+    background-color: rgba(67, 66, 75, 1);
 }
 
 #v-controls:active{
@@ -33,19 +32,19 @@
     transform: scale(1.2)
 }
 
-#drag-region {
-    background-color: red;
-    height: 30px;
-}
-
-#video-continer {
+#video-container {
     height: 100%;
     width: 100%;
+    padding-bottom: 20px;
 }
+
+body:-webkit-full-screen #video-container{
+    padding: 0;
+}
+
 #v-index{
     width: 70px;
 }
-
 
 #v-controls input[type=number] {
     font-size: 20px;
@@ -162,6 +161,4 @@
     background-color: red;
 }
 
-#drag-region{
-    display: none
-}
+

@@ -1,21 +1,28 @@
 var listofFile = []
 var $list_modal = $('#modal-list-file');
-var zIndex = 8;
 
+
+$list_modal.keydown((e) => {
+    e.stopPropagation()
+});
+$list_modal.keypress((e) => {
+    e.stopPropagation()
+});
 
 $('.list-file-show').click((event) => {
     if ($list_modal[0].style.display != "flex") {
         loadRecent();
-        $('.list-file-content').css({ height: $('#modal-list-file').height() - 95 });
         $list_modal.fadeIn('slow', () => {
-            $list_modal.css({ display: 'flex', zIndex: zIndex++ });
+            $list_modal.css({
+                display: 'flex'
+            });
         });
     }
 });
 
 $('#list-file-hide').click(() => {
     $list_modal.fadeOut('fast');
-    $list_modal.css({ zIndex: zIndex-- });
+    hideCreateFav($fav_dialog);
 });
 
 $list_modal.on('dblclick', '#delete-list', (event) => {
@@ -23,29 +30,93 @@ $list_modal.on('dblclick', '#delete-list', (event) => {
     event.preventDefault();
 });
 
-$list_modal.on('dblclick', 'ul li', (event) => {
-
-    var li = event.target.closest('li');
-    var id = li.id.replace("file-", "");
-    filesList = listofFile;
-    loadZip("", id);
+$list_modal.on('click', 'ul li', (event) => {
+    $(event.target).focus();
 });
 
-function loadList(listName, list) {
-    var $the_ul = $(listName);
-    var $new_ul = $the_ul.empty().clone();
-    $new_ul.append(`<li class="list-item-empty list-group-item">Not Files Found</li>`);
-    for (let value of list) {
-        // $new_ul.append(template('./template/list-row.html',
-        //     { id: value.Id, name: value.Name, size: FormattBytes(value.Size) }));
-        $new_ul.append(`<li id="file-${value.Id}" class="list-group-item popup-msg" data-title="${value.Name}">
-            <span id="delete-list"><i class="fas fa-trash-alt fa-1x"></i></span>
-            <span class="list-text">${value.Name} ${FormattBytes(value.Size)}</span>
-        </li>`);
+processRow = (event) => {
+    var li = event.target.closest('li');
+    var id = li.id.replace("file-", "");
+    var ul_id = li.closest('ul').id
+    if ($(li).data('isfile')) {
+        if(ul_id != "list-recent") filesList = listofFile;
+        loadZip("", id);
+    } else {
+        loadDirectory('', id);
+        toggleViewer(false);
     }
+}
 
-    $(listName).replaceWith($new_ul);
-    listofFile = list.map(f => { return f.Name; });
+$list_modal.on('keydown', 'ul li', (event) => {
+    var $row = $(event.target);
+    switch (event.keyCode) {
+        case 13:
+            {
+                processRow(event);
+                break;
+            }
+
+        case 38:
+            {
+                if ($row.prev()[0].id == "") {
+                    var $list = $row.closest('ul');
+                    if ($list[0].id == "list-files" && currentPage > 1) {
+                        loadNewPage(--currentPage).then(() => {
+                            $('#list-files').find('li').get(1).focus();
+                        });
+                    }
+                    $row.closest('ul').find('li').last().focus();
+                } else {
+                    $row.prev().focus();
+                }
+                break;
+            }
+
+        case 40:
+            {
+                if ($row.next()[0] == undefined) {
+                    var $list = $row.closest('ul');
+                    if ($list[0].id == "list-files" && currentPage < numberOfPages) {
+                        loadNewPage(++currentPage).then(() => {
+                            $('#list-files').find('li').get(1).focus();
+                        });
+                    }
+                    $list.find('li').get(1).focus();
+                } else {
+                    $row.next().focus();
+                }
+                break;
+            }
+    }
+    event.stopPropagation();
+    event.preventDefault();
+});
+
+$list_modal.on('dblclick', 'ul li', processRow);
+
+createEntry = (value, isFile) => {
+    var div = document.createElement('div');
+    div.innerHTML = `<li id="file-${value.Id}" class="list-group-item popup-msg" data-isFile="${isFile}" data-title="${value.Name}" tabindex="0">` +
+        `<span id="delete-list"><i class="fas fa-trash-alt fa-1x"></i></span>` +
+        `<span class="list-text">${value.Name} ${FormattBytes(value.Size)}</span></li>`;
+        
+    return div.firstElementChild;
+}
+
+function loadList(listName, list, isFile) {
+    var newList = document.getElementById(listName);
+    newList.innerHTML = "";
+    var documentFragment = document.createDocumentFragment();
+    var div = document.createElement('div');
+    div.innerHTML = `<li class="list-item-empty list-group-item">Not Files Found</li>`
+    documentFragment.append(div.firstElementChild);
+    list.forEach(value=>{
+        documentFragment.append(createEntry(value, isFile));
+    });
+    newList.append(documentFragment);
+    listofFile = list.map(f => {
+        return f.Name;
+    });
 }
 
 $('#list-file-header input').change(event => {
@@ -56,22 +127,22 @@ $('#list-file-header input').change(event => {
     $('#' + listId).removeClass('d-none');
 
     switch (listId) {
-        case "recent": {
-            $('.list-file-content').css({ height: $('#modal-list-file').height() - 95 });
-            loadRecent();
-            break;
-        }
+        case "recent":
+            {
+                loadRecent();
+                break;
+            }
 
-        case "files": {
-            $('.list-file-content').css({ height: $('#modal-list-file').height() - 93 });
-            loadNewPage(1);
-            break;
-        }
+        case "files":
+            {
+                loadNewPage(1);
+                break;
+            }
 
-        case "favorite": {
-            $('.list-file-content').css({ height: $('#modal-list-file').height() - 93 });
-            loadFav();
-            break;
-        }
+        case "favorite":
+            {
+                loadFav();
+                break;
+            }
     }
 });

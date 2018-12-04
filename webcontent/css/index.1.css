@@ -5,14 +5,16 @@
 #popup {
     display: none;
     position: absolute;
+    min-width: 70px;
     max-width: 250px;
-    z-index: 9999;
+    z-index: 995;
     color: white;
     background-color: black;
     padding: 5px 10px;
     border-radius: 10px;
     font-size: 14px;
     pointer-events: none;
+    word-wrap: break-word;
 }
 
 #popup:after {

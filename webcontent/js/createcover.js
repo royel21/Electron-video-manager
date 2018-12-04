@@ -37,7 +37,7 @@ function RarCover(filename, coverP, basedir) {
     var list = rar.ListFiles().sort(sortFiles);
 
     var firstImg = list.find(e => {
-        return ['png', 'jpg', 'jpeg', 'gif'].indexOf(e.Extension.toLocaleLowerCase()) > -1 && e.Size > 1024 * 30
+        return ['png', 'jpg', 'jpeg', 'gif'].includes(e.Extension.toLocaleLowerCase()) && e.Size > 1024 * 30
     });
 
     if (firstImg == undefined) return false;
@@ -65,7 +65,7 @@ function ZipCover(filename, coverP, basedir) {
             });
             
             var firstImg = entries.find(e => {
-                return ['png', 'jpg', 'jpeg', 'gif'].indexOf(e.name.toLocaleLowerCase().split('.').pop()) > -1
+                return ['png', 'jpg', 'jpeg', 'gif'].includes(e.name.toLocaleLowerCase().split('.').pop())
                     && e.size > 1024 * 30
             });
 
@@ -87,10 +87,10 @@ function ZipCover(filename, coverP, basedir) {
 sortFiles = (a, b) => {
     var a1 = a;
     var b1 = b;
-    if (['[', '('].indexOf(String(a)) > -1) {
+    if (['[', '('].includes(String(a))) {
         a1[0] = '0';
     }
-    if (['[', '('].indexOf(String(b)) > -1) {
+    if (['[', '('].includes(String(b))) {
         b1[0] = '0';
     }
     return String(a1).localeCompare(String(b1));

@@ -1,39 +1,19 @@
 .modal-body {
     padding: 0 .2rem;
+    height: 100%;
 }
 
 #modal-list-file {
     display: none;
     height: calc(80% - 90px);
-    border-radius: 0;
     max-height: 800px;
     bottom: 46px;
     font-size: 14px;
     border-radius: 1%;
 }
 
-body:-webkit-full-screen #modal-list-file {
-    top: 0;
-    bottom: 0;
-    height: 100%;
-    z-index: 99;
-}
-
-#scan-list-show {
-    align-self: center;
-    margin: 0 10px;
-}
-
-#list-file-show i, #scan-list-show .fa-clipboard {
-    position: relative;
-}
-
-#scan-list-show .fa-folder {
-    position: absolute;
-    font-size: 12px;
-    top: 11px;
-    left: 4.6px;
-    transform: initial
+.tab-content{
+    height: calc(100% - 49px);
 }
 
 .list-group-item {
@@ -46,6 +26,11 @@ body:-webkit-full-screen #modal-list-file {
 .list-file-content {
     overflow-y: auto;
     text-align: left;
+    height: calc(100% - 50px);
+}
+
+#modal-scan-folder .list-file-content{
+    height: calc(100% - 94px);
 }
 
 .list-footer {
@@ -102,7 +87,7 @@ body:-webkit-full-screen #modal-list-file {
 #current-page {
     font-weight: bolder;
     font-size: 18px;
-    margin-bottom: 5px;
+    margin-bottom: 3px;
 }
 
 #delete-list {
@@ -139,8 +124,8 @@ body:-webkit-full-screen #modal-list-file {
     right: 10px;
 }
 #list-file-header{
-    min-height: 44px;
-    border-bottom: 1px solid;
+    /* min-height: 39px; */
+    /* border-bottom: 1px solid; */
 }
 
 #list-file-header label:not(.active) {
@@ -152,10 +137,6 @@ body:-webkit-full-screen #modal-list-file {
     opacity: 0.97;
 }
 
-.nav-tabs {
-    border-bottom: initial;
-}
-
 .list-item-empty {
     display: none;
 }
@@ -164,6 +145,11 @@ body:-webkit-full-screen #modal-list-file {
     display: block;
     text-align: center;
     pointer-events: none;
+}
+
+.list-group-item:focus{
+    outline: none;
+    background-color: rgba(0,0,0,0.6);
 }
 
 ul, label {
@@ -232,4 +218,21 @@ ul, label {
 /*empty input*/
 #files-filter:valid + span{
     display:inline-block;
+}
+
+.modal label .fa-star{
+    pointer-events: none;
+}
+.modal label.active .fa-star{
+    color: yellow;
+}
+#modal-search .input-group{
+    pointer-events: none;  
+}
+
+#modal-search .input-group span{
+    pointer-events: all;
+}
+#modal-search #search-found {
+    pointer-events: none;  
 }

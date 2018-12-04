@@ -21,15 +21,16 @@
     bottom: 5px;
 }
 
-#img-toolbar {
+.img-toolbar {
     display: flex;
     margin-left:230px;
     margin-right:10px;
     z-index: 10;
     pointer-events: all;
+    transition: all .25s ease;
 }
 
-#img-toolbar span {
+.img-toolbar span {
     margin: 0 5px;
 }
 
@@ -55,29 +56,6 @@
     margin: 0 5px;
 }
 
-body:-webkit-full-screen .footer {
-    background-color: transparent;
-    bottom: 5px;
-}
-
-body:-webkit-full-screen #footer-toolbar {
-    display: inline-block;
-    border-radius: .5rem;
-    background-color: rgba(67, 66, 75, 0.7);
-}
-
-body:-webkit-full-screen .top {
-    display: none;
-}
-
-body:-webkit-full-screen #page-n2 {
-    display: block;
-}
-body:-webkit-full-screen #img-toolbar {
-    margin-right:200px;
-    background-color: rgba(67, 66, 75, 0.7);
-    border-radius: .5rem;
-}
 
 #viewer .toolbar>div {
     width: 70%;
@@ -139,20 +117,20 @@ body:-webkit-full-screen #img-toolbar {
     box-shadow: 0 0 0 2px rgba(49, 41, 41, 0.7), 0 0 0 4px #ffffff;
 }
 
-input[type=range] + output{
+#seek-numb {
     position: absolute;
     background-color: white;
+    width: 42px;
     height: 30px;
-    top: -35px;
+    top: -30px;
     text-align: center;
     border-radius: 10px;
     font: bold 15px/30px Georgia;
     bottom: 175%;
     color: #9e5757;
-    padding: 0 5px;
 }
 
-input[type=range] + output:after {
+#seek-numb:after {
     content: "";
     position: absolute;
     width: 0;
@@ -178,14 +156,15 @@ input[type=range] + output:after {
     }
 }
 
-.modal span i:hover,
-.footer div span:hover i{
+.modal span:hover > i,
+.footer div label:hover > i,
+.footer div span:hover > i{
     cursor: pointer;
     text-shadow: 0px 0px 20px rgb(53, 237, 243);
 }
 
-.footer div span:active i,
-.modal span i:active{
+.footer div > span:active > i,
+.modal span:active > i{
     transform: translateY(4px);
 }
 

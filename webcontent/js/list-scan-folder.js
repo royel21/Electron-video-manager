@@ -23,7 +23,6 @@ $('#scan-list-show').click((e) => {
                         Id: id,
                         dir: dir[0]
                     });
-                    $('#folder-reloading .fa-database').removeClass('d-none');
                     createBackgroundWin('reload-Db', {
                         folders: [{
                             Id: id,
@@ -41,6 +40,7 @@ $('#scan-list-show').click((e) => {
 
         $modalScnList.find('#list-sync-folder').click(() => {
             $('#folder-reloading .fa-database').removeClass('d-none');
+            console.log('reload')
             createBackgroundWin('reload-Db', {
                 folders: config.scanFolder,
                 filters: config.fileFilters
@@ -51,19 +51,18 @@ $('#scan-list-show').click((e) => {
             hideModal($modalScnList);
             $modalScnList = undefined;
         });
-        $modalScnList.css({
-            zIndex: zIndex--
-        });
         positionModal(e, $modalScnList);
-        $modalScnList.fadeIn('slow', () => {
-            $modalScnList.find('.list-file-content').css({
-                height: $modalScnList.height() - 93
-            });
-        });
+        $modalScnList.fadeIn('slow');
 
         var $filterSelete = $modalScnList.find('#filter-select');
         config.fileFilters.forEach(function (name, i) {
             $filterSelete.append($(`<option value="${i}">${name}</option>"`));
+        });
+
+        $modalScnList.on('dblclick', 'ul li', (event) => {
+            var li = event.target.closest('li');
+            basedir = li.dataset.dir;
+            loadDirectory('');
         });
     }
 });
@@ -93,7 +92,8 @@ var $dialog;
 $('.content').on('click', ' #scan-footer #add-filter', (e) => {
     if ($dialog == undefined) {
         $dialog = $(template('./template/create-dialog.html', {
-            title: "Create Filter"
+            title: "Create Filter",
+            btn1: "Create"
         }));
 
         $('.content').prepend($dialog);
@@ -101,7 +101,7 @@ $('.content').on('click', ' #scan-footer #add-filter', (e) => {
             var name = $('#name').val();
             var $filter = $modalScnList.find('#filter-select');
             $filter.prepend($(`<option value="${name}" selected>${name}</option>"`));
-            if (config.fileFilters.indexOf(name) == -1)
+            if (!config.fileFilters.includes(name))
                 config.fileFilters.push(name);
             config.fileFilters.sort();
             hideDialog();

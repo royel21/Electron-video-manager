@@ -7,10 +7,11 @@ var totalFiles = 0;
 
 /**************************************/
 
-loadNewPage = (page) => {
+loadNewPage = async (page) => {
+    console.time("bcf");
     var val = $('#files-filter').val().toLowerCase();
     var begin = ((page - 1) * numberPerPage);
-    db.VideoFile.findAndCount({
+    var files = await db.File.findAndCount({
         order: ['Name'],
         offset: begin,
         limit: numberPerPage,
@@ -19,12 +20,12 @@ loadNewPage = (page) => {
                 [db.Op.like]: "%" + val + "%"
             }
         }
-    }).then(files => {
-        loadList('#list-files', files.rows);
-        numberOfPages = Math.ceil(files.count / numberPerPage);
-        $('#file-found').html(files.count);
-        $('#current-page').text((numberOfPages < 1 ? 0 : currentPage) + '/' + numberOfPages);
     });
+    loadList('list-files', files.rows, true);
+    numberOfPages = Math.ceil(files.count / numberPerPage);
+    $('#file-found').html(files.count);
+    $('#current-page').text((numberOfPages < 1 ? 0 : currentPage) + '/' + numberOfPages);
+    console.timeEnd("bcf");
 }
 
 $('#prev-list-page').click((e) => {
@@ -41,17 +42,12 @@ $('#next-list-page').click((e) => {
 
 
 $('#files-filter').keyup((e) => {
-
     e.stopPropagation();
-    if ([37, 38, 39, 40].indexOf(e.keyCode) == -1)
-    {
+    if (![37, 38, 39, 40].includes(e.keyCode)) {
         loadNewPage(1);
     }
 });
 
-$('#files-filter').keydown((event) => {
-    event.stopPropagation();
-});
 
 $('#current-page').on('click', function () {
 
@@ -91,7 +87,7 @@ $('#current-page').on('click', function () {
 $('.list-file-content').on('click', '#list-files #delete-list', (event) => {
     var li = event.target.closest('li');
     var id = li.id.replace("file-", "");
-    db.VideoFile.findOne({
+    db.File.findOne({
         where: {
             id: id
         },
@@ -112,17 +108,34 @@ $('.list-file-content').on('click', '#list-files #delete-list', (event) => {
     });
 });
 
-$('#btn-search-clear').click(()=>{
+$('#btn-search-clear').click(() => {
     $('#files-filter').val("");
+    loadNewPage(0);
 });
 
 removeRow = (li, id) => {
     $(li).fadeOut('fast', () => {
         $(li).remove();
-        db.VideoFile.destroy({
+        db.File.destroy({
             where: {
                 Id: id
             }
         });
     });
 }
+
+$('#files .list-file-content').on('scroll',(event)=>{
+    // if($(event.target).scrollTop() > $('#list-files').height()-300)
+    // {
+    //     if (currentPage < numberOfPages) {
+    //         loadNewPage(++currentPage);
+    //         $('#list-files').find('li').get(1).focus();
+    //     }
+    // }else if($(event.target).scrollTop() < 1)
+    // {
+    //     if (currentPage > 1) {
+    //         loadNewPage(--currentPage);
+    //         $('#list-files').find('li').last().focus();
+    //     }
+    // }
+});

@@ -1,42 +1,51 @@
 var $favList = $('#list-favs');
 var $selFav = $('#fav-select');
 var $fav_dialog;
+var $deleteFav = $('#fav-remove');
 
 $('#fav-create').click((e) => {
     if ($fav_dialog == undefined) {
         $fav_dialog = $(template('./template/create-dialog.html', {
-            title: "Create Favorite"
+            title: "Create Favorite",
+            btn1: "Create"
         }));
-
+        var $nameBox = $fav_dialog.find('#name');
         $('.content').prepend($fav_dialog);
         $fav_dialog.find('#create').click(() => {
-            db.FavoriteVideo.create({
-                Name: $('#name').val()
+            if ($nameBox.val() > 3);
+            db.FavoriteFile.create({
+                Name: $nameBox.val()
             }).then(fav => {
                 CurrentFav = fav;
-                $selFav.prepend($(`<option value="${fav.id}" selected>${fav.Name}</option>"`));
-                config.favId = fav.id;
-                hideCreateFav();
+                $selFav.prepend($(`<option value="${fav.Id}" selected>${fav.Name}</option>"`));
+                config.favId = fav.Id;
+                loadFavFiles();
+                hideCreateFav($fav_dialog);
             });
         });
-        $fav_dialog.find('#close').click(hideCreateFav);
+        $fav_dialog.find('#close').click(() => { hideCreateFav($fav_dialog) });
+
+        $nameBox.keydown((e) => { e.stopPropagation() });
+        $nameBox.keypress((e) => { e.stopPropagation() });
+
+        $fav_dialog.css({
+            zIndex: 999,
+            minHeight: 150,
+            height: 150,
+            width: 300,
+            left: $list_modal.offset().left,
+            top: e.clientY - 177
+        });
+
+        $fav_dialog.fadeIn('slow', () => {
+            $nameBox.focus();
+        });
     }
-
-    $fav_dialog.css({
-        zIndex: 999,
-        minHeight: 150,
-        height: 150,
-        width: 300,
-        left: e.clientX,
-        top: e.clientY - 177
-    });
-
-    $fav_dialog.fadeIn('slow');
 });
 
-$('#fav-remove').click((e) => {
+$deleteFav.click((e) => {
     var id = $selFav.val();
-    db.FavoriteVideo.destroy({
+    db.FavoriteFile.destroy({
         where: {
             Id: id
         }
@@ -45,9 +54,10 @@ $('#fav-remove').click((e) => {
             $selFav[0].remove($selFav[0].selectedIndex);
             if ($selFav.children().length > 0) {
                 config.favId = $selFav.val();
+
             } else {
-                config.favId = -1;
-                db.db.query("DELETE FROM sqlite_sequence WHERE name = 'FavoriteVideos';").catch(err => {
+                config.favId = 1;
+                db.db.query("DELETE FROM sqlite_sequence WHERE name = 'favoritefiles';").catch(err => {
                     console.log(err);
                 });
             }
@@ -56,10 +66,12 @@ $('#fav-remove').click((e) => {
     });
 });
 hideCreateFav = function () {
-    $fav_dialog.fadeOut('fast', () => {
-        $fav_dialog.remove();
-        $fav_dialog = undefined;
-    });
+    if ($fav_dialog !== undefined) {
+        $fav_dialog.fadeOut('fast', () => {
+            $fav_dialog.remove();
+            $fav_dialog = undefined;
+        });
+    }
 };
 
 $selFav.change(e => {
@@ -69,14 +81,16 @@ $selFav.change(e => {
 
 loadFav = function () {
     if ($selFav.children().length == 0) {
-        db.FavoriteVideo.findAll().then(favs => {
+        db.FavoriteFile.findAll().then(favs => {
             for (var f of favs) {
                 var selected = '';
-                if (f.id == config.favId) {
+                if (f.Id == config.favId) {
                     selected = "selected";
-                    config.favId = f.Id;
+                    if (config.favId == 1) {
+                        $deleteFav.addClass("d-none");
+                    }
                 }
-                $selFav.append(`<option value="${f.id}" ${selected}>${f.Name}</option>"`)
+                $selFav.append(`<option value="${f.Id}" ${selected}>${f.Name}</option>"`)
             }
             loadFavFiles();
         });
@@ -84,50 +98,57 @@ loadFav = function () {
         loadFavFiles();
 }
 
-loadFavFiles = () => {
-    if (config.favId > 0) {
-        db.FavoriteVideo.findById(config.favId).then(fav => {
-            if (fav != undefined) {
-                db.VideoFile.findAll({
-                    where: {
-                        FavoriteVideoId: fav.id
-                    },
-                    include: {
-                        model: db.Folder
-                    }
-                }).then(files => {
-                    if (files.length == 0) {
-                        $('#fav-found').text("");
-                    } else {
-                        $('#fav-found').text(files.length);
-                    }
-                    loadList('#list-favs', files);
-                });
+loadFavFiles = async () => {
+    var files = [];
+    var isFile = true;
+    if (config.favId == 1) {
+        files = await db.Folder.findAll({
+            where: {
+                favoritefileId: 1
+            }
+        });
+        isFile = false;
+        $deleteFav.addClass("d-none");
+    } else {
+        files = await db.File.findAll({
+            where: {
+                favoritefileId: config.favId
+            }
+        });
+        $deleteFav.removeClass("d-none");
+    }
+    $('#fav-found').text(files.length == 0 ? "" : files.length);
+    loadList('list-favs', files, isFile);
+}
+
+removeFavFromList = async (event) => {
+
+    var li = event.target.closest('li');
+    var id = li.id.replace("file-", "");
+    var f;
+    console.log(id)
+    if ($(li).data('isfile')) {
+        f = await db.File.findOne({
+            where: {
+                Id: id
             }
         });
     } else {
-        $('#fav-found').text("");
-        loadList('#list-favs', []);
+        f = await db.Folder.findOne({
+            where: {
+                Id: id
+            }
+        });
     }
+    f.updateAttributes({
+        favoritefileId: null
+    }).then(() => {
+        $(li).fadeOut('fast', () => {
+            $(li).remove();
+            var t = $('#fav-found').text();
+            $('#fav-found').text(t - 1);
+        });
+    });
 }
 
-$('.list-file-content').on('click', '#list-favs #delete-list', (event) => {
-    var li = event.target.closest('li');
-    var id = li.id.replace("file-", "");
-    db.VideoFile.findOne({
-        where: {
-            id: id
-        }
-    }).then((f) => {
-        f.updateAttributes({
-                favoritevideoId: null
-            })
-            .then(() => {
-                $(li).fadeOut('fast', () => {
-                    $(li).remove();
-                    var t = $('#fav-found').text();
-                    $('#fav-found').text(t - 1);
-                });
-            });
-    });
-});
+$('.list-file-content').on('click', '#list-favs #delete-list', removeFavFromList);

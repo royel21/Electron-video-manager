@@ -1,4 +1,5 @@
 const ipcRenderer = require('electron').ipcRenderer;
+const { clipboard } = require('electron');
 const app = require('electron').remote;
 const WinDrive = require('win-explorer');
 const dialog = app.dialog;
@@ -11,14 +12,18 @@ var basedir = "";
 var config = {
     recents: [],
     recentMax: 50,
-    favId: -1,
+    favId: 1,
     lastDir: "",
     scanFolder: [],
     imgScale: 0.6,
-    fileFilters: ['mp4','mkv','ogg']
+    fileFilters: ['zip','rar'],
+    videoFilters: ['mp4','mkv','avi','webm'],
+    sortBy: "",
+    pageAnimation: "slide",
+    animDuration: 200
 };
 var filesList = [];
-
+const prettyBytes = require('pretty-bytes');
 var fileFound = [];
 
 calCol = () => {
@@ -37,32 +42,35 @@ const invisPath = `file://${path.join(__dirname, 'background/createthumb.html')}
 const windowID = mainWindow.id;
 
 createBackgroundWin = (event, data) => {
-    var win = new BrowserWindow({
-        width: 1000,
-        height: 1000,
-        show: true
-    });
-    win.loadURL(invisPath);
-    win.webContents.on('did-finish-load', () => {
-        try {
-            win.webContents.send(event, data, windowID);
-        } catch (error) {}
-    });
-    win.on('closed', (e) => {
-        console.log('win-close');
-        win = null;
-    });
+    setTimeout(() => {
+        var e = event;
+        var d = data;
+        var win = new BrowserWindow({
+            width: 1,
+            height: 1,
+            show: false
+        });
+        win.loadURL(invisPath);
+        win.webContents.on('did-finish-load', () => {
+            try {
+                win.webContents.send(e, d, windowID);
+            } catch (error) { }
+        });
+        win.on('closed', (e) => {
+            win = null;
+        });
+    }, 0)
 }
 
 toggleViewer = (isViewer) => {
-    if (isViewer === true) {
+    if(isViewer)
+    {
         $('#file-browser').addClass('hidden');
         $('#viewer').removeClass('hidden');
-        $('#total-files').removeClass('hidden');
-    } else {
+
+    }else{
         $('#file-browser').removeClass('hidden');
         $('#viewer').addClass('hidden');
-        $('#total-files').addClass('hidden');
     }
 }
 
@@ -79,24 +87,35 @@ template = (file, data) => {
 
 $.expr[":"].contains = $.expr.createPseudo(function (arg) {
     return function (elem) {
-        return $(elem).text().toUpperCase().indexOf(arg.toUpperCase()) >= 0;
+        return $(elem).text().trim().toUpperCase().includes(arg.trim().toUpperCase());
+    };
+});
+
+$.expr[":"].textequalto = $.expr.createPseudo(function (arg) {
+    return function (elem) {
+        return $(elem).text().trim().toUpperCase() === arg.trim().toUpperCase();
     };
 });
 
 lazyLoad = () => {
-    var lazyCovers = document.querySelectorAll('.item-file');
+    var lazyCovers = document.querySelectorAll('.items');
     var lazyImageObserver = new IntersectionObserver((entries, observer) => {
         entries.forEach((entry) => {
             let lazyCover = entry.target.querySelector('img');
             if (entry.isIntersecting) {
-                lazyCover.src = lazyCover.dataset.src;
+                var icon = path.join('./covers/' + entry.target.dataset.name + '.jpg');
+                if (fs.existsSync(icon)) {
+                    lazyCover.src = icon.replace('#', '%23');
+                } else {
+                    lazyCover.src = lazyCover.dataset.src;
+                }
             } else {
                 lazyCover.src = "";
             }
         });
     }, {
-        rootMargin: "384px 0px 384px 0px"
-    });
+            rootMargin: "384px 0px 384px 0px"
+        });
 
     lazyCovers.forEach((lazyImg) => {
         lazyImageObserver.observe(lazyImg);
@@ -121,7 +140,7 @@ Array.prototype.removeById = function (obj) {
     var i = this.length;
     while (i--) {
         if (this[i] instanceof Object && this[i].Id == obj.Id) {
-            return this.splice(i, 1);
+            return this.splice(i, 1)[0];
         }
     }
 }
@@ -146,6 +165,8 @@ deleteFile = (file, showloading) => {
                 if (fs.existsSync(file)) {
                     if (showloading) $('#loadingDiv').removeClass('d-none');
                     fs.removeSync(file);
+                    var cover = path.join("./covers", path.basename(file)+".jpg");
+                    if(fs.existsSync(cover)) fs.removeSync(cover);
                     if (showloading) $('#loadingDiv').addClass('d-none');
                 }
             }
@@ -155,7 +176,7 @@ deleteFile = (file, showloading) => {
 }
 
 JumpFolder = (num) => {
-    if (basedir == "") return;
+    if (basedir == "" || !$('#viewer').hasClass('hidden')) return;
 
     try {
         //get root dir
@@ -163,7 +184,7 @@ JumpFolder = (num) => {
         //list all folder in root dir
         var folders = WinDrive.ListFiles(dir).filter(f => {
             return f.isDirectory && !f.isHidden
-        }).map(a => a.FileName);
+        }).sort(sortFileBy).map(a => a.FileName);
         //get current folder
         var toJump = folders.indexOf(path.basename(basedir)) + num;
         //jump to next or previous folder
@@ -190,25 +211,18 @@ if (local.getObject('config') != null && !$.isEmptyObject(local.getObject('confi
     config = local.getObject('config');
 }
 
-updateFilePage = (file, page) => {
-    if (file != undefined) {
-        db.VideoFile.findOne({
-            where: {
-                Name: path.basename(file)
-            }
-        }).then((f) => {
-            if (file != null)
-                f.updateAttributes({
-                    CurrentPos: page
-                });
-        });
+updateFilePage = (file, page, totalPage) => {
+    if (file != undefined && !isImage) {
+        return db.db.query(`UPDATE files set CurrentPage = ${page}, TotalPage = ${totalPage} WHERE Id = ${file.Id};`);
     }
 }
 
 function FormattBytes(b) {
-    var div = [];
-    var mul = 1024
+    if (b === undefined) return "";
+
     if (typeof b === 'number') {
+        var div = [];
+        var mul = 1024
         switch (b) {
             case ((b >= 0 && b <= mul) ? b : -1):
                 {
@@ -239,4 +253,23 @@ function FormattBytes(b) {
     } else
         return "";
 }
-var timer;
+
+function formatName(name, padding = 3) {
+    var str = name.replace(/[\\|?|<|>|*|:|"]/ig, '');
+    var res1 = str.split(/\d+/g);
+    var res2 = str.match(/\d+/g);
+    var temp = "";
+    if (res1 == null || res2 == null) return str;
+
+    for (let [i, s] of res2.entries()) {
+        temp += res1[i] + String(Number(s)).padStart(padding, 0);
+    }
+
+    var elem = document.createElement('textarea');
+    elem.innerHTML = temp + res1[res1.length - 1];
+    return elem.value;
+}
+
+isViewer = () =>{
+    return !$('#viewer').hasClass('hidden');
+}

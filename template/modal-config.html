@@ -4,10 +4,32 @@
         <span id="modal-close" class="btn-hide"><i class="far fa-times-circle"></i></span>
     </div>
     <div id="modal-body">
-        <div id="viewer-config" class="card-body">
-            <div class="">
+        <div id="viewer-config" class="card-body {isviewer}">
+            <div>
                 <label for="img-width">Image ScaleX: <span id="img-width-val"></span></label>
                 <input id="img-width" class="slider" type="range" min="0.0" max="1.0" step="0.01" value="0.63" name="imgw" />
+            </div>
+            <div class="input-group mt-2">
+                <div class="input-group-prepend">
+                    <div class="select-style">Page Animation:</div>
+                </div>
+                <select id="anim-select" class="form-control select-list">
+                </select>
+            </div>
+            <div class="input-group mt-2">
+                <div class="input-group-prepend">
+                    <div class="select-style">Slide Duration ms: </span></div>
+                </div>
+                <input id="anim-duration" type="number" class="form-control mr-1" min="0" step="50"></span>
+            </div>
+        </div>
+        <div id="viewer-config" class="card-body {isfilebrowser}">
+            <div class="input-group mt-2">
+                <div class="input-group-prepend">
+                    <div class="select-style">Sort By:</div>
+                </div>
+                <select id="sort-select" class="form-control select-list">
+                </select>
             </div>
         </div>
     </div>

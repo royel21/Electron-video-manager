@@ -3,10 +3,10 @@ const path = require('path');
 const fs = require('fs-extra');
 const os = require('os');
 
-var dbPath = path.join(os.homedir(), '.RCVideoPlayer/mangas.db');
+var dbPath = path.join(os.homedir(), './.mangas-common/mangas.db');
 
 const Op = Sequelize.Op
-const db = new Sequelize('sqlite:./'+dbPath, {
+const db = new Sequelize('sqlite:./' + dbPath, {
     logging: false,
     operatorsAliases: {
         $and: Op.and,
@@ -30,13 +30,20 @@ const Folder = db.define('folders', {
         type: Sequelize.STRING,
         unique: true,
         allowNull: false
+    },
+    folderId:{
+        type: Sequelize.INTEGER,
+        references:{
+            model: "folders",
+            key: "Id"
+        }
     }
 },
     {
         timestamps: false
     })
 
-const VideoFile = db.define('videofiles', {
+const File = db.define('files', {
     Id: {
         type: Sequelize.INTEGER,
         primaryKey: true,
@@ -46,8 +53,12 @@ const VideoFile = db.define('videofiles', {
         type: Sequelize.STRING,
         unique: true
     },
-    CurrentPos: {
-        type: Sequelize.INTEGER.UNSIGNED,
+    CurrentPage: {
+        type: Sequelize.INTEGER(5).UNSIGNED,
+        defaultValue: 0
+    },
+    TotalPage:{
+        type: Sequelize.INTEGER(5).UNSIGNED,
         defaultValue: 0
     },
     Size: {
@@ -58,8 +69,8 @@ const VideoFile = db.define('videofiles', {
         timestamps: false
     });
 
-const FavoriteVideo = db.define('favoritevideos', {
-    id: {
+const FavoriteFile = db.define('favoritefiles', {
+    Id: {
         type: Sequelize.INTEGER,
         primaryKey: true,
         autoIncrement: true
@@ -72,19 +83,22 @@ const FavoriteVideo = db.define('favoritevideos', {
         timestamps: false
     });
 
-VideoFile.belongsTo(Folder);
-Folder.hasMany(VideoFile);
-FavoriteVideo.hasMany(VideoFile);
+File.belongsTo(Folder);
+Folder.hasMany(File);
+Folder.hasMany(Folder);
+FavoriteFile.hasMany(File);
+FavoriteFile.hasMany(Folder);
 
 init = async () => {
     if (!fs.existsSync(dbPath)) {
         await db.sync({ logging: true });
+        await FavoriteFile.findOrCreate({ where: { Name: "Folders" } });
     }
 }
 
 module.exports = {
-    VideoFile,
-    FavoriteVideo,
+    File,
+    FavoriteFile,
     Folder,
     init,
     Op,

@@ -4,14 +4,13 @@ var numberPerPage = 500;
 var numberOfPages = 0;
 var list = []
 var $list_modal = $('#modal-list-file');
-var zIndex = 8;
 var totalFiles = 0;
 
 
 loadNewPage = (page) => {
     var val = $('#files-filter').val().toLowerCase();
     var begin = ((page - 1) * numberPerPage);
-    db.VideoFile.findAndCountAll({
+    db.File.findAndCountAll({
         order: ['Name'],
         offset: begin, limit: numberPerPage,
         where: { Name: { [db.Op.like]: "%" + val + "%" } },
@@ -57,7 +56,7 @@ $('.list-file-show').click((event) => {
             $('#modal-list-file').appendTo('body');
         }
         $list_modal.fadeIn('slow', () => {
-            $list_modal.css({ display: 'flex', zIndex: zIndex++ });
+            $list_modal.css({ display: 'flex' });
             $('.list-file-content').css({ height: $('#modal-list-file').height() - 93 });
             loadNewPage(0);
         });
@@ -66,7 +65,6 @@ $('.list-file-show').click((event) => {
 
 $('#list-file-hide').click(() => {
     $list_modal.fadeOut('slow');
-    $list_modal.css({ zIndex: zIndex-- });
 });
 
 $('#files-filter').keyup((e) => {
@@ -76,13 +74,11 @@ $('#files-filter').keyup((e) => {
 const $modalScnList = $('#modal-scan-folder');
 
 $('#scan-list-hide').click(() => {
-    $modalScnList.css({ zIndex: zIndex-- });
     $modalScnList.fadeOut('slow');
 });
 
 $('#scan-list-show').click(() => {
     if ($modalScnList[0].style.display != "block") {
-        $modalScnList.css({ zIndex: zIndex++ });
         $modalScnList.fadeIn('slow');
     }
 });
@@ -163,7 +159,7 @@ $list_modal.on('dblclick', 'ul li', (event) => {
     var li = event.target.closest('li')
     console.log(li);
     var id = li.id.replace("file-", "");
-    db.VideoFile.findOne({ where: { id: id }, include: { model: db.Folder } }).then(f=>{
+    db.File.findOne({ where: { id: id }, include: { model: db.Folder } }).then(f=>{
         console.log(f);
         loadZip(path.join(f.folder.Name, f.Name));
     });

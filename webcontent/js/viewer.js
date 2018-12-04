@@ -1,6 +1,9 @@
+const StreamZip = require('node-stream-zip');
+const rcunrar = require('rcunrar');
 
-
-var direction = 'right';
+var zip = null;
+var rar = null;
+var direction = true;
 var totalPage = 0;
 var isImage = false;
 const viewerImg = document.getElementById('myimg');
@@ -14,10 +17,14 @@ var filename;
 var fileN = 0;
 var backImages = [];
 var isChange = true;
-var loadingImage = false
+var LoadNextImage = true;
+var loadingNext = false;
+var $viewer = $('#viewer');
+var $input;
+var backgroundLoader;
 /***********************************************************/
 function imgFilter(entry) {
-    return ['png', 'gif', 'jpg', 'jpeg', 'bmp'].indexOf(String(entry.name).toLocaleLowerCase().split('.').pop()) > -1;
+    return images.includes(String(entry.name).toLocaleLowerCase().split('.').pop());
 }
 /***********************************************************/
 function getRandomNum() {
@@ -25,35 +32,56 @@ function getRandomNum() {
 }
 /**********************************************************/
 function cleanUpViewer() {
-    
+    if (zip !== null) {
+        zip.close();
+        zip = null;
+    }
+    if (backgroundLoader != undefined) {
+        clearInterval(backgroundLoader);
+        backgroundLoader = undefined;
+    }
+    if (rar != null) rar = null;
+    backImages = [];
+    totalimg = [];
 }
-$(window).on('beforeunload', () => {
-    updateFilePage(filename, pageNum);
+
+$(window).on('beforeunload', (e) => {
+    updateFilePage(filename, pageNum, totalPage).then(() => {
+    });
 });
 
-function resizeImage() {
-
-    if ($('#viewer')[0].style.display !== 'none') {
-        var ratio = viewerImg.width / viewerImg.height;
-        if (isNaN(ratio)) return;
-
-        $('#myimg').css('width', window.innerWidth);
-        if ($('#viewer')[0].style.display !== 'none') {
-            if (document.webkitIsFullScreen) {
-                $('#myimg').css('height', window.innerHeight);
-            } else {
-                $('#myimg').css('height', window.innerHeight - 86);
+/***********************************************************/
+prevImg = () => {
+    if (!loadingNext) {
+        if (pageNum > 0) {
+            direction = false;
+            $(tempImg).stop();
+            if (LoadNextImage) {
+                showImage(--pageNum);
             }
+        } else {
+            prevFile();
         }
-        $(viewerImg).css("transform", "scaleX(" + config.imgScale + ")");
-        rangePopup();
-        $('#myimg').focus();
+    }
+}
+/***********************************************************/
+nextImg = () => {
+    if (!loadingNext) {
+        if (pageNum < totalPage - 1) {
+            direction = true;
+            $(tempImg).stop();
+            if (LoadNextImage) {
+                showImage(++pageNum);
+            }
+        } else {
+            nextFile();
+        }
     }
 }
 /***********************************************************/
 prevFile = () => {
     if (fileN > 0 && isImage === false) {
-        LoadVideo(filesList[--fileN]);
+        loadZip(filesList[--fileN]);
     } else {
         backToFileBrowser();
     }
@@ -61,7 +89,7 @@ prevFile = () => {
 /***********************************************************/
 nextFile = () => {
     if (fileN < filesList.length - 1 && isImage === false) {
-        LoadVideo(filesList[++fileN]);
+        loadZip(filesList[++fileN]);
     } else {
         backToFileBrowser();
     }
@@ -69,16 +97,11 @@ nextFile = () => {
 /***********************************************************/
 $('#page-n').on('click', function () {
 
-    if (totalPage !== 0) {
+    if (totalPage !== 0 && $input == undefined) {
         this.textContent = "";
-        var $input = $(`<input type="number" value=${(pageNum + 1)}
+        $input = $(`<input type="number" value=${(pageNum + 1)}
                          style="width:70px; padding:0" min=1 
-                         max=${totalPage}>`)
-            .appendTo($(this)).focus();
-
-        $input.click((event) => {
-            event.stopPropagation();
-        });
+                         max=${totalPage}>`).appendTo($(this)).focus();
 
         $input.on('keyup', (event) => {
             if (event.keyCode === 13) {
@@ -87,33 +110,41 @@ $('#page-n').on('click', function () {
                 if (pageNum > totalPage - 1) {
                     pageNum = totalPage - 1;
                 }
-                event.stopPropagation();
-                event.preventDefault();
                 isChange = false;
                 $imgRange.val(pageNum + 1);
-                $input = null;
+                viewImage(pageNum);
                 isChange = true;
+                LoadNextImage = true;
             }
+            event.stopPropagation();
         });
-        $input.focus();
+        $input.focusout(() => {
+            $input = undefined;
+            $('.pages').text(String(pageNum + 1).padStart(totalPage > 99 ? 3 : 2, '0') + "/" + totalPage);
+        })
+        $input.keydown((e) => {
+            e.stopPropagation()
+        });
+        $input.keypress((e) => {
+            e.stopPropagation()
+        });
     }
 });
 
-$imgRange[0].oninput = (event) => {
+$imgRange.on('change', (event) => {
 
     if (isChange) {
         pageNum = event.target.value - 1;
-
         if (pageNum > totalPage - 1) {
             pageNum = totalPage - 1;
         }
-        
-        event.stopPropagation();
-        event.preventDefault();
+        viewImage(pageNum);
         rangePopup();
+        LoadNextImage = true;
     }
-};
-rangePopup = (curPage, curFile) => {
+});
+
+rangePopup = () => {
     if ($('#seeker')[0].style.display != 'none') {
         var newPoint, newPlace;
         // Cache this for efficiency
@@ -132,128 +163,198 @@ rangePopup = (curPage, curFile) => {
                 marginLeft: newPoint.map(0.0, 1.0, -9, -33)
             }).text($imgRange.val());
     }
-    if (curPage != undefined) {
-        $filescount.text('Files: ' + (curFile + 1) + '/' + filesList.length);
-        $('.pages').text(String(curPage).padStart(totalPage > 99 ? 3 : 2, '0') + "/" + totalPage);
-    }
+
+    $filescount.text('Files: ' + (fileN + 1) + '/' + filesList.length);
+    $('.pages').text(String(pageNum + 1).padStart(totalPage > 99 ? 3 : 2, '0') + "/" + totalPage);
 }
 
+viewImage = (pn) => {
+    viewerImg.src = getImage(pn);
+}
 /***********************************************************/
 
-function LoadVideo(name, id) {
-    timer = new Date();
+function loadZip(name, id) {
+    loadingNext = true;
     isImage = false;
     cleanUpViewer();
     $('#loadingDiv').removeClass('d-none');
+    updateFilePage(filename, pageNum, totalPage);
 
-    updateFilePage(filename, pageNum);
+    db.File.findOne({
+        where: {
+            $or: [{
+                Id: id
+            }, {
+                Name: name
+            }]
+        },
+        include: {
+            model: db.Folder
+        }
+    }).then((file) => {
+        filename = {
+            path: path.join(basedir, name),
+            pn: 0
+        }
 
-    // db.VideoFile.findOne({
-    //     where: {
-    //         $or: [{
-    //             Id: id
-    //         }, {
-    //             Name: path.basename(name)
-    //         }]
-    //     },
-    //     include: {
-    //         model: db.Folder
-    //     }
-    // }).then((file) => {
+        if (file != null) {
+            var dir = path.join(file.folder.Name, file.Name);;
+            if (fs.existsSync(dir)) filename.path = dir;
+            filename.Id = file.Id;
+            filename.pn = file.CurrentPage;
+        }
 
-    //     if (file != null) {
-
-    //         filename = path.join(file.folder.Name, file.Name);
-    //         if (fs.existsSync(filename)) {
-    //             if (file.Name.indexOf('.rar') > -1) {
-    //                 rar = new rcunrar(filename);
-    //                 totalimg = rar.ListFiles().filter(e => {
-    //                     return ['png', 'jpg', 'jpeg', 'gif'].indexOf(e.Extension.toLocaleLowerCase()) > -1;
-    //                 }).sort((a, b) => {
-    //                     return a.Name.localeCompare(b.Name);
-    //                 });
-
-    //                 totalPage = totalimg.length;
-
-    //                 if (totalimg.length === 0) {
-    //                     filename == undefined;
-    //                     $('#loadingDiv').addClass('d-none');
-    //                     return;
-    //                 }
-
-    //                 viewerImg.src = loadBackImage(file.CurrentPage);
-    //                 setupView(file);
-    //                 console.log(new Date()-timer);
-    //             } else {
-
-    //                 zip = new StreamZip({
-    //                     file: filename,
-    //                     storeEntries: true
-    //                 });
-
-    //                 zip.on('ready', () => {
-
-    //                     totalimg = Object.values(zip.entries()).sort((a, b) => {
-    //                         return String(a.name).localeCompare(String(b.name));
-    //                     }).filter(imgFilter);
-
-    //                     totalPage = totalimg.length;
-
-    //                     if (totalimg.length === 0) {
-    //                         filename == undefined;
-    //                         $('#loadingDiv').addClass('d-none');
-    //                         return;
-    //                     }
-    //                     viewerImg.src = loadBackImage(file.CurrentPage);
-    //                     setupView(file);
-    //                     console.log(new Date()-timer);
-    //                 });
-    //             }
-    //         } else {
-    //             $('#loadingDiv').addClass('d-none');
-    //             backToFileBrowser();
-    //         }
-    //     }else{
-    //         $('#loadingDiv').addClass('d-none');
-    //         backToFileBrowser();
-    //     }
-    // });
-}
-setupView = async (file) => {
-    pageNum = file.CurrentPage;
-    $('.clock').addClass('clock-50up');
-    $('#loadingDiv').addClass('d-none');
-    toggleViewer(true);
-
-    $('#title').text(file.Name);
-    fileN = filesList.indexOf(filename);
-    $imgRange.attr('max', totalPage);
-    $imgRange.val(pageNum + 1);
-    rangePopup(pageNum + 1, fileN + 1);
-
-    if (config.recents.find(f => {
-            return f.Name == file.Name;
-        }) == undefined) 
-        {
-        config.recents.unshift({
-            Id: file.Id,
-            Name: file.Name,
-            folder: {
-                Name: file.folder.Name
+        compressFile(filename.path, filename.pn).then(result => {
+            if (result) {
+                if (file == null) {
+                    var tempFile = WinDrive.ListFiles(filename.path, true)[0];
+                    db.Folder.findOrCreate({
+                        where: {
+                            Name: basedir
+                        }
+                    }).then(folder => {
+                        db.File.create({
+                            Name: name,
+                            folderId: folder[0].Id,
+                            CurrentPage: 0,
+                            TotalPage: totalPage,
+                            Size: tempFile.Size
+                        }).then(f => {
+                            updateRecents(f);
+                            loadingNext = false;
+                            filename.Id = f.Id;
+                        });
+                    });
+                } else {
+                    updateRecents(file);
+                    loadingNext = false;
+                }
             }
         });
+    });
+}
+
+updateRecents = async (file) => {
+
+    if (config.recents.find(f => {
+        return f.Id == file.Id;
+    }) == undefined) {
+        config.recents.unshift({
+            Id: file.Id,
+            Name: file.Name
+        });
     } else {
-        config.recents.unshift(config.recents.removeById(file)[0]);
+        var lastFile = config.recents.removeById({
+            Id: file.Id
+        });
+        config.recents.unshift(lastFile);
     }
 
-
-    if (config.recents.length == config.recentMax) config.recents.pop();
+    if (config.recents.length > config.recentMax) config.recents.pop();
 
     if (!$('#recent').hasClass('d-none')) {
-        loadList('#list-recent', config.recents);
+
+        var li = $('#list-recent #file-' + file.Id)[0];
+        if (li == undefined) {
+            $('#list-recent').prepend(createEntry(file), true);
+        } else {
+            $(li).prependTo($('#list-recent'));
+        }
+        $('#recent-count').text(config.recents.length + "/" + config.recentMax);
     }
 };
+/*******************Compress File**************************************/
+compressFile = async (filePath, pn) => {
 
+    if (fs.existsSync(filePath)) {
+
+        if (filePath.includes('.rar')) {
+            rar = new rcunrar(filePath);
+            totalimg = rar.ListFiles().filter(e => {
+                return images.includes(e.Extension.toLocaleLowerCase());
+            }).sort((a, b) => {
+                return a.Name.localeCompare(b.Name);
+            });
+        } else {
+            zip = new StreamZip({
+                file: filePath,
+                storeEntries: true
+            });
+            await new Promise((resolve, reject) => {
+                zip.on('ready', () => {
+
+                    totalimg = Object.values(zip.entries()).sort((a, b) => {
+                        return String(a.name).localeCompare(String(b.name));
+                    }).filter(imgFilter);
+                    resolve();
+                });
+            });
+        }
+
+        if (totalimg.length > 0) {
+            var p = path.basename(filePath);
+            totalPage = totalimg.length;
+            viewerImg.src = getImage(pn);
+            pageNum = pn;
+            $('.clock').addClass('clock-50up');
+            $('#loadingDiv').addClass('d-none');
+            $('#title').text(p);
+            fileN = filesList.indexOf(p);
+
+            $imgRange.attr('max', totalPage);
+            $imgRange.val(pageNum + 1);
+            toggleViewer(true);
+            rangePopup();
+            LoadNextImage = true;
+            return true;
+        }
+    }
+
+    $('#loadingDiv').addClass('d-none');
+    backToFileBrowser();
+    return false;
+}
+/***********************************************************/
+function loadImage(fname) {
+    filename = {
+        path: path.join(basedir, fname)
+    };
+    isImage = true;
+    viewerImg.src = path.join(basedir, fname) + '?x=' + getRandomNum();
+    $('#title').text(path.join(basedir, fname));
+    pageNum = fileN = filesList.indexOf(fname);
+    totalPage = filesList.length;
+
+    toggleViewer(true);
+    $('.clock').addClass('clock-50up');
+    $imgRange.attr('max', totalPage);
+    $imgRange.val(1);
+    rangePopup();
+}
+
+/***********************************************************/
+function showImage(pn) {
+    console.time('i')
+    isChange = false;
+    LoadNextImage = false;
+    if (isImage === false) {
+        tempImg.src = getImage(pn);
+    } else {
+        fileN = pn;
+        tempImg.src = path.join(basedir, filesList[pn]) + '?x=' + getRandomNum();
+        $('#title').text(path.join(basedir, filesList[pn]));
+    }
+}
+
+getImage = function (pn) {
+    let entry = totalimg[pn];
+    if (entry == undefined) return;
+
+    var img = 'data:image/jpeg;base64,' +
+        (zip != undefined ? zip.entryDataSync(entry.name) :
+            rar.ExtractFile(entry)).toString('base64');
+    return img
+}
 
 
 /***********************************************************/
@@ -263,94 +364,108 @@ $('#openFile').on('click', function () {
     dialog.showOpenDialog(mainWindow, {
         title: "Select the file to open",
         filters: [{
-                name: 'Videos',
-                extensions: ['mp4', 'mkv']
-            },
-            {
-                name: 'All Files',
-                extensions: ['*']
-            }
+            name: 'Files',
+            extensions: images
+        },
+        {
+            name: 'All Files',
+            extensions: ['*']
+        }
         ]
-    }, function (fileNames) {
-        if (fileNames !== undefined && fileNames.length > 0) {
-            filename = fileNames[0];
-            basedir = path.dirname(filename);
-            LoadVideo(filename);
+    }, function (openedFile) {
+        if (openedFile !== undefined && openedFile.length > 0) {
+            basedir = path.dirname(openedFile[0]);
+            loadZip(openedFile[0]);
         }
     });
 });
 
 /******************************************************/
-$('#viewer').mousedown(event => {
+$viewer.mousedown(event => {
     event.which === 1 ? nextImg() : prevImg();
-    $('#viewer').focus();
+    $viewer.focus();
 });
 
 /******************************************************/
+updateItemPageView = () => {
+    var $item, index;
+    if (filename.path != undefined) {
+        $item = $('.items:textequalto(' + path.basename(filename.path) + ')');
+        if (pageNum > 0 && !isImage) {
+            var $itemf = $item.find('.item-file');
+            $itemf.find('.file-page').remove();
+            $itemf.append(`<span class="file-page ${pageNum + 1 == totalPage ? "bg-primary" : "bg-danger"}"` +
+                ` data-pages="${pageNum + 1}/${totalPage}"></span>`);
+            index = $('.items').index($item[0])
+        } else {
+            index = fileN;
+        }
+    }
+    toggleViewer(false);
 
+    selectItem(index);
+}
 function backToFileBrowser() {
     cleanUpViewer();
-    $('#viewer').addClass('hidden');
-    $('#file-browser').removeClass('hidden');
-    var item = $('.items').toArray().filter((t) => {
-        return $(t).attr('data-name') === path.basename(filename);
-    });
-    selectItem($('.items').index(item[0]));
-    $('.clock').removeClass('clock-50up');
-    updateFilePage(filename, pageNum);
-    filesList = allFiles;
-}
-
-/****Viewer Config****/
-
-
-
-ViewerKeyUp = (event) => {
-
-    var wasProcesed = false;
-    if (!$('#viewer').hasClass('hidden') && event.target.type !== 'number')
-        switch (event.keyCode) {
-            case 13:
-                {
-                    setfullscreen();
-                    wasProcesed = true;
-                    break;
-                }
-            case 37:
-                {
-                    if (event.ctrlKey) {
-                        prevFile();
-                    } else {
-                        prevImg();
-                    }
-                    wasProcesed = true;
-                    break;
-                }
-            case 38:
-                {
-                    if (event.ctrlKey) {
-                        backToFileBrowser();
-                        break;
-                    }
-                    wasProcesed = true;
-                    break;
-                }
-            case 39:
-                {
-                    if (event.ctrlKey) {
-                        nextFile();
-                    } else {
-                        nextImg();
-                    }
-                    wasProcesed = true;
-                    break;
-                }
-        }
-
-    if (wasProcesed) {
-        event.stopPropagation();
-        event.preventDefault();
+    updateFilePage(filename, pageNum, totalPage);
+    if (WinDrive.ListFiles(basedir).length === totalitem) {
+        $('.clock').removeClass('clock-50up');
+        filesList = allFiles;
+        $filescount.text('Files: ' + totalitem);
+        $('#title').text(basedir);
+        updateItemPageView();
+    } else {
+        loadDirectory('').then(() => {
+            updateItemPageView();
+        });
     }
 }
 
-$(document).keyup(ViewerKeyUp);
+/****Viewer Config****/
+ViewerKeyUp = (event) => {
+
+    switch (event.keyCode) {
+        case 13:
+            {
+                setfullscreen();
+                break;
+            }
+        case 37:
+            {
+                if (event.ctrlKey) {
+                    prevFile();
+                } else {
+                    prevImg();
+                }
+                break;
+            }
+        case 38:
+            {
+                if (event.ctrlKey) {
+                    backToFileBrowser();
+                    break;
+                }
+                break;
+            }
+        case 39:
+            {
+                if (event.ctrlKey) {
+                    nextFile();
+                } else {
+                    nextImg();
+                }
+                break;
+            }
+    }
+}
+
+tempImg.onload = function () {
+    pgAnimation[config.pageAnimation]();
+}
+
+$(window).on('resize', rangePopup);
+$('#img-content img').css("transform", "scaleX(" + config.imgScale + ")");
+
+$('#img-toolbar').click((event) => {
+    event.stopPropagation();
+});

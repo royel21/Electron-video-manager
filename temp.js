@@ -1,31 +1,19 @@
-const winex = require('win-explorer')
-const path = require('path')
-const remote = require('electron').remote
-const mainWindow = remote.getCurrentWindow();
 const generatePreview = require('ffmpeg-generate-video-preview');
-const fs = require('fs-extra')
 
 var ffmpeg = require("fluent-ffmpeg")
 ffmpeg.setFfmpegPath("./ffmpeg/bin/ffmpeg.exe") //Argument path is a string with the full path to the ffmpeg binary.
 ffmpeg.setFfprobePath("./ffmpeg/bin/ffprobe.exe") //Argument path is a string with the full path to the ffprobe binary.
 
-Number.prototype.map = function (in_min, in_max, out_min, out_max) {
-    return (this - in_min) * (out_max - out_min) / (in_max - in_min) + out_min;
-}
-
 var volcontrol = document.getElementById('v-vol-control');
 var vseeker = document.getElementById('v-seek');
 var btnPlay = document.getElementById('v-play');
 var btnMuted = document.getElementById('v-mute');
+var player = document.getElementById('player');
+var dir = "D:\\anime"
+var videoFilter = ['mp4', 'mkv', 'avi', 'webm'];
 
-$('#v-close').click(() => {
-    window.close();
-});
-
-var dir = "D:\\Anime\\One Piece"
-
-var videos = winex.ListFiles(dir).filter(v => {
-    return ['mp4', 'mkv', 'avi'].indexOf(v.extension.toLowerCase()) > -1
+var videos = WinDrive.ListFiles(dir).filter(v => {
+    return videoFilter.indexOf(v.extension.toLowerCase()) > -1
 }).sort((a, b) => {
     var a1 = a.FileName.replace(/\[|\(/ig, "0");
     var b1 = b.FileName.replace(/\[|\(/ig, "0");
@@ -33,32 +21,30 @@ var videos = winex.ListFiles(dir).filter(v => {
 }).map((video) => {
     return path.join(dir, video.FileName);
 });
-console.log(videos);
-var player = $('#player')[0];
+
 // player.setAttribute("controls", "controls")
-var index = 0;
+var videoIndex = 0;
 
 $('#v-next').click(() => {
-    if (index < videos.length - 1) {
-        playVideo(++index);
+    if (videoIndex < videos.length - 1) {
+        playVideo(++videoIndex);
     }
 });
 
 $('#v-prev').click(() => {
-    if (index > 0) {
-        playVideo(--index);
+    if (videoIndex > 0) {
+        playVideo(--videoIndex);
     }
 });
 
 $('#reload-list').click(() => {
-    videos = winex.ListFiles(dir).filter(v => {
-        return ['flv', 'FLV'].indexOf(v.extension) > -1
+    videos = WinDrive.ListFiles(dir).filter(v => {
+        return ['flv', 'FLV'].videoIndexOf(v.extension) > -1
     }).map((video) => {
         return path.join(dir, video.FileName);
     }).sort();
-    $('#v-index').attr('max', videos.length - 1)
     console.log(videos.length);
-    index = 0;
+    videoIndex = 0;
     playVideo(0)
 })
 
@@ -80,39 +66,20 @@ convertVideo = async (video) => {
         })
         .on('end', () => {
             console.log(`file:${video} has been converted succesfully`);
-            if (index < videos.length - 1) {
-                playVideo(++index);
+            if (videoIndex < videos.length - 1) {
+                playVideo(++videoIndex);
             }
         }).saveToFile(newFile);
 }
 
-playVideo = async (index) => {
-    var v = videos[index]
+playVideo = async (videoIndex) => {
+    var v = videos[videoIndex]
     player.src = v;
     //convertVideo(v);
     $('#title').text(v);
-    $('#v-index').val(index);
     console.time('s');
-    // ffmpeg.ffprobe(v, function(err, metadata) {
-    //     console.dir(metadata);
-    //     console.timeEnd('s');
-    // });
-    player.play();
+    player.play().catch(e=>{});
 }
-
-
-$('#v-index').attr('min', 0)
-$('#v-index').attr('max', videos.length - 1)
-$('#v-index').attr('value', 0)
-
-$('#v-index').on('change', (val) => {
-    var val = $('#v-index').val();
-    if (val > 0 && val < videos.length - 1) {
-        index = val;
-        playVideo(val);
-    }
-    console.log(val)
-});
 
 //const extractFrames = require('ffmpeg-extract-frames')
 // generatePreview({
@@ -216,9 +183,9 @@ player.ontimeupdate = (e) => {
     ajustSeekerPos(player.currentTime);
 }
 //createThumb();
-playVideo(0);
+//playVideo(0);
 player.onended = function() {
-    if (index < videos.length - 1) {
+    if (videoIndex < videos.length - 1) {
         playVideo(++index);
     }
 }
