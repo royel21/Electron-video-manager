@@ -1,7 +1,7 @@
 const winex = require('win-explorer')
 const path = require('path')
 const remote = require('electron').remote
-const mainWin = remote.BrowserView
+const mainWindow = remote.getCurrentWindow();
 const generatePreview = require('ffmpeg-generate-video-preview');
 const fs = require('fs-extra')
 
@@ -16,12 +16,13 @@ Number.prototype.map = function (in_min, in_max, out_min, out_max) {
 var volcontrol = document.getElementById('v-vol-control');
 var vseeker = document.getElementById('v-seek');
 var btnPlay = document.getElementById('v-play');
-var videoTime = "00:00:00";
+var btnMuted = document.getElementById('v-mute');
+
 $('#v-close').click(() => {
     window.close();
 });
 
-var dir = "G:\\Jav2\\resize"
+var dir = "D:\\Anime\\One Piece"
 
 var videos = winex.ListFiles(dir).filter(v => {
     return ['mp4', 'mkv', 'avi'].indexOf(v.extension.toLowerCase()) > -1
@@ -38,7 +39,6 @@ var player = $('#player')[0];
 var index = 0;
 
 $('#v-next').click(() => {
-
     if (index < videos.length - 1) {
         playVideo(++index);
     }
@@ -97,6 +97,7 @@ playVideo = async (index) => {
     //     console.dir(metadata);
     //     console.timeEnd('s');
     // });
+    player.play();
 }
 
 
@@ -157,7 +158,14 @@ createThumb = async () => {
     }
 }
 
-ajustSeekerPos = () => {
+ajustSeekerPos = (pos) => {
+   var v = pos;
+
+    var h = Math.floor(v / 3600);
+    var m = Math.floor((v / 3600 - h) * 60);
+    var s = Math.floor(v % 60);
+    videoTime = (h == 0 ? "" : String(h).padStart(2, "0") + ':') + String(m).padStart(2, "0") + ':' + String(s).padStart(2, "0");
+    
     var $vseeker = $(vseeker);
     var newPoint, newPlace;
     // Cache this for efficiency
@@ -166,14 +174,14 @@ ajustSeekerPos = () => {
     width = $('#video-seeker').width();
 
     // Figure out placement percentage between left and right of input
-    newPoint = (vseeker.value) / (player.duration);
+    newPoint = (Math.floor(vseeker.value)) / (player.duration);
 
-    newPlace = (width * newPoint.toFixed(3));
+    newPlace = (width * newPoint);
 
-    $vseeker.next("output")
+    $vseeker.next()
         .css({
             left: newPlace,
-            marginLeft: newPoint.map(0.0, 1.0, 11, -10)
+            marginLeft: h > 0 ? newPoint.map(0.0, 1.0, 11, -10) : newPoint.map(0.0, 1.0, 26, 2)
         }).text(videoTime);
 }
 
@@ -183,30 +191,34 @@ player.onloadedmetadata = function (e) {
     vseeker.max = player.duration;
     vseeker.value = 0.0;
     console.timeEnd('s');
-    ajustSeekerPos();
+    ajustSeekerPos(player.currentTime);
 }
 
 vseeker.oninput = (e) => {
-    var v = e.target.value;
-    player.currentTime = v;
-
-    var h = Math.floor(v / 3600);
-    var m = Math.floor((v / 3600 - h) * 60);
-    var s = v % 60;
-    videoTime = String(h).padStart(2, "0") + ':' + String(m).padStart(2, "0") + ':' + String(s).padStart(2, "0");
-    ajustSeekerPos();
+    //ajustSeekerPos();
+    player.currentTime = e.target.value;
 }
 volcontrol.oninput = (e) => {
     player.volume = volcontrol.value;
 }
 
-btnPlay.onchange = () => btnPlay.checked ? player.play() : player.pause()
+btnPlay.onchange = () => btnPlay.checked ? player.play() : player.pause();
+btnMuted.onchange = () => player.muted = btnMuted.checked;
 
 player.onmousedown = (e) => {
     if(e.which == 1){
         player.paused ? player.play() : player.pause();
+        btnPlay.checked = !player.paused;
     }
 }
-
+player.ontimeupdate = (e) => {
+    vseeker.value = Math.floor(player.currentTime); 
+    ajustSeekerPos(player.currentTime);
+}
 //createThumb();
 playVideo(0);
+player.onended = function() {
+    if (index < videos.length - 1) {
+        playVideo(++index);
+    }
+}

@@ -14,12 +14,15 @@
 
 <body>
     <div class="main">
+        <div id="drag-region" class="text-light">
+            <h2 id="title"></h2>
+        </div>
         <div id="video-continer" class="text-center">
             <video id="player" preload="auto" src=""></video>
             <div id="v-controls" class="text-center">
                 <div id="video-seeker">
                     <input id="v-seek" class="slider" type="range">
-                    <output id="v-seek-numb">test</output>
+                    <span id="vseek-thumb">test</span>
                 </div>
                 <span id="v-prev"><i class="far fa-arrow-alt-circle-left"></i></i></span>
                 <span id="v-play-pause">
@@ -42,9 +45,6 @@
                 </span>
             </div>
         </div>
-        <div id="drag-region" class="text-light">
-            <h2 id="title"></h2>
-        </div>
         <script>
             if (typeof module === 'object') {
                 window.module = module;
@@ -53,6 +53,7 @@
         </script>
         <script src="./webcontent/lib/js/jquery.min.js"></script>
         <script src="./temp.js"></script>
+        <script src="./t.js"></script>
 </body>
 
 </html>
