@@ -70,7 +70,7 @@ $('#cm-sh-details').click((e) => {
             tempf.Date = date.toLocaleDateString("en-US") + " " + date.toLocaleTimeString("en-US");
             tempf.Size = FormattBytes(tempf.Size);
             $dialogDetails = $(template('./template/modal-details.html', tempf));
-            $('#file-browser').prepend($dialogDetails);
+            $('#file-viewer').prepend($dialogDetails);
 
             $dialogDetails.find('#modal-close').click(() => {
                 hidedetails();

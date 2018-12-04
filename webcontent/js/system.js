@@ -47,9 +47,11 @@ setfullscreen = () => {
         });
         mainWindow.setResizable(true);
     }
-    if ($('#viewer').hasClass('hidden')) {
+
+    if ($viewer.hasClass('d-none')) {
         selectItem(selectedIndex);
     }
+    console.trace("T");
 }
 $('#btn-sys-min').on('click', minWindow);
 $('#btn-sys-max').on('click', maxWindow);
@@ -62,10 +64,10 @@ goToRoots = async () => {
     $('#file-list').empty();
     var dir = basedir;
     basedir = '';
-    
+
     folderId = null;
     await loadFavs();
-    var drives = WinDrive.ListDrivesInfo().filter(d=> d.Type !== 5);
+    var drives = WinDrive.ListDrivesInfo().filter(d => d.Type !== 5);
     totalitem = drives.length;
     drives.sort().forEach((d, index) => {
         var ico = diskIcon;
@@ -82,8 +84,18 @@ goToRoots = async () => {
     selectItem($('.items').index(item[0]));
     localStorage.setItem('basedir', '');
     lazyLoad();
-    toggleViewer(false);
+    toggleView("FileViewer");
 }
 $('#btn-home').click(goToRoots);
 
 /****************Resize*******************************************/
+
+$(document).on('keydown', (e) => {
+    if (!$viewer.hasClass('d-none')) {
+        ViewerKeyUp(e);
+    } else if (!$('#video-viewer').hasClass('d-none')) {
+        playerKeyHandler(e);
+    } else {
+        keyboardHandler(e);
+    }
+});

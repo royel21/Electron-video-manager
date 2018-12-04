@@ -19,6 +19,12 @@
 
     var startTime, endTime;
 
+    Storage.prototype.getObject = function (key) {
+        var value = this.getItem(key);
+        if (value == "undefined") return [];
+        return value && JSON.parse(value);
+    }
+
     ipc.on('remove-files', function (event, data, fromWindowId) {
         let fromWindow = BrowserWindow.fromId(fromWindowId)
         fs.removeSync(data.dir);
@@ -121,6 +127,13 @@
                             state = await RarCover(file.FileName, coverP, data.basedir);
                             break;
                         }
+                    case "mp4":
+                    case "webm":
+                    case "mkv":
+                    case "avi": {
+                        state = await VideoThumb(path.join(data.basedir, file.FileName));
+                        break;
+                    }
                 }
                 if (state) {
                     fromWindow.webContents.send('thumb-create', file.FileName);
@@ -129,6 +142,7 @@
             fromWindow.webContents.send("error", 'Thumbnail Create');
             window.close();
         } catch (error) {
+            console.log(error)
             fromWindow.webContents.send("error", error);
         }
     }
@@ -188,6 +202,27 @@
         });
     }
 
+    var ffmpeg = require("fluent-ffmpeg")
+    ffmpeg.setFfmpegPath("./ffmpeg/bin/ffmpeg.exe") //Argument path is a string with the full path to the ffmpeg binary.
+    ffmpeg.setFfprobePath("./ffmpeg/bin/ffprobe.exe") //Argument path is a string with the full path to the ffprobe binary.
+
+    VideoThumb = (vfile) => {
+        return new Promise((resolve, rejected) => {
+            try {
+                ffmpeg(vfile).screenshots({
+                    timestamps: ["26.9%"],
+                    filename: '%f',
+                    folder: './covers/',
+                    size: '240x?'
+                }).on('end', () => {
+                    resolve(true);
+                });
+            } catch (error) {
+                resolve(false);
+            }
+        });
+    }
+
     ipc.on('zip-file', (e, data, id) => {
         var fromWindow = BrowserWindow.fromId(id);
         if (!fs.existsSync(data.dir + '.zip')) {
@@ -202,8 +237,10 @@
         zipper.sync.zip(data.dir).compress().save(data.dir + '.zip');
         //fs.removeSync(data.dir);
         fromWindow.webContents.send('zip-done',
-            {file: WinDrive.ListFiles(path.dirname(data.dir))
-                .find((f) => f.FileName === path.basename(data.dir) + '.zip'), dir: data.dir });
+            {
+                file: WinDrive.ListFiles(path.dirname(data.dir))
+                    .find((f) => f.FileName === path.basename(data.dir) + '.zip'), dir: data.dir
+            });
         window.close();
     }
 </script>

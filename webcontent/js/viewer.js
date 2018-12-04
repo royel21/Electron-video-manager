@@ -19,7 +19,7 @@ var backImages = [];
 var isChange = true;
 var LoadNextImage = true;
 var loadingNext = false;
-var $viewer = $('#viewer');
+var $viewer = $('#image-viewer');
 var $input;
 var backgroundLoader;
 /***********************************************************/
@@ -131,7 +131,7 @@ $('#page-n').on('click', function () {
     }
 });
 
-$imgRange.on('change', (event) => {
+$imgRange.on('input', (event) => {
 
     if (isChange) {
         pageNum = event.target.value - 1;
@@ -303,7 +303,7 @@ compressFile = async (filePath, pn) => {
 
             $imgRange.attr('max', totalPage);
             $imgRange.val(pageNum + 1);
-            toggleViewer(true);
+            toggleView("ImageViewer");
             rangePopup();
             LoadNextImage = true;
             return true;
@@ -325,7 +325,7 @@ function loadImage(fname) {
     pageNum = fileN = filesList.indexOf(fname);
     totalPage = filesList.length;
 
-    toggleViewer(true);
+    toggleView("ImageViewer");
     $('.clock').addClass('clock-50up');
     $imgRange.attr('max', totalPage);
     $imgRange.val(1);
@@ -401,7 +401,7 @@ updateItemPageView = () => {
             index = fileN;
         }
     }
-    toggleViewer(false);
+    toggleView("FileViewer");
 
     selectItem(index);
 }

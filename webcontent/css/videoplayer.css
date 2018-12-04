@@ -4,41 +4,52 @@
     object-fit: fill;
 }
 
-#v-controls{
-    position: absolute;
-    bottom: 0;
+.v-controls{
+    position: fixed;
+    bottom: 0px;
     left: 0;
     right: 0;
-    -webkit-app-region: drag;
-    border-radius: 0 0 1rem 1rem;
     background-color: rgba(67, 66, 75, 1);
+    font-size: initial;
+    transition: all .3s;
+    opacity: 1;
+    padding-bottom: 5px;
 }
 
-#v-controls:active{
+.hide-vcontrols{
+    opacity: 0;
+}
+
+.v-controls:active{
     cursor: grabbing;
 }
 
-#v-controls > *,
-#v-controls > * > *{
-    -webkit-app-region: no-drag;
+.v-controls > *,
+.v-controls > * > *{
     cursor: pointer;
+    position: initial;
+    left: initial;
+}
+.v-controls span{
+    position: initial;
+    left: initial;
 }
 
-#v-controls span i{
+.v-controls span i{
     color: #fff;
     font-size: 30px;
 }
-#v-controls span i:active{
+.v-controls span i:active{
     transform: scale(1.2)
 }
 
-#video-container {
+#video-viewer {
     height: 100%;
     width: 100%;
-    padding-bottom: 20px;
+    padding-bottom: 16px;
 }
 
-body:-webkit-full-screen #video-container{
+body:-webkit-full-screen #video-viewer{
     padding: 0;
 }
 
@@ -46,7 +57,7 @@ body:-webkit-full-screen #video-container{
     width: 70px;
 }
 
-#v-controls input[type=number] {
+.v-controls input[type=number] {
     font-size: 20px;
     background-color: transparent;
     color: white;
@@ -55,13 +66,13 @@ body:-webkit-full-screen #video-container{
     border-radius: 5px;
 }
 
-#v-controls input[type=number] {
+.v-controls input[type=number] {
     transition: all 0.30s ease-in-out;
     outline: none;
     border: 1px solid #DDDDDD;
 }
 
-#v-controls input[type=number]:focus {
+.v-controls input[type=number]:focus {
     box-shadow: 0 0 5px rgba(81, 203, 238, 1);
     border: 1px solid rgba(81, 203, 238, 1);
 }
@@ -143,22 +154,18 @@ body:-webkit-full-screen #video-container{
 }
 
 #mute-icon{
-    display: none;
+    display: inline-block;
     position: absolute;
     top: 13px;
-    background-color: white;
+    background-color: red;
     height: 4px;
-    width: 0px;
-    transform: rotateZ(135deg);
+    width: 38px;
+    transform: rotateZ(135deg) scale(0);
     pointer-events: none;
-    transition: all 3s;
+    transition: all .3s;
     border-radius: 4px;
 }
 
-#v-mute:checked + #mute-icon{
-    display: inline-block;
-    width: 38px;
-    background-color: red;
-}
+#v-mute:checked + #mute-icon{transform: rotateZ(135deg) scale(1);}
 
 

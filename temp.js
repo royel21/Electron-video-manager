@@ -1,18 +1,13 @@
-const generatePreview = require('ffmpeg-generate-video-preview');
-
-var ffmpeg = require("fluent-ffmpeg")
-ffmpeg.setFfmpegPath("./ffmpeg/bin/ffmpeg.exe") //Argument path is a string with the full path to the ffmpeg binary.
-ffmpeg.setFfprobePath("./ffmpeg/bin/ffprobe.exe") //Argument path is a string with the full path to the ffprobe binary.
-
 var volcontrol = document.getElementById('v-vol-control');
 var vseeker = document.getElementById('v-seek');
 var btnPlay = document.getElementById('v-play');
 var btnMuted = document.getElementById('v-mute');
 var player = document.getElementById('player');
-var dir = "D:\\anime"
+var $vplayer = $('#video-viewer');
+
 var videoFilter = ['mp4', 'mkv', 'avi', 'webm'];
 
-var videos = WinDrive.ListFiles(dir).filter(v => {
+var videos = WinDrive.ListFiles(basedir).filter(v => {
     return videoFilter.indexOf(v.extension.toLowerCase()) > -1
 }).sort((a, b) => {
     var a1 = a.FileName.replace(/\[|\(/ig, "0");
@@ -37,102 +32,23 @@ $('#v-prev').click(() => {
     }
 });
 
-$('#reload-list').click(() => {
-    videos = WinDrive.ListFiles(dir).filter(v => {
-        return ['flv', 'FLV'].videoIndexOf(v.extension) > -1
-    }).map((video) => {
-        return path.join(dir, video.FileName);
-    }).sort();
-    console.log(videos.length);
-    videoIndex = 0;
-    playVideo(0)
-})
-
-convertVideo = async (video) => {
-    var newFile = path.join('G:\\Jav2\\proccesses', path.basename(video).split('.')[0] + '.mp4');
-    console.log(newFile);
-    return new ffmpeg({
-        source: video,
-        nolog: false
-    })
-        .withVideoCodec('libx264')
-        .fps(29.7)
-        .withVideoBitrate(368)
-        .withAudioBitrate('64k')
-        .withAudioChannels(1)
-        .size('840x?')
-        .toFormat('mp4').on('progress', function (progress) {
-            console.log('Processing: ' + progress.percent.toFixed(2) + '% done');
-        })
-        .on('end', () => {
-            console.log(`file:${video} has been converted succesfully`);
-            if (videoIndex < videos.length - 1) {
-                playVideo(++videoIndex);
-            }
-        }).saveToFile(newFile);
-}
-
-playVideo = async (videoIndex) => {
-    var v = videos[videoIndex]
-    player.src = v;
+playVideo = async (name) => {
+    player.src = path.join(basedir, name);
     //convertVideo(v);
-    $('#title').text(v);
-    console.time('s');
-    player.play().catch(e=>{});
+    $('#title').text(name);
+    player.play().catch(e => { });
 }
 
-//const extractFrames = require('ffmpeg-extract-frames')
-// generatePreview({
-//     input: 'E:\\dev\\Swing_Out_Sisters_1-2_ESP_www.UnderHentai.net.mp4',
-//     output: './cover/1.jpg',
-//     width: 128,
-//     row: 5,
-//     cols: 5,
-//     numFrames: 20,
-//     padding: 5,
-//     mqrgin: 5
-// }).then(() => {
-//     console.log('finish', start - new Date());
-// });
-
-// extract 3 frames at 1s, 2s, and 3.5s respectively
-// video = 'E:\\dev\\Swing_Out_Sisters_1-2_ESP_www.UnderHentai.net.mp4'
-// extractFrames({
-//     input: video,
-//     output: path.join('./cover/', path.basename(video).split('.')[0] + '.png'),
-//     offsets: [
-//         5000
-//     ]
-// }).then(() => {
-//     console.log('finish', new Date()-start);
-// });
-createThumb = async () => {
-    for (var video of videos) {
-        start = new Date();
-        await new Promise((resolve, rejected) => {
-            ffmpeg(video)
-                .screenshots({
-                    timestamps: ["26.9%"],
-                    filename: '%b',
-                    folder: './covers/',
-                    size: '240x?'
-                }).on('end', () => {
-                    resolve();
-                });
-        }).then(() => {
-            console.log('finish', new Date() - start);
-        });
-    }
-}
 
 ajustSeekerPos = (pos) => {
-   var v = pos;
+    var v = pos;
 
     var h = Math.floor(v / 3600);
     var m = Math.floor((v / 3600 - h) * 60);
     var s = Math.floor(v % 60);
-    videoTime = (h == 0 ? "" : String(h).padStart(2, "0") + ':') + String(m).padStart(2, "0") + ':' + String(s).padStart(2, "0");
-    
+    videoTime = (h == 0 ? "" : String(h).padStart(2, "0") + ':') +
+        String(m).padStart(2, "0") + ':' + String(s).padStart(2, "0");
+
     var $vseeker = $(vseeker);
     var newPoint, newPlace;
     // Cache this for efficiency
@@ -157,14 +73,16 @@ player.onloadedmetadata = function (e) {
     vseeker.min = 0.0;
     vseeker.max = player.duration;
     vseeker.value = 0.0;
-    console.timeEnd('s');
     ajustSeekerPos(player.currentTime);
+    toggleView("VideoViewer");
+    player.volume = volcontrol.value;
 }
 
 vseeker.oninput = (e) => {
     //ajustSeekerPos();
     player.currentTime = e.target.value;
 }
+
 volcontrol.oninput = (e) => {
     player.volume = volcontrol.value;
 }
@@ -172,20 +90,107 @@ volcontrol.oninput = (e) => {
 btnPlay.onchange = () => btnPlay.checked ? player.play() : player.pause();
 btnMuted.onchange = () => player.muted = btnMuted.checked;
 
-player.onmousedown = (e) => {
-    if(e.which == 1){
-        player.paused ? player.play() : player.pause();
-        btnPlay.checked = !player.paused;
-    }
-}
+$(player).dblclick((e) => {
+    setfullscreen();
+});
+
 player.ontimeupdate = (e) => {
-    vseeker.value = Math.floor(player.currentTime); 
+    vseeker.value = Math.floor(player.currentTime);
     ajustSeekerPos(player.currentTime);
 }
 //createThumb();
 //playVideo(0);
-player.onended = function() {
+player.onended = function () {
     if (videoIndex < videos.length - 1) {
         playVideo(++index);
     }
 }
+
+var mouseTimer = null, cursorVisible = true;
+hideVideoControls = () => {
+    if (document.webkitIsFullScreen) {
+        $('.v-controls').removeClass('hide-vcontrols');
+        if (mouseTimer) {
+            window.clearTimeout(mouseTimer);
+        }
+        if (!cursorVisible) {
+            $vplayer.css({ cursor: "default" });
+            cursorVisible = true;
+        }
+
+        mouseTimer = window.setTimeout(() => {
+            mouseTimer = null;
+            if (!player.paused && document.webkitIsFullScreen) {
+                $vplayer.css({ cursor: "none" });
+                cursorVisible = false;
+                $('.v-controls').addClass('hide-vcontrols');
+            }
+        }, 1000);
+    }
+}
+
+$('body').mousemove(hideVideoControls);
+$(document).on('webkitfullscreenchange', hideVideoControls);
+
+playerKeyHandler = (e) => {
+    console.log(e.keyCode)
+    switch (e.keyCode) {
+        case 13: {
+            setfullscreen();
+            break;
+        }
+        case 32: {
+            player.paused ? player.play() : player.pause();
+            break;
+        }
+        case 37: {
+            player.currentTime -= event.ctrlKey ? 5 : 1;
+            break;
+        }
+        case 38: {
+            volcontrol.value = player.volume + (event.ctrlKey ? 0.05 : 0.01);
+            player.volume = volcontrol.value;
+            break;
+        }
+        case 39: {
+            player.currentTime += event.ctrlKey ? 5 : 1;
+            break;
+        }
+        case 40: {
+            volcontrol.value -= Number(event.ctrlKey ? 0.05 : 0.01);
+            player.volume = volcontrol.value;
+            break;
+        }
+    }
+}
+
+$(player).click((e) => {
+    if (e.which == 1) {
+        if (player.paused) {
+            player.play();
+        } else {
+            player.pause();
+        }
+        btnPlay.checked = !player.paused;
+        hideVideoControls();
+    }
+});
+
+player.onvolumechange = function (e) {
+    btnMuted.checked = player.volume == 0;
+}
+
+$(window).on('wheel', function (event) {
+
+    // deltaY obviously records vertical scroll, deltaX and deltaZ exist too
+    if (!$vplayer.hasClass('d-none')) {
+        if (event.originalEvent.deltaY < 0) {
+            volcontrol.value = player.volume + 0.05;
+            player.volume = volcontrol.value;
+        }
+        else {
+            volcontrol.value -= 0.05;
+            player.volume = volcontrol.value;
+        }
+    }
+});

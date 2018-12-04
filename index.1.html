@@ -15,6 +15,7 @@
     <link rel="stylesheet" href="./webcontent/css/details.css">
     <link rel="stylesheet" href="./webcontent/css/toolbars.css">
     <link rel="stylesheet" href="./webcontent/css/fullscreen.css">
+    <link rel="stylesheet" href="./webcontent/css/videoplayer.css">
 </head>
 
 <body>
@@ -135,9 +136,9 @@
                 </span><span id="loading-msg">Please Wait</span>
                 <div class="loader"></div>
             </div>
-            <div id="video-container" class="text-center hidden">
+            <div id="video-viewer" class="text-center d-none">
                 <video id="player" preload="auto" src=""></video>
-                <div id="v-controls" class="text-center">
+                <div class="text-center v-controls footer">
                     <div id="video-seeker">
                         <input id="v-seek" class="slider" type="range">
                         <span id="vseek-thumb">test</span>
@@ -150,11 +151,11 @@
                         </label>
                     </span>
                     <span id="v-next"><i class="far fa-arrow-alt-circle-right"></i></i></span>
-                    <span id="v-close">
-                        <i class="fas fa-window-close"></i>
+                    <span class="btn-fullscr">
+                        <i class="fas fa-expand-arrows-alt"></i>
                     </span>
                     <span id="v-vol">
-                        <input id="v-vol-control" class="slider" type="range" min="0" step="0.05" max="1">
+                        <input id="v-vol-control" class="slider" type="range" min="0" step="0.01" value="0.5" max="1">
                         <label for="v-mute">
                             <input type="checkbox" id="v-mute">
                             <span id="mute-icon"></span>
@@ -163,7 +164,7 @@
                     </span>
                 </div>
             </div>
-            <div id="viewer" class="hidden">
+            <div id="image-viewer" class="d-none">
                 <div id="img-viewer">
                     <div class="footer text-center">
                         <div class="text-center toolbar img-toolbar">
@@ -219,7 +220,7 @@
                 </div>
                 <span class="total-files"></span></span>
             </div>
-            <div id="file-browser">
+            <div id="file-viewer">
                 <div id="context-menu">
                     <ul>
                         <li id="cm-cp-name">Copy Name</li>

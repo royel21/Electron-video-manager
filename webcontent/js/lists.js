@@ -39,11 +39,11 @@ processRow = (event) => {
     var id = li.id.replace("file-", "");
     var ul_id = li.closest('ul').id
     if ($(li).data('isfile')) {
-        if(ul_id != "list-recent") filesList = listofFile;
+        if (ul_id != "list-recent") filesList = listofFile;
         loadZip("", id);
     } else {
         loadDirectory('', id);
-        toggleViewer(false);
+        toggleView("FileViewer");
     }
 }
 
@@ -99,7 +99,7 @@ createEntry = (value, isFile) => {
     div.innerHTML = `<li id="file-${value.Id}" class="list-group-item popup-msg" data-isFile="${isFile}" data-title="${value.Name}" tabindex="0">` +
         `<span id="delete-list"><i class="fas fa-trash-alt fa-1x"></i></span>` +
         `<span class="list-text">${value.Name} ${FormattBytes(value.Size)}</span></li>`;
-        
+
     return div.firstElementChild;
 }
 
@@ -110,7 +110,7 @@ function loadList(listName, list, isFile) {
     var div = document.createElement('div');
     div.innerHTML = `<li class="list-item-empty list-group-item">Not Files Found</li>`
     documentFragment.append(div.firstElementChild);
-    list.forEach(value=>{
+    list.forEach(value => {
         documentFragment.append(createEntry(value, isFile));
     });
     newList.append(documentFragment);

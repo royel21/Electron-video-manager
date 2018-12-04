@@ -16,10 +16,10 @@ var config = {
     lastDir: "",
     scanFolder: [],
     imgScale: 0.6,
-    fileFilters: ['zip','rar'],
-    videoFilters: ['mp4','mkv','avi','webm'],
+    fileFilters: ['zip', 'rar'],
+    videoFilters: ['mp4', 'mkv', 'avi', 'webm'],
     sortBy: "",
-    pageAnimation: "slide",
+    pageAnimation: "Slide",
     animDuration: 200
 };
 var filesList = [];
@@ -62,16 +62,28 @@ createBackgroundWin = (event, data) => {
     }, 0)
 }
 
-toggleViewer = (isViewer) => {
-    if(isViewer)
-    {
-        $('#file-browser').addClass('hidden');
-        $('#viewer').removeClass('hidden');
-
-    }else{
-        $('#file-browser').removeClass('hidden');
-        $('#viewer').addClass('hidden');
+toggleView = (view) => {
+    switch (view) {
+        case "ImageViewer": {
+            $viewer.removeClass('d-none');
+            $('#file-viewer').addClass('d-none');
+            $vplayer.addClass('d-none');
+            break;
+        }
+        case "FileViewer": {
+            $('#file-viewer').removeClass('d-none');
+            $vplayer.addClass('d-none');
+            $viewer.addClass('d-none');
+            break;
+        }
+        case "VideoViewer": {
+            $vplayer.removeClass('d-none');
+            $('#file-viewer').addClass('d-none');
+            $viewer.addClass('d-none');
+            break;
+        }
     }
+    $('.content').css({ 'overflow-y': $vplayer.hasClass('d-none') ? "auto" : "hidden" });
 }
 
 template = (file, data) => {
@@ -103,7 +115,11 @@ lazyLoad = () => {
         entries.forEach((entry) => {
             let lazyCover = entry.target.querySelector('img');
             if (entry.isIntersecting) {
-                var icon = path.join('./covers/' + entry.target.dataset.name + '.jpg');
+
+                var ds = entry.target.dataset;
+                var isVideo = config.videoFilter.includes(ds.ex);
+                var icon = './covers/' + ds.name + (isVideo ? '.png' : '.jpg');
+
                 if (fs.existsSync(icon)) {
                     lazyCover.src = icon.replace('#', '%23');
                 } else {
@@ -165,8 +181,8 @@ deleteFile = (file, showloading) => {
                 if (fs.existsSync(file)) {
                     if (showloading) $('#loadingDiv').removeClass('d-none');
                     fs.removeSync(file);
-                    var cover = path.join("./covers", path.basename(file)+".jpg");
-                    if(fs.existsSync(cover)) fs.removeSync(cover);
+                    var cover = path.join("./covers", path.basename(file) + ".jpg");
+                    if (fs.existsSync(cover)) fs.removeSync(cover);
                     if (showloading) $('#loadingDiv').addClass('d-none');
                 }
             }
@@ -176,14 +192,14 @@ deleteFile = (file, showloading) => {
 }
 
 JumpFolder = (num) => {
-    if (basedir == "" || !$('#viewer').hasClass('hidden')) return;
+    if (basedir == "" || !$('#image-viewer').hasClass('d-none')) return;
 
     try {
         //get root dir
         var dir = path.dirname(basedir);
         //list all folder in root dir
         var folders = WinDrive.ListFiles(dir).filter(f => {
-            return f.isDirectory && !f.isHidden
+            return f.isDirectory && !f.isd - none
         }).sort(sortFileBy).map(a => a.FileName);
         //get current folder
         var toJump = folders.indexOf(path.basename(basedir)) + num;
@@ -270,6 +286,6 @@ function formatName(name, padding = 3) {
     return elem.value;
 }
 
-isViewer = () =>{
-    return !$('#viewer').hasClass('hidden');
+isViewer = () => {
+    return !$('#image-viewer').hasClass('d-none');
 }

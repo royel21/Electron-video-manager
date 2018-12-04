@@ -7,6 +7,8 @@ var contentScroll = $('.content').get(0);
 var processRunning = 0;
 var folderIcon = path.join('./webcontent/image/Folder.png');
 var zipIcon = path.join('./webcontent/image/zip.png');
+var videoIcon = path.join('./webcontent/image/video.png');
+
 var $cmenu = $('#context-menu');
 var favs = [];
 var folderId = null;
@@ -16,12 +18,13 @@ var compressingCount = 0;
 
 ipcRenderer.on('thumb-create', (event, name) => {
     var item = $('.items:textequalto(' + name + ')').find('img')[0];
-    if (item != undefined) {
-        var name = 'covers/' + name.replace('#', '%23') + '.jpg';
-        item.dataset.src = name;
-        if (item.offsetTop < $(window).height() + $(item).closest('.items').height()) {
-            item.src = name;
-        }
+    if (item != undefined &&
+        item.offsetTop < $(window).height() + $(item).closest('.items').height()) {
+
+        var icon = './covers/' + name.replace('#', '%23') +
+            (config.videoFilter.includes(name.split('.').pop()) ? '.png' : '.jpg');
+        item.dataset.src = icon;
+        item.src = icon;
     }
 });
 
@@ -52,9 +55,9 @@ ipcRenderer.on('files-removed', (e, index) => {
 
 ipcRenderer.on('zip-done', (e, result) => {
     compressingCount--;
-    
-   if(compressingCount == 0) $('.fa-file-archive').addClass('d-none');
-    
+
+    if (compressingCount == 0) $('.fa-file-archive').addClass('d-none');
+
     if (path.dirname(result.dir) === basedir) {
         $('#file-list').append(CreateEl(result.file))
         sortElements();
@@ -63,10 +66,13 @@ ipcRenderer.on('zip-done', (e, result) => {
 
 processFile = (name) => {
     var ex = String(name).split('.').pop().toLocaleLowerCase();
+    console.log(ex)
     if (images.includes(ex)) {
         loadImage(name);
-    } else if (['zip', 'rar']) {
+    } else if (config.fileFilters.includes(ex)) {
         loadZip(name);
+    } else if (config.videoFilter.includes(ex)) {
+        playVideo(name);
     }
 }
 
@@ -195,13 +201,18 @@ addToFav = async ($item, event) => {
 
 function CreateEl(file, diskIcon) {
     var isFile = !file.isDirectory;
-
     var img = diskIcon === undefined ? isFile ? zipIcon : folderIcon : diskIcon;
     var isImage = false;
-    if (isFile && images.includes(file.extension.toLocaleLowerCase())) {
-        isImage = true;
-        img = path.join(basedir, file.FileName).replace('#', '%23');
+    var ex = file.extension.toLocaleLowerCase();
+    if (isFile) {
+        if (images.includes(ex)) {
+            isImage = true;
+            img = path.join(basedir, file.FileName).replace('#', '%23');
+        }else if(config.videoFilter.includes(ex)){
+            img = videoIcon;
+        }
     }
+
     var fav = favs.find(f => f.Name === file.FileName);
     var isFav;
     var page = " ";
@@ -216,7 +227,7 @@ function CreateEl(file, diskIcon) {
     }
     var div = document.createElement('div');
     div.innerHTML =
-        `<div data-isfile="${isFile}" data-name="${file.FileName}" tabindex="0" data-size="${file.Size}" data-mdate="${file.LastModified}" class="items" >
+        `<div data-isfile="${isFile}" data-name="${file.FileName}" tabindex="0" data-size="${file.Size}" data-mdate="${file.LastModified}" data-ex="${file.extension}" class="items" >
                 <div class="item-file popup-msg" >
                     <div class="item-btns">
                         <span class="item-del fas fa-trash"></span>
@@ -275,13 +286,6 @@ loadDirectory = async (folder, id) => {
                     }
                 }
             });
-            // var $div = $("<div>");
-            // totalitem = folders.length + files.length;
-            // folders.concat(files).forEach((f) => {
-            //     $div.append(CreateEl(f));
-            // });
-
-            // $('#file-list').empty().append($div.children());
             totalitem = folders.length + files.length;
             var documentFragment = document.createDocumentFragment();
             folders.concat(files).forEach((f) => {
@@ -296,8 +300,9 @@ loadDirectory = async (folder, id) => {
             setTimeout(() => {
 
                 var tFiles = files.filter(f => {
-                    return ['rar', 'zip'].includes(f.extension) &&
-                        !fs.existsSync(path.resolve("./covers", f.FileName + ".jpg"))
+                    var fv = path.resolve("./covers", f.FileName);
+                    return config.fileFilters.concat(config.videoFilter).includes(f.extension) &&
+                        !fs.existsSync(fv + ".jpg") && !fs.existsSync(fv + ".png")
                 });
 
                 if (tFiles.length > 0) {
@@ -318,10 +323,6 @@ loadDirectory = async (folder, id) => {
         goToRoots();
         console.log(error)
     }
-
-    // $itemsFound = [];
-    // curIndex = 0;
-    // $fileFound.text('0/0');
 };
 
 
@@ -352,89 +353,84 @@ jumpToFile = (event) => {
 }
 
 keyboardHandler = (event) => {
+    var wasProcesed = false;
+    switch (event.keyCode) {
+        case 13:
+            {
+                if (event.ctrlKey) {
+                    setfullscreen();
+                } else {
+                    var $el = $(document.activeElement);
+                    var name = $el.data('name');
 
-    if ($('#viewer').hasClass('hidden')) {
-        var wasProcesed = false;
-        switch (event.keyCode) {
-            case 13:
-                {
-                    if (event.ctrlKey) {
-                        setfullscreen();
+                    if ($el.data('isfile')) {
+                        processFile(name);
                     } else {
-                        var $el = $(document.activeElement);
-                        var name = $el.data('name');
-
-                        if ($el.data('isfile')) {
-                            processFile(name);
-                        } else {
-                            loadDirectory(name);
-                        }
+                        loadDirectory(name);
                     }
-                    wasProcesed = true;
-                    break;
                 }
-            case 37:
-                {
-                    if (event.ctrlKey) {
-                        JumpFolder(-1);
-                    } else {
-                        if (selectedIndex > 0) {
-                            selectItem(selectedIndex - 1);
-                        } else {
-                            selectItem(totalitem - 1);
-                        }
-                    }
-                    wasProcesed = true;
-                    break;
-                }
-            case 38:
-                {
-                    if (event.ctrlKey) {
-                        returnFolder();
-                    } else if (selectedIndex - calCol() >= 0) {
-                        selectItem(selectedIndex - calCol());
-                    }
-                    wasProcesed = true;
-                    break;
-                }
-            case 39:
-                {
-                    if (event.ctrlKey) {
-                        JumpFolder(1);
-                    } else if (selectedIndex < totalitem - 1) {
-                        selectItem(selectedIndex + 1);
-                    } else {
-                        selectItem(0);
-                    }
-                    wasProcesed = true;
-                    break;
-                }
-
-            case 40:
-                {
-                    if (selectedIndex + calCol() < totalitem) {
-                        selectItem(selectedIndex + calCol());
-                    }
-                    wasProcesed = true;
-                    break;
-                }
-            case 116: {
-                loadDirectory('');
                 wasProcesed = true;
                 break;
             }
-        }
+        case 37:
+            {
+                if (event.ctrlKey) {
+                    JumpFolder(-1);
+                } else {
+                    if (selectedIndex > 0) {
+                        selectItem(selectedIndex - 1);
+                    } else {
+                        selectItem(totalitem - 1);
+                    }
+                }
+                wasProcesed = true;
+                break;
+            }
+        case 38:
+            {
+                if (event.ctrlKey) {
+                    returnFolder();
+                } else if (selectedIndex - calCol() >= 0) {
+                    selectItem(selectedIndex - calCol());
+                }
+                wasProcesed = true;
+                break;
+            }
+        case 39:
+            {
+                if (event.ctrlKey) {
+                    JumpFolder(1);
+                } else if (selectedIndex < totalitem - 1) {
+                    selectItem(selectedIndex + 1);
+                } else {
+                    selectItem(0);
+                }
+                wasProcesed = true;
+                break;
+            }
 
-        if (event.ctrlKey && event.keyCode == 70) {
-            showSearch(event);
+        case 40:
+            {
+                if (selectedIndex + calCol() < totalitem) {
+                    selectItem(selectedIndex + calCol());
+                }
+                wasProcesed = true;
+                break;
+            }
+        case 116: {
+            loadDirectory('');
+            wasProcesed = true;
+            break;
         }
+    }
 
-        if (wasProcesed) {
-            event.stopPropagation();
-            event.preventDefault();
-        }
-    } else {
-        ViewerKeyUp(event);
+    if (event.ctrlKey && event.keyCode == 70) {
+        showSearch(event);
+    }
+
+    if (wasProcesed) {
+        event.stopPropagation();
+        event.preventDefault();
     }
 }
 
@@ -462,7 +458,7 @@ dropFile = function (e) {
     if (e.dataTransfer.files.length > 0) {
         var f = e.dataTransfer.files[0];
         if (fs.lstatSync(f.path).isDirectory()) {
-            toggleViewer(false);
+            toggleView("FileViewer");
             basedir = f.path;
             loadDirectory('');
         } else {
@@ -500,7 +496,7 @@ dbclick = (event) => {
 }
 
 mousemove = (me) => {
-    if (!$('#viewer').hasClass('hidden') && document.webkitIsFullScreen) {
+    if (!$viewer.hasClass('d-none') && document.webkitIsFullScreen) {
         if (me.clientY < (window.innerHeight - 100)) {
             $('.toolbar').addClass('slide-down');
             $('output').css({
@@ -527,7 +523,6 @@ $('#tool-folderNext').click(() => {
 $(readyFunc = (event) => {
 
     $(document).keypress(jumpToFile);
-    $(document).on('keydown', keyboardHandler);
     $(document).on('mousemove', mousemove);
     document.ondrop = dropFile;
     $(document).on('dragover', cancerDragOver);
@@ -541,8 +536,8 @@ $(readyFunc = (event) => {
     $('#next-file').on('click', nextFile);
     $('.openDir').on('click', openDir);
     $('.tool-folderUp').on('click', returnFolder);
-    $('#file-browser #file-list').on('click', '.items', itemClick);
-    $('#file-browser #file-list').on('dblclick', dbclick);
+    $('#file-viewer #file-list').on('click', '.items', itemClick);
+    $('#file-viewer #file-list').on('dblclick', dbclick);
     $('.top input[type=checkbox]').on('change', (e) => {
         $('.top input[type=checkbox]').prop('checked', e.target.checked);
         mainWindow.setAlwaysOnTop(e.target.checked);
