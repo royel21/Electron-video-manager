@@ -7,6 +7,7 @@ body:-webkit-full-screen .clock-60up{
     left: 47%;
     right: initial;
 }
+
 body:-webkit-full-screen .clock-60up .time{
     font-size: 14px;
 }
@@ -209,5 +210,7 @@ body:-webkit-full-screen #video-viewer{
 }
 
 #v-mute:checked + #mute-icon{transform: rotateZ(135deg) scale(1);}
-
+body:not(:-webkit-full-screen) .v-controls{
+    opacity: 1;
+}
 
