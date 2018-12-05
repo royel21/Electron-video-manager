@@ -202,9 +202,12 @@
         });
     }
 
-    var ffmpeg = require("fluent-ffmpeg")
-    ffmpeg.setFfmpegPath("./ffmpeg/bin/ffmpeg.exe") //Argument path is a string with the full path to the ffmpeg binary.
-    ffmpeg.setFfprobePath("./ffmpeg/bin/ffprobe.exe") //Argument path is a string with the full path to the ffprobe binary.
+    var ffmpeg = require("fluent-ffmpeg");
+    var ffpstatic = require('ffprobe-static');
+    var ffmstatic = require('ffmpeg-static');
+
+    ffmpeg.setFfmpegPath(ffmstatic.path) //Argument path is a string with the full path to the ffmpeg binary.
+    ffmpeg.setFfprobePath(ffpstatic.path) //Argument path is a string with the full path to the ffprobe binary.
 
     VideoThumb = (vfile) => {
         return new Promise((resolve, rejected) => {

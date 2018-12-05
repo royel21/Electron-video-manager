@@ -81,7 +81,7 @@ nextImg = () => {
 /***********************************************************/
 prevFile = () => {
     if (fileN > 0 && isImage === false) {
-        loadZip(filesList[--fileN]);
+        processFile(filesList[--fileN]);
     } else {
         backToFileBrowser();
     }
@@ -89,7 +89,7 @@ prevFile = () => {
 /***********************************************************/
 nextFile = () => {
     if (fileN < filesList.length - 1 && isImage === false) {
-        loadZip(filesList[++fileN]);
+        processFile(filesList[++fileN]);
     } else {
         backToFileBrowser();
     }
@@ -173,65 +173,65 @@ viewImage = (pn) => {
 }
 /***********************************************************/
 
-function loadZip(name, id) {
+function loadZip(file) {
     loadingNext = true;
     isImage = false;
     cleanUpViewer();
     $('#loadingDiv').removeClass('d-none');
     updateFilePage(filename, pageNum, totalPage);
 
-    db.File.findOne({
-        where: {
-            $or: [{
-                Id: id
-            }, {
-                Name: name
-            }]
-        },
-        include: {
-            model: db.Folder
-        }
-    }).then((file) => {
-        filename = {
-            path: path.join(basedir, name),
-            pn: 0
-        }
+    // db.File.findOne({
+    //     where: {
+    //         $or: [{
+    //             Id: id
+    //         }, {
+    //             Name: name
+    //         }]
+    //     },
+    //     include: {
+    //         model: db.Folder
+    //     }
+    // }).then((file) => {
+    filename = {
+        path: path.join(basedir, name),
+        pn: 0
+    }
 
-        if (file != null) {
-            var dir = path.join(file.folder.Name, file.Name);;
-            if (fs.existsSync(dir)) filename.path = dir;
-            filename.Id = file.Id;
-            filename.pn = file.CurrentPage;
-        }
+    if (file.CurrentPage != undefined) {
+        var dir = path.join(file.folder.Name, file.Name);
+        if (fs.existsSync(dir)) filename.path = dir;
+        filename.Id = file.Id;
+        filename.pn = file.CurrentPage;
+    }
 
-        compressFile(filename.path, filename.pn).then(result => {
-            if (result) {
-                if (file == null) {
-                    var tempFile = WinDrive.ListFiles(filename.path, true)[0];
-                    db.Folder.findOrCreate({
-                        where: {
-                            Name: basedir
-                        }
-                    }).then(folder => {
-                        db.File.create({
-                            Name: name,
-                            folderId: folder[0].Id,
-                            CurrentPage: 0,
-                            TotalPage: totalPage,
-                            Size: tempFile.Size
-                        }).then(f => {
-                            updateRecents(f);
-                            loadingNext = false;
-                            filename.Id = f.Id;
-                        });
+    compressFile(filename.path, filename.pn).then(result => {
+        if (result) {
+            if (file.CurrentPage == undefined) {
+                var tempFile = WinDrive.ListFiles(filename.path, [], true)[0];
+                db.Folder.findOrCreate({
+                    where: {
+                        Name: basedir
+                    }
+                }).then(folder => {
+                    db.File.create({
+                        Name: name,
+                        folderId: folder[0].Id,
+                        CurrentPage: 0,
+                        TotalPage: totalPage,
+                        Size: tempFile.Size
+                    }).then(f => {
+                        updateRecents(f);
+                        loadingNext = false;
+                        filename.Id = f.Id;
                     });
-                } else {
-                    updateRecents(file);
-                    loadingNext = false;
-                }
+                });
+            } else {
+                updateRecents(file);
+                loadingNext = false;
             }
-        });
+        }
     });
+    // });
 }
 
 updateRecents = async (file) => {
@@ -296,7 +296,6 @@ compressFile = async (filePath, pn) => {
             totalPage = totalimg.length;
             viewerImg.src = getImage(pn);
             pageNum = pn;
-            $('.clock').addClass('clock-50up');
             $('#loadingDiv').addClass('d-none');
             $('#title').text(p);
             fileN = filesList.indexOf(p);
@@ -326,7 +325,6 @@ function loadImage(fname) {
     totalPage = filesList.length;
 
     toggleView("ImageViewer");
-    $('.clock').addClass('clock-50up');
     $imgRange.attr('max', totalPage);
     $imgRange.val(1);
     rangePopup();
@@ -375,7 +373,7 @@ $('#openFile').on('click', function () {
     }, function (openedFile) {
         if (openedFile !== undefined && openedFile.length > 0) {
             basedir = path.dirname(openedFile[0]);
-            loadZip(openedFile[0]);
+            loadZip({ Name: openedFile[0] });
         }
     });
 });
@@ -409,7 +407,6 @@ function backToFileBrowser() {
     cleanUpViewer();
     updateFilePage(filename, pageNum, totalPage);
     if (WinDrive.ListFiles(basedir).length === totalitem) {
-        $('.clock').removeClass('clock-50up');
         filesList = allFiles;
         $filescount.text('Files: ' + totalitem);
         $('#title').text(basedir);

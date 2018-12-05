@@ -56,11 +56,6 @@
     margin: 0 5px;
 }
 
-
-#viewer .toolbar>div {
-    width: 70%;
-}
-
 #img-viewer .toolbar-control span {
     flex-shrink: 1;
 }

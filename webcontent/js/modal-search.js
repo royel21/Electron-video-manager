@@ -4,6 +4,7 @@
 // var $fileFound = $('#search-found');
 var $modalSearch = $('#modal-search');
 var $searchBox = $('#modal-search-box');
+var boxFilter = "";
 showSearch = (e) => {
 
     $modalSearch.css({
@@ -50,6 +51,7 @@ searchFile = (e) => {
             // });
             // $filescount.text('Files: ' + count);
             if ($searchBox.val().length > 2 || $searchBox.val().length == 0) {
+                boxFilter = $searchBox.val().toLocaleLowerCase();
                 loadDirectory("");
             }
         }
@@ -100,5 +102,6 @@ $('#close-search').click((e) => {
     });
     e.stopPropagation();
     $searchBox.val("");
+    boxFilter = "";
     loadDirectory("");
 });

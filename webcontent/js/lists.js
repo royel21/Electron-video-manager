@@ -40,7 +40,7 @@ processRow = (event) => {
     var ul_id = li.closest('ul').id
     if ($(li).data('isfile')) {
         if (ul_id != "list-recent") filesList = listofFile;
-        loadZip("", id);
+        processFile(li.dataset.title);
     } else {
         loadDirectory('', id);
         toggleView("FileViewer");

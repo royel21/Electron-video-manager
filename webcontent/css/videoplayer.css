@@ -1,3 +1,16 @@
+.clock-60up{
+    bottom: 62px;
+}
+
+body:-webkit-full-screen .clock-60up{
+    bottom: 0px;
+    left: 47%;
+    right: initial;
+}
+body:-webkit-full-screen .clock-60up .time{
+    font-size: 14px;
+}
+
 #player{
     width: 100%;
     height: 100%;
@@ -33,20 +46,48 @@
 .v-controls span{
     position: initial;
     left: initial;
+    display: inline-block;
+    border-radius: 50%;
+    height: 30px;
+    width: 32.5px;
+}
+
+body:-webkit-full-screen .v-controls span{    
+    background-color: black;
 }
 
 .v-controls span i{
     color: #fff;
     font-size: 30px;
 }
+
 .v-controls span i:active{
     transform: scale(1.2)
+}
+
+#v-total-time{
+    position: fixed;
+    left: 10px;
+    bottom: 5px;
+    font-size: 17px;
+    color: white;
+    z-index: 10;
+    font-weight: bold;
+}
+body:-webkit-full-screen #v-total-time{
+    font-size: 20px;
+    background-color: black;
+    border-radius: 5px;
+    padding: 0 6px;
+    bottom: 2px;
+    border: 1px solid;
 }
 
 #video-viewer {
     height: 100%;
     width: 100%;
     padding-bottom: 16px;
+    background-color: black;
 }
 
 body:-webkit-full-screen #video-viewer{
@@ -102,7 +143,8 @@ body:-webkit-full-screen #video-viewer{
     border-radius: 5px;
     font-weight: bold;
     color: blue;
-
+    height: initial;
+    width: initial;
 }
 
 #vseek-thumb:after{

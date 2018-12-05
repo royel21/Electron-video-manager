@@ -63,7 +63,7 @@ $('#cm-sh-details').click((e) => {
     db.File.findOne({ where: { Name: cpyFile } }).
         then(file => {
             hidedetails();
-            var tempf = WinDrive.ListFiles(path.join(basedir, cpyFile), true)[0];
+            var tempf = WinDrive.ListFiles(path.join(basedir, cpyFile), [], true)[0];
             tempf.Page = file != null ? file.CurrentPage + 1 : 0;
             tempf.TotalPage = file != null ? file.TotalPage : 0;
             var date = new Date(tempf.LastModified);

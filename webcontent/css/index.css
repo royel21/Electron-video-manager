@@ -20,11 +20,6 @@ body,
     user-select: none;
 }
 
-#viewer{
-    height: 100%;
-    width: 100%;
-}
-
 .main {
     background-color: #14243d;
     background: radial-gradient(ellipse at center, #14243d 0%,#030611 100%);
@@ -301,7 +296,7 @@ input[type=number]:focus {
     min-width: 250px;
     height: 40px;
     z-index: 12;
-    bottom: 44px;
+    bottom: 45px;
     left: calc(100%/2 - 125px);
 }
 

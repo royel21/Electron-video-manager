@@ -23,7 +23,6 @@ var config = {
     animDuration: 200
 };
 var filesList = [];
-const prettyBytes = require('pretty-bytes');
 var fileFound = [];
 
 calCol = () => {
@@ -68,22 +67,25 @@ toggleView = (view) => {
             $viewer.removeClass('d-none');
             $('#file-viewer').addClass('d-none');
             $vplayer.addClass('d-none');
+            $('.clock').addClass('clock-50up');
             break;
         }
         case "FileViewer": {
             $('#file-viewer').removeClass('d-none');
             $vplayer.addClass('d-none');
             $viewer.addClass('d-none');
+            $('.clock').removeClass('clock-50up clock-60up');
             break;
         }
         case "VideoViewer": {
             $vplayer.removeClass('d-none');
             $('#file-viewer').addClass('d-none');
             $viewer.addClass('d-none');
+            $('.clock').addClass('clock-60up');
             break;
         }
     }
-    $('.content').css({ 'overflow-y': $vplayer.hasClass('d-none') ? "auto" : "hidden" });
+    $('.content').css({ 'overflow-y': !isPlayer() ? "auto" : "hidden" });
 }
 
 template = (file, data) => {

@@ -1,4 +1,3 @@
-var backgroundImageIndex = [];
 var selectedIndex = 0;
 var totalitem = 0;
 var isMaximized = false;
@@ -13,7 +12,7 @@ var $cmenu = $('#context-menu');
 var favs = [];
 var folderId = null;
 var images = ['png', 'gif', 'jpg', 'jpeg', 'webp', 'bmp'];
-
+var backgroundImage = [];
 var compressingCount = 0;
 
 ipcRenderer.on('thumb-create', (event, name) => {
@@ -38,6 +37,7 @@ ipcRenderer.on('error', (event, msg) => {
             --processRunning;
             if (processRunning == 0)
                 $('#folder-reloading .fa-folder').addClass('d-none');
+                backgroundImage = [];
         }
 });
 
@@ -65,15 +65,18 @@ ipcRenderer.on('zip-done', (e, result) => {
 });
 
 processFile = (name) => {
-    var ex = String(name).split('.').pop().toLocaleLowerCase();
-    console.log(ex)
-    if (images.includes(ex)) {
-        loadImage(name);
-    } else if (config.fileFilters.includes(ex)) {
-        loadZip(name);
-    } else if (config.videoFilter.includes(ex)) {
-        playVideo(name);
-    }
+    db.File
+        .findOne({ where: { Name: name }, include: { model: db.Folder } })
+        .then((f) => {
+            if (f == null) f = { Name: name, folder: { Name: basedir } };
+            var ex = f.Name.split('.').pop().toLocaleLowerCase();
+            console.log(ex)
+            if (config.fileFilters.includes(ex)) {
+                loadZip(f);
+            } else if (config.videoFilter.includes(ex)) {
+                initPlayer(f);
+            }
+        });
 }
 
 selectItem = (index) => {
@@ -203,12 +206,12 @@ function CreateEl(file, diskIcon) {
     var isFile = !file.isDirectory;
     var img = diskIcon === undefined ? isFile ? zipIcon : folderIcon : diskIcon;
     var isImage = false;
-    var ex = file.extension.toLocaleLowerCase();
     if (isFile) {
+        var ex = file.extension.toLocaleLowerCase();
         if (images.includes(ex)) {
             isImage = true;
             img = path.join(basedir, file.FileName).replace('#', '%23');
-        }else if(config.videoFilter.includes(ex)){
+        } else if (config.videoFilter.includes(ex)) {
             img = videoIcon;
         }
     }
@@ -274,14 +277,14 @@ loadDirectory = async (folder, id) => {
             basedir = dir;
             var files = [];
             var folders = [];
-            backgroundImageIndex = [];
-            WinDrive.ListFiles(dir).sort(sortBy).forEach((f) => {
+            WinDrive.ListFiles(dir).forEach((f) => {
+                var name = f.FileName.toLocaleLowerCase();
                 if (!f.isHidden) {
-                    if (f.isDirectory) {
+                    if (f.isDirectory && name.includes(boxFilter)) {
                         folders.push(f);
                     } else {
                         if (images.concat(config.fileFilters).concat(config.videoFilter).includes(f.extension)
-                            && f.FileName.toLocaleLowerCase().indexOf($('#modal-search-box').val().toLocaleLowerCase()) > -1)
+                            && name.includes(boxFilter))
                             files.push(f);
                     }
                 }
@@ -302,12 +305,13 @@ loadDirectory = async (folder, id) => {
                 var tFiles = files.filter(f => {
                     var fv = path.resolve("./covers", f.FileName);
                     return config.fileFilters.concat(config.videoFilter).includes(f.extension) &&
-                        !fs.existsSync(fv + ".jpg") && !fs.existsSync(fv + ".png")
+                        !fs.existsSync(fv + ".jpg") && !fs.existsSync(fv + ".png") && backgroundImage.find(f2 => f2.FileName === f.FileName) == undefined
                 });
 
                 if (tFiles.length > 0) {
                     $('#folder-reloading .fa-folder').removeClass('d-none');
                     createBackgroundWin('create-cover', { basedir, files: tFiles });
+                    backgroundImage = backgroundImage.concat(tFiles);
                     processRunning++;
                 }
 
@@ -364,7 +368,10 @@ keyboardHandler = (event) => {
                     var name = $el.data('name');
 
                     if ($el.data('isfile')) {
-                        processFile(name);
+                        if (images.includes(name.split('.').pop())) {
+                            loadImage(name);
+                        } else
+                            processFile(name);
                     } else {
                         loadDirectory(name);
                     }
@@ -483,9 +490,12 @@ dbclick = (event) => {
 
     var $item = $(event.target).closest('.items');
 
-    var name = $item.attr('data-name');
+    var name = $item.data('name');
     if (name) {
         if ($item.data('isfile')) {
+            if (images.includes(name.split('.').pop())) {
+                loadImage(name);
+            } else
             processFile(name);
         } else {
             loadDirectory(name);
