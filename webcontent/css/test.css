@@ -1,0 +1,71 @@
+.slider {
+    position: relative;
+    top: 100px;
+    width: 80%;
+    margin: auto;
+    height: 10px;
+    cursor: pointer;
+}
+
+.slider .slider-track,
+.slider .slider-progress{
+    width: 100%;
+    height: 10px;
+    background-color: wheat;
+    border-radius: 5px;
+}
+
+.slider .slider-progress{
+    position: absolute;
+    width: 50%;
+    top: 0;
+    z-index: 1;
+    background-color:  aqua;
+    pointer-events: none;
+}
+.slider .slider-thumb{
+    display: inline-block;
+    position: absolute;
+    top: -8px;
+    left: -12.5px;
+    z-index: 2;
+    height: 25px;
+    width: 25px;
+    border-radius: 50%;
+    background-color: wheat;
+    box-shadow: 0 0 5px rgba(81, 203, 238, 1);
+}
+
+.slider .slider-preview{
+    display: none;
+    position: absolute;
+    top: -80px;
+    left: 0;
+    height: 60px;
+    width: 70px;
+    background-color: white;
+    border-radius: 5px;
+    padding: 2px;
+}
+.slider .v-preview-arrow:after{
+    content: " ";
+    position: absolute;
+    bottom: -7.5px;
+    left: 38%;
+    background-color: white;
+    height: 15px;
+    width: 15px;
+    transform: rotateZ(45deg);
+    z-index: 0;
+}
+
+.slider .slider-preview video{
+    position: absolute;
+    width: 94%;
+    height: 92%;
+    object-fit: fill;
+    z-index: 10;
+}
+.slider .slider-track:hover + .slider-preview{
+    display: inline-block;
+}

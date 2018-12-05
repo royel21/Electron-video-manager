@@ -1,5 +1,4 @@
 var volcontrol = document.getElementById('v-vol-control');
-var vseeker = document.getElementById('v-seek');
 var btnPlay = document.getElementById('v-play');
 var btnMuted = document.getElementById('v-mute');
 var player = document.getElementById('player');
@@ -10,11 +9,12 @@ var $vTotalTime = $('#v-total-time');
 var isPlayer = () => !$vplayer.hasClass('d-none');
 var vFilter = ['mp4', 'mkv', 'avi', 'webm', 'ogg'];
 var totalTime;
-// player.setAttribute("controls", "controls")
 var videoIndex = 0;
 var videos = [];
 var hour = false;
 var vDuration = "";
+
+var Slider = null;
 
 formatTime = (time) => {
     var h = Math.floor(time / 3600);
@@ -42,7 +42,10 @@ returnToFb = () => {
     $(window).off('wheel', wheelScroll);
     $(document).off('mousemove', hideVideoControls);
     $(document).off('webkitfullscreenchange', hideVideoControls);
-    $(window).off('resize', ajustSeekerPos);
+    if (slider) {
+        Slider.setVideo("");
+        Slider = null;
+    }
     videos = [];
     toggleView('FileViewer');
 }
@@ -53,45 +56,17 @@ playVideo = async (v) => {
     player.src = v.replace('#', '%23');
     $('#title').text(path.basename(v));
     player.play().catch(e => { });
+    Slider.setVideo(v);
 }
-
-ajustSeekerPos = () => {
-    var v = formatTime(player.currentTime);
-
-    var $vseeker = $(vseeker);
-    var newPoint, newPlace;
-    // Cache this for efficiency
-
-    // Measure width of range input
-    width = $('#video-seeker').width();
-
-    // Figure out placement percentage between left and right of input
-    newPoint = (Math.floor(vseeker.value)) / (player.duration);
-
-    newPlace = (width * newPoint);
-    $vseeker.next()
-        .css({
-            left: newPlace,
-            marginLeft: hour ? newPoint.map(0.0, 1.0, 11, -10) : newPoint.map(0.0, 1.0, 26, 2)
-        }).text(v);
-    $vTotalTime.text(v + "/" + formatTime(player.duration));
-}
-
 
 player.onloadedmetadata = function (e) {
-    vseeker.min = 0.0;
-    vseeker.max = player.duration;
-    vseeker.value = 0.0;
-    hour = player.duration/3600 < 0;
+    Slider.min = 0;
+    Slider.max = player.duration;
+    Slider.value = 0;
+    hour = player.duration / 3600 < 0;
     vDuration = formatTime(0) + "/" + vDuration;
     player.volume = volcontrol.value;
-    ajustSeekerPos();
     toggleView("VideoViewer");
-    
-}
-
-vseeker.oninput = (e) => {
-    player.currentTime = e.target.value;
 }
 
 volcontrol.oninput = (e) => {
@@ -106,11 +81,9 @@ $(player).dblclick((e) => {
 });
 
 player.ontimeupdate = (e) => {
-    vseeker.value = Math.floor(player.currentTime);
-    ajustSeekerPos();
+    Slider.value = Math.floor(player.currentTime);
 }
-//createThumb();
-//playVideo(0);
+
 player.onended = function () {
     if (videoIndex < videos.length - 1) {
         playVideo(videos[++videoIndex]);
@@ -201,16 +174,18 @@ wheelScroll = (event) => {
 };
 
 initPlayer = (v) => {
+    Slider = new SliderRange();
+    Slider.oninput = (value) => {
+        player.currentTime = value;
+    }
     var video = path.join(v.folder.Name, v.Name);
     playVideo(video);
 
     $(window).on('wheel', wheelScroll);
     $(document).on('mousemove', hideVideoControls);
     $(document).on('webkitfullscreenchange', hideVideoControls);
-    $(window).on('resize', ajustSeekerPos);
-
-    videos = WinDrive.ListFiles(basedir, vFilter).map((video) => {
-        return path.join(basedir, video.FileName);
+    videos = WinDrive.ListFiles(v.folder.Name, vFilter).map((vid) => {
+        return path.join(basedir, vid.FileName);
     });
     videoIndex = videos.indexOf(video);
 }

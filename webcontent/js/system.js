@@ -1,3 +1,8 @@
+
+const app = require('electron').remote;
+const mainWindow = app.getCurrentWindow();
+var isMaximized = false;
+
 closeWindow = () => mainWindow.close();
 minWindow = () => mainWindow.minimize();
 maxWindow = () => {
@@ -47,55 +52,9 @@ setfullscreen = () => {
         });
         mainWindow.setResizable(true);
     }
-
-    if ($viewer.hasClass('d-none')) {
-        selectItem(selectedIndex);
-    }
-    console.trace("T");
 }
 $('#btn-sys-min').on('click', minWindow);
 $('#btn-sys-max').on('click', maxWindow);
 $('.btn-sys-close').on('click', closeWindow);
 $('.btn-fullscr').on('click', setfullscreen);
 
-goToRoots = async () => {
-    $('#title').text("Home");
-    var diskIcon = './webcontent/image/hard-disk-256.png'
-    $('#file-list').empty();
-    var dir = basedir;
-    basedir = '';
-
-    folderId = null;
-    await loadFavs();
-    var drives = WinDrive.ListDrivesInfo().filter(d => d.Type !== 5);
-    totalitem = drives.length;
-    drives.sort().forEach((d, index) => {
-        var ico = diskIcon;
-        $('#file-list').append(CreateEl({
-            FileName: d.Drive,
-            isDirectory: true
-        }, ico));
-    });
-    $filescount.empty().append('Files: ' + totalitem);
-    calCol();
-    var item = $('.items').toArray().filter((t) => {
-        return $(t).attr('data-name') === dir
-    });
-    selectItem($('.items').index(item[0]));
-    localStorage.setItem('basedir', '');
-    lazyLoad();
-    toggleView("FileViewer");
-}
-$('#btn-home').click(goToRoots);
-
-/****************Resize*******************************************/
-
-$(document).on('keydown', (e) => {
-    if (!$viewer.hasClass('d-none')) {
-        ViewerKeyUp(e);
-    } else if (!$('#video-viewer').hasClass('d-none')) {
-        playerKeyHandler(e);
-    } else {
-        keyboardHandler(e);
-    }
-});

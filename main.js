@@ -24,7 +24,7 @@ function createWin() {
         frame: false,
     });
     //win.setMenu(null);
-    win.loadURL('file://' + __dirname + '/index.1.html');
+    win.loadURL('file://' + __dirname + '/index.html');
     win.on('ready-to-show', () => {
         win.show();
     });

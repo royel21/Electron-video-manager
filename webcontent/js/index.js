@@ -1,6 +1,5 @@
 var selectedIndex = 0;
 var totalitem = 0;
-var isMaximized = false;
 var allFiles;
 var contentScroll = $('.content').get(0);
 var processRunning = 0;
@@ -530,6 +529,36 @@ $('#tool-folderNext').click(() => {
     JumpFolder(1)
 });
 
+goToRoots = async () => {
+    $('#title').text("Home");
+    var diskIcon = './webcontent/image/hard-disk-256.png'
+    $('#file-list').empty();
+    var dir = basedir;
+    basedir = '';
+
+    folderId = null;
+    await loadFavs();
+    var drives = WinDrive.ListDrivesInfo().filter(d => d.Type !== 5);
+    totalitem = drives.length;
+    drives.sort().forEach((d, index) => {
+        var ico = diskIcon;
+        $('#file-list').append(CreateEl({
+            FileName: d.Drive,
+            isDirectory: true
+        }, ico));
+    });
+    $filescount.empty().append('Files: ' + totalitem);
+    calCol();
+    var item = $('.items').toArray().filter((t) => {
+        return $(t).attr('data-name') === dir
+    });
+    selectItem($('.items').index(item[0]));
+    localStorage.setItem('basedir', '');
+    lazyLoad();
+    toggleView("FileViewer");
+}
+$('#btn-home').click(goToRoots);
+
 $(readyFunc = (event) => {
 
     $(document).keypress(jumpToFile);
@@ -610,4 +639,20 @@ $(readyFunc = (event) => {
 
     //     testFiles();
     // });
+});
+
+$(document).on('webkitfullscreenchange', ()=>{
+    if ($viewer.hasClass('d-none')) {
+        selectItem(selectedIndex);
+    }
+});
+
+$(document).on('keydown', (e) => {
+    if (!$viewer.hasClass('d-none')) {
+        ViewerKeyUp(e);
+    } else if (!$('#video-viewer').hasClass('d-none')) {
+        playerKeyHandler(e);
+    } else {
+        keyboardHandler(e);
+    }
 });

@@ -1,13 +1,11 @@
 const ipcRenderer = require('electron').ipcRenderer;
 const { clipboard } = require('electron');
-const app = require('electron').remote;
 const WinDrive = require('win-explorer');
 const dialog = app.dialog;
 const fs = require('fs-extra');
 const path = require('path');
 const db = require('./webcontent/entity/models')
 const local = localStorage;
-const mainWindow = app.getCurrentWindow();
 var basedir = "";
 var config = {
     recents: [],

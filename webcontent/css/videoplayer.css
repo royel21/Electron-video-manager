@@ -28,6 +28,7 @@ body:-webkit-full-screen .clock-60up .time{
     transition: all .3s;
     opacity: 1;
     padding-bottom: 5px;
+    /* height: 41px; */
 }
 
 .hide-vcontrols{
@@ -87,7 +88,7 @@ body:-webkit-full-screen #v-total-time{
 #video-viewer {
     height: 100%;
     width: 100%;
-    padding-bottom: 16px;
+    padding-bottom: 23px;
     background-color: black;
 }
 
@@ -123,7 +124,7 @@ body:-webkit-full-screen #video-viewer{
     margin: 0 40px;
 }
 
-#video-seeker .slider::-webkit-slider-thumb {
+#video-seeker .range::-webkit-slider-thumb {
     -webkit-appearance: none;
     appearance: none;
     width: 25px;
@@ -214,3 +215,6 @@ body:not(:-webkit-full-screen) .v-controls{
     opacity: 1;
 }
 
+#slider-container{
+    height: 30px;
+}
