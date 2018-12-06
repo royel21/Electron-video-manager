@@ -1,6 +1,6 @@
 .slider {
     position: relative;
-    width: 90%;
+    width: 85%;
     margin: auto;
     height: 10px;
     cursor: pointer;
@@ -9,25 +9,22 @@
 
 .slider .slider-track,
 .slider .slider-progress{
+    position: absolute;
     width: 100%;
     height: 10px;
     background-color: wheat;
     border-radius: 5px;
+    z-index: 2;
 }
 
 .slider .slider-progress{
-    position: absolute;
-    width: 50%;
-    top: 0;
-    z-index: 1;
     background-color:  aqua;
     pointer-events: none;
 }
 .slider .slider-thumb{
     display: inline-block;
     position: absolute;
-    top: -10px;
-    left: -12.5px;
+    top: -8px;
     z-index: 2;
     height: 25px;
     width: 25px;
@@ -36,18 +33,18 @@
     box-shadow: 0 0 5px rgba(81, 203, 238, 1);
 }
 
-.slider .slider-preview{
+.slider #slider-preview{
     display: none;
     position: absolute;
-    top: -80px;
+    top: -100px;
     left: 0;
-    height: 65px;
-    width: 85px;
+    height: 80px;
+    width: 100px;
     background-color: white;
     border-radius: 5px;
     padding: 2px;
 }
-.slider .v-preview-arrow:after{
+#slider-preview .v-preview-arrow:after{
     content: " ";
     position: absolute;
     bottom: -7.5px;
@@ -59,17 +56,34 @@
     z-index: 0;
 }
 
-.slider .slider-preview video{
+.slider #slider-preview video{
+    position: absolute;
+    left: 2px;
+    top: 4px;
     width: 95%;
-    height: 86%;
+    height: 90%;
     object-fit: fill;
     z-index: 10;
 }
+.slider #slider-preview:after{
+    content: attr(data-time);
+    position:absolute;
+    left: 0;
+    bottom: 5px;
+    z-index: 10;
+    width: 100%;
+    padding: 0 5px;
+    border-radius: 5px;
+}
 
-
-.slider .slider-track:hover + .slider-preview{
+.slider:hover #slider-preview{
     display: inline-block;
 }
+
+.slider .slider-thumb:hover + #slider-preview{
+    display: none;
+}
+
 .slider:hover .slider-progress,
 .slider:hover .slider-track{
     height: 10px;

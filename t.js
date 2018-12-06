@@ -1,59 +1,58 @@
 var sld12232 = $('.slider')[0];
-var $sltrack = $('.slider .slider-track');
-var $slTrackProgress = $('.slider .slider-progress');
-var $slthumb = $('.slider .slider-thumb');
-var vpreview = $('#v-preview')[0];
+var $slider_track = $('.slider .slider-track');
+var $slider_trackProgress = $('.slider .slider-progress');
+var $slider_thumb = $('.slider .slider-thumb');
 var player = $('#player')[0];
 var slthumbPresses = false;
-var offsetW = 0;
-
-Number.prototype.map = function (in_min, in_max, out_min, out_max) {
-    return (this - in_min) * (out_max - out_min) / (in_max - in_min) + out_min;
-}
 
 getOffset = () => sld12232.offsetLeft + 12.5;
 
+offsetW = () => Math.floor(sld12232.offsetWidth - 13);
+
 class SliderRange {
-    constructor() {
+    constructor(video) {
         this.oninput = null;
         this._value = 50;
         this._min = 0;
         this._max = 100;
-        $sltrack.mousedown((e) => {
+        this.vpreview = $('#v-preview')[0];
+
+        $slider_track.mousedown((e) => {
             slthumbPresses = true;
-            offsetW = Math.floor(sld12232.offsetWidth - 12);
             this.updateValue(e.pageX - getOffset());
         });
 
-        $slthumb.mousedown((e) => {
+        $slider_thumb.mousedown((e) => {
             slthumbPresses = true;
-            offsetW = Math.floor(sld12232.offsetWidth - 13);
         });
 
         $(document).mousemove((ev) => {
             if (slthumbPresses) {
                 var newPos = Math.floor(ev.pageX - getOffset());
-                if (newPos > -11 && newPos < offsetW) {
+                if (newPos > -11 && newPos < offsetW()) {
                     this.updateValue(newPos);
                 }
             }
         });
-        
-        $sltrack.mousemove((ev) => {
+
+        $slider_track.mousemove((ev) => {
             var newPos = Math.floor(ev.pageX - getOffset());
-            $('.slider-preview').css({ left: newPos-20 });
-            vpreview.currentTime = Number(newPos.map(-10, offsetW - 1, this.min, this.max).toFixed(2))
+            $('.slider-preview').css({ left: newPos - 20 });
+            this.vpreview.currentTime = Number(newPos.map(-10, offsetW() - 1, this.min, this.max).toFixed(2))
         });
 
-        offsetW = Math.floor(sld12232.offsetWidth - 12);
         $(document).mouseup(() => {
             slthumbPresses = false;
         });
-        
+
         $(window).on('resize', () => {
-            offsetW = Math.floor(sld12232.offsetWidth - 13);
             this.updatePos();
         });
+
+        // $slider_thumb.mouseenter(() => $('.slider-preview').css({ display: "inline-block" }));
+        // $slider_thumb.mouseleave(() => $('.slider-preview').css({ display: "none" }));
+
+
     }
 
     get max() {
@@ -84,7 +83,7 @@ class SliderRange {
     }
 
     updateValue(val) {
-        this._value = Number(val.map(-10, offsetW - 1, this.min, this.max).toFixed(2));
+        this._value = Number(val.map(-10, offsetW() - 1, this.min, this.max).toFixed(2));
         if (this.oninput) {
             this.oninput(this._value);
         }
@@ -93,26 +92,14 @@ class SliderRange {
 
     updatePos() {
         if (typeof this._value === "number") {
-            $slthumb.css({ left: this._value.map(this._min, this._max, -10, offsetW - 1) });
-            $slTrackProgress.css({ width: this._value.map(this._min, this._max, 0, 100) + "%" });
+            $slider_thumb.css({ left: this._value.map(this._min, this._max, -10, offsetW() - 1) });
+            $slider_trackProgress.css({ width: this._value.map(this._min, this._max, 0, 100) + "%" });
         }
+    }
+
+    setVideo(v) {
+        this.vpreview.src = v;
     }
 }
 
-var Slider = new SliderRange();
-vpreview.src = "D:\\anime\\[by d_a_HD] One Piece (701).mp4";
-player.src = vpreview.src;
-
-
-
-player.onloadedmetadata = function (e) {
-    Slider.min = 0;
-    Slider.max = player.duration;
-    Slider.value = 0;
-}
-Slider.min = player;
-Slider.max = 1;
-Slider.value = 0.5;
-Slider.oninput = (value) => {
-   player.currentTime = value;
-}
+initPlayer({ Name: "[by d_a_HD] One Piece (701).mp4", folder: { Name: "D:\\anime\\One Piece\\" } })

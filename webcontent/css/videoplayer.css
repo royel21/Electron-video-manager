@@ -1,5 +1,5 @@
 .clock-60up{
-    bottom: 62px;
+    bottom: 69px;
 }
 
 body:-webkit-full-screen .clock-60up{
@@ -28,7 +28,6 @@ body:-webkit-full-screen .clock-60up .time{
     transition: all .3s;
     opacity: 1;
     padding-bottom: 5px;
-    /* height: 41px; */
 }
 
 .hide-vcontrols{

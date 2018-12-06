@@ -6,7 +6,8 @@
     <link rel="stylesheet" href="./webcontent/lib/css/bootstrap.min.css">
     <link rel="stylesheet" href="./webcontent/lib/css/fontawesome-all.min.css">
     <link rel="stylesheet" href="./webcontent/css/index.css">
-    <link rel="stylesheet" href="./webcontent/css/test.css">
+    <link rel="stylesheet" href="./webcontent/css/videoplayer.css">
+    <link rel="stylesheet" href="./test.css">
 </head>
 
 <body>
@@ -31,18 +32,44 @@
     <div class="main">
         <div class="p-2">
             <video id="player" src=""></video>
-            <div>
-                <div class="slider">
-                    <div class="slider-progress"></div>
-                    <div class="slider-track"></div>
-                    <span class="slider-preview">
-                        <video id="v-preview" src=""></video>
-                        <span class="v-preview-arrow">
+            <div class="text-center v-controls footer">
+                <div id="slider-container">
+                    <div class="slider">
+                        <div class="slider-track">
+                            <div class="slider-progress"></div>
+                        </div>
+                        <span class="slider-preview">
+                            <video id="v-preview" src=""></video>
+                            <span class="v-preview-arrow">
+                            </span>
                         </span>
-                    </span>
-                    <span class="slider-thumb"></span>
+                        <span class="slider-thumb"></span>
+                    </div>
                 </div>
+                <span id="v-exit-to-fb">
+                    <i class="fas fa-arrow-circle-up"></i>
+                </span>
+                <span id="v-prev"><i class="far fa-arrow-alt-circle-left"></i></i></span>
+                <span id="v-play-pause">
+                    <label for="v-play">
+                        <input id="v-play" type="checkbox">
+                        <i class="far fa-play-circle"></i>
+                    </label>
+                </span>
+                <span id="v-next"><i class="far fa-arrow-alt-circle-right"></i></i></span>
+                <span class="btn-fullscr">
+                    <i class="fas fa-expand-arrows-alt"></i>
+                </span>
+                <span id="v-vol">
+                    <input id="v-vol-control" class="range" type="range" min="0" step="0.01" value="0.5" max="1">
+                    <label for="v-mute">
+                        <input type="checkbox" id="v-mute">
+                        <span id="mute-icon"></span>
+                        <i class="fas fa-volume-up"></i>
+                    </label>
+                </span>
             </div>
+            <span id="v-total-time">00:00:00</span>
         </div>
     </div>
     <script>
@@ -52,7 +79,9 @@
         }
     </script>
     <script src="./webcontent/lib/js/jquery.min.js"></script>
+    <script src="./util.js"></script>
     <script src="./webcontent/js/system.js"></script>
+    <script src="./webcontent/js/videoplayer.js"></script>
     <script src="t.js"></script>
 </body>
 

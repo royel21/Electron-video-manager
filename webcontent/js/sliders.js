@@ -4,9 +4,10 @@ var $slider_trackProgress = $('.slider .slider-progress');
 var $slider_thumb = $('.slider .slider-thumb');
 var player = $('#player')[0];
 var slthumbPresses = false;
-var offsetW = 0;
 
 getOffset = () => sld12232.offsetLeft + 12.5;
+
+offsetW = () => Math.floor(sld12232.offsetWidth - 13);
 
 class SliderRange {
     constructor(video) {
@@ -18,19 +19,18 @@ class SliderRange {
 
         $slider_track.mousedown((e) => {
             slthumbPresses = true;
-            offsetW = Math.floor(sld12232.offsetWidth - 12);
             this.updateValue(e.pageX - getOffset());
+            console.log("click")
         });
 
         $slider_thumb.mousedown((e) => {
             slthumbPresses = true;
-            offsetW = Math.floor(sld12232.offsetWidth - 13);
         });
 
         $(document).mousemove((ev) => {
             if (slthumbPresses) {
                 var newPos = Math.floor(ev.pageX - getOffset());
-                if (newPos > -11 && newPos < offsetW) {
+                if (newPos > -11 && newPos < offsetW()) {
                     this.updateValue(newPos);
                 }
             }
@@ -38,17 +38,15 @@ class SliderRange {
         
         $slider_track.mousemove((ev) => {
             var newPos = Math.floor(ev.pageX - getOffset());
-            $('.slider-preview').css({ left: newPos-20 });
-            this.vpreview.currentTime = Number(newPos.map(-10, offsetW - 1, this.min, this.max).toFixed(2))
+            this.vpreview.currentTime = Number(newPos.map(-10, offsetW() - 1, this.min, this.max).toFixed(2));
+            $('#slider-preview').css({ left: newPos-30 }).attr('data-time',formatTime(this.vpreview.currentTime));
         });
 
-        offsetW = Math.floor(sld12232.offsetWidth - 12);
         $(document).mouseup(() => {
             slthumbPresses = false;
         });
         
         $(window).on('resize', () => {
-            offsetW = Math.floor(sld12232.offsetWidth - 13);
             this.updatePos();
         });
     }
@@ -81,7 +79,7 @@ class SliderRange {
     }
 
     updateValue(val) {
-        this._value = Number(val.map(-10, offsetW - 1, this.min, this.max).toFixed(2));
+        this._value = Number(val.map(-10, offsetW() - 1, this.min, this.max).toFixed(2));
         if (this.oninput) {
             this.oninput(this._value);
         }
@@ -90,7 +88,7 @@ class SliderRange {
 
     updatePos() {
         if (typeof this._value === "number") {
-            $slider_thumb.css({ left: this._value.map(this._min, this._max, -10, offsetW - 1) });
+            $slider_thumb.css({ left: this._value.map(this._min, this._max, -10, offsetW() - 1) });
             $slider_trackProgress.css({ width: this._value.map(this._min, this._max, 0, 100) + "%" });
         }
     }

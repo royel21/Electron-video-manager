@@ -1,5 +1,5 @@
-const ipcRenderer = require('electron').ipcRenderer;
-const { clipboard } = require('electron');
+
+const { clipboard, ipcRenderer } = require('electron');
 const WinDrive = require('win-explorer');
 const dialog = app.dialog;
 const fs = require('fs-extra');
@@ -199,7 +199,7 @@ JumpFolder = (num) => {
         var dir = path.dirname(basedir);
         //list all folder in root dir
         var folders = WinDrive.ListFiles(dir).filter(f => {
-            return f.isDirectory && !f.isd - none
+            return f.isDirectory && !f.isHidden;
         }).sort(sortFileBy).map(a => a.FileName);
         //get current folder
         var toJump = folders.indexOf(path.basename(basedir)) + num;
@@ -221,6 +221,8 @@ JumpFolder = (num) => {
 
 $(window).on('beforeunload', (e) => {
     local.setObject('config', config);
+    local.setObject('playerconfig', playerConfig);
+    ipcRenderer.send('console-log', "test");
 });
 
 if (local.getObject('config') != null && !$.isEmptyObject(local.getObject('config'))) {

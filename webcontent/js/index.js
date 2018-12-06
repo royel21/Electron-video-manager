@@ -639,6 +639,7 @@ $(readyFunc = (event) => {
 
     //     testFiles();
     // });
+    
 });
 
 $(document).on('webkitfullscreenchange', ()=>{

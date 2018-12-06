@@ -13,8 +13,9 @@ var videoIndex = 0;
 var videos = [];
 var hour = false;
 var vDuration = "";
-
 var Slider = null;
+var muted = false;
+var playerConfig = { volume: 0, isMuted: false, hideCtrSecond: 1 };
 
 formatTime = (time) => {
     var h = Math.floor(time / 3600);
@@ -42,12 +43,13 @@ returnToFb = () => {
     $(window).off('wheel', wheelScroll);
     $(document).off('mousemove', hideVideoControls);
     $(document).off('webkitfullscreenchange', hideVideoControls);
-    if (slider) {
+    if (Slider) {
         Slider.setVideo("");
         Slider = null;
     }
     videos = [];
     toggleView('FileViewer');
+    local.setObject('video-player-config', playerConfig);
 }
 
 $('#v-exit-to-fb').click(returnToFb);
@@ -64,24 +66,22 @@ player.onloadedmetadata = function (e) {
     Slider.max = player.duration;
     Slider.value = 0;
     hour = player.duration / 3600 < 0;
-    vDuration = formatTime(0) + "/" + vDuration;
-    player.volume = volcontrol.value;
+    vDuration = formatTime(player.duration);
+    $vTotalTime.text(formatTime(0) + "/" + vDuration);
+    player.volume = playerConfig.volume;
+    volcontrol.value = playerConfig.volume;
+    player.muted = playerConfig.isMuted;
+    btnMuted.checked = playerConfig.isMuted;
     toggleView("VideoViewer");
 }
-
-volcontrol.oninput = (e) => {
-    player.volume = volcontrol.value;
-}
-
-btnPlay.onchange = () => btnPlay.checked ? player.play() : player.pause();
-btnMuted.onchange = () => player.muted = btnMuted.checked;
 
 $(player).dblclick((e) => {
     setfullscreen();
 });
 
 player.ontimeupdate = (e) => {
-    Slider.value = Math.floor(player.currentTime);
+    if(Slider) Slider.value = Math.floor(player.currentTime);
+    $vTotalTime.text(formatTime(player.currentTime) + "/" + vDuration)
 }
 
 player.onended = function () {
@@ -109,7 +109,7 @@ hideVideoControls = () => {
                 cursorVisible = false;
                 $('.v-controls').addClass('hide-vcontrols');
             }
-        }, 1000);
+        }, playerConfig.hideCtrSecond * 1000);
     }
 }
 
@@ -130,6 +130,7 @@ playerKeyHandler = (e) => {
         }
         case 38: {
             volcontrol.value = player.volume + (event.ctrlKey ? 0.05 : 0.01);
+            muted = false;
             player.volume = volcontrol.value;
             break;
         }
@@ -139,6 +140,7 @@ playerKeyHandler = (e) => {
         }
         case 40: {
             volcontrol.value -= Number(event.ctrlKey ? 0.05 : 0.01);
+            muted = false;
             player.volume = volcontrol.value;
             break;
         }
@@ -157,11 +159,31 @@ $(player).click((e) => {
     }
 });
 
-player.onvolumechange = function (e) { btnMuted.checked = player.volume == 0; }
+volcontrol.oninput = (e) => {
+    muted = false;
+    player.volume = volcontrol.value;
+}
+
+btnPlay.onchange = () => btnPlay.checked ? player.play() : player.pause();
+
+btnMuted.onchange = () => {
+    muted = true;
+    playerConfig.isMuted = btnMuted.checked;
+    player.muted = btnMuted.checked ? true : false;
+    console.log(btnMuted.checked);
+}
+player.onvolumechange = function (e) { 
+    if(!muted){
+        player.muted = btnMuted.checked = (player.volume == 0); 
+        playerConfig.volume = player.volume;
+
+    }
+}
 
 wheelScroll = (event) => {
     // deltaY obviously records vertical scroll, deltaX and deltaZ exist too
     if (isPlayer()) {
+        muted = false;
         if (event.originalEvent.deltaY < 0) {
             volcontrol.value = player.volume + 0.05;
             player.volume = volcontrol.value;
@@ -174,19 +196,23 @@ wheelScroll = (event) => {
 };
 
 initPlayer = (v) => {
+
     Slider = new SliderRange();
     Slider.oninput = (value) => {
         player.currentTime = value;
     }
     var video = path.join(v.folder.Name, v.Name);
-    playVideo(video);
 
     $(window).on('wheel', wheelScroll);
     $(document).on('mousemove', hideVideoControls);
     $(document).on('webkitfullscreenchange', hideVideoControls);
     videos = WinDrive.ListFiles(v.folder.Name, vFilter).map((vid) => {
-        return path.join(basedir, vid.FileName);
+        return path.join(v.folder.Name, vid.FileName);
     });
     videoIndex = videos.indexOf(video);
-}
+    if (local.getObject('playerconfig') != null && !$.isEmptyObject(local.getObject('playerconfig'))) {
+        playerConfig = local.getObject('playerconfig');
+    }
+    playVideo(video);
 
+}
