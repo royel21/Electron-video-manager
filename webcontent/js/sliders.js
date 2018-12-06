@@ -3,7 +3,7 @@ var $slider_track = $('.slider .slider-track');
 var $slider_trackProgress = $('.slider .slider-progress');
 var $slider_thumb = $('.slider .slider-thumb');
 var player = $('#player')[0];
-var slthumbPresses = false;
+var isSliderThumbPressed = false;
 
 getOffset = () => sld12232.offsetLeft + 12.5;
 
@@ -18,17 +18,17 @@ class SliderRange {
         this.vpreview = $('#v-preview')[0];
 
         $slider_track.mousedown((e) => {
-            slthumbPresses = true;
+            isSliderThumbPressed = true;
             this.updateValue(e.pageX - getOffset());
             console.log("click")
         });
 
         $slider_thumb.mousedown((e) => {
-            slthumbPresses = true;
+            isSliderThumbPressed = true;
         });
 
         $(document).mousemove((ev) => {
-            if (slthumbPresses) {
+            if (isSliderThumbPressed) {
                 var newPos = Math.floor(ev.pageX - getOffset());
                 if (newPos > -11 && newPos < offsetW()) {
                     this.updateValue(newPos);
@@ -42,10 +42,8 @@ class SliderRange {
             $('#slider-preview').css({ left: newPos-30 }).attr('data-time',formatTime(this.vpreview.currentTime));
         });
 
-        $(document).mouseup(() => {
-            slthumbPresses = false;
-        });
-        
+        $(document).mouseup(() => isSliderThumbPressed = false);
+
         $(window).on('resize', () => {
             this.updatePos();
         });

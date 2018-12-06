@@ -22,9 +22,16 @@ var loadingNext = false;
 var $viewer = $('#image-viewer');
 var $input;
 var backgroundLoader;
+
+updateFilePage = (file, page, totalPage) => {
+    if (file != undefined && !isImage) {
+        return db.db.query(`UPDATE files set CurrentPage = ${page}, TotalPage = ${totalPage} WHERE Id = ${file.Id};`);
+    }
+}
+
 /***********************************************************/
 function imgFilter(entry) {
-    return images.includes(String(entry.name).toLocaleLowerCase().split('.').pop());
+    return imagesFilter.includes(String(entry.name).toLocaleLowerCase().split('.').pop());
 }
 /***********************************************************/
 function getRandomNum() {
@@ -36,13 +43,22 @@ function cleanUpViewer() {
         zip.close();
         zip = null;
     }
+
     if (backgroundLoader != undefined) {
         clearInterval(backgroundLoader);
         backgroundLoader = undefined;
     }
+    
     if (rar != null) rar = null;
     backImages = [];
     totalimg = [];
+
+    $(document).off('keydown', ViewerKeyUp);
+    $('#prev-file').off('click', prevFile);
+    $('#prev-img').off('click', prevImg);
+    $('#next-img').off('click', nextImg);
+    $('#next-file').off('click', nextFile);
+    $('#backtofilelist').off('click', backToFileBrowser);
 }
 
 $(window).on('beforeunload', (e) => {
@@ -180,20 +196,8 @@ function loadZip(file) {
     $('#loadingDiv').removeClass('d-none');
     updateFilePage(filename, pageNum, totalPage);
 
-    // db.File.findOne({
-    //     where: {
-    //         $or: [{
-    //             Id: id
-    //         }, {
-    //             Name: name
-    //         }]
-    //     },
-    //     include: {
-    //         model: db.Folder
-    //     }
-    // }).then((file) => {
     filename = {
-        path: path.join(basedir, name),
+        path: path.join(currentDir, file.Name),
         pn: 0
     }
 
@@ -210,11 +214,11 @@ function loadZip(file) {
                 var tempFile = WinDrive.ListFiles(filename.path, [], true)[0];
                 db.Folder.findOrCreate({
                     where: {
-                        Name: basedir
+                        Name: currentDir
                     }
                 }).then(folder => {
                     db.File.create({
-                        Name: name,
+                        Name: file.Name,
                         folderId: folder[0].Id,
                         CurrentPage: 0,
                         TotalPage: totalPage,
@@ -231,7 +235,6 @@ function loadZip(file) {
             }
         }
     });
-    // });
 }
 
 updateRecents = async (file) => {
@@ -271,7 +274,7 @@ compressFile = async (filePath, pn) => {
         if (filePath.includes('.rar')) {
             rar = new rcunrar(filePath);
             totalimg = rar.ListFiles().filter(e => {
-                return images.includes(e.Extension.toLocaleLowerCase());
+                return imagesFilter.includes(e.Extension.toLocaleLowerCase());
             }).sort((a, b) => {
                 return a.Name.localeCompare(b.Name);
             });
@@ -282,7 +285,7 @@ compressFile = async (filePath, pn) => {
             });
             await new Promise((resolve, reject) => {
                 zip.on('ready', () => {
-
+                    console.log(zip)
                     totalimg = Object.values(zip.entries()).sort((a, b) => {
                         return String(a.name).localeCompare(String(b.name));
                     }).filter(imgFilter);
@@ -302,8 +305,9 @@ compressFile = async (filePath, pn) => {
 
             $imgRange.attr('max', totalPage);
             $imgRange.val(pageNum + 1);
-            toggleView("ImageViewer");
-            rangePopup();
+
+            imgViewerInit();
+            toggleView(2);
             LoadNextImage = true;
             return true;
         }
@@ -316,18 +320,17 @@ compressFile = async (filePath, pn) => {
 /***********************************************************/
 function loadImage(fname) {
     filename = {
-        path: path.join(basedir, fname)
+        path: path.join(currentDir, fname)
     };
     isImage = true;
-    viewerImg.src = path.join(basedir, fname) + '?x=' + getRandomNum();
-    $('#title').text(path.join(basedir, fname));
+    viewerImg.src = path.join(currentDir, fname) + '?x=' + getRandomNum();
+    $('#title').text(path.join(currentDir, fname));
     pageNum = fileN = filesList.indexOf(fname);
     totalPage = filesList.length;
-
-    toggleView("ImageViewer");
     $imgRange.attr('max', totalPage);
     $imgRange.val(1);
-    rangePopup();
+    imgViewerInit();
+    toggleView(2);
 }
 
 /***********************************************************/
@@ -339,8 +342,8 @@ function showImage(pn) {
         tempImg.src = getImage(pn);
     } else {
         fileN = pn;
-        tempImg.src = path.join(basedir, filesList[pn]) + '?x=' + getRandomNum();
-        $('#title').text(path.join(basedir, filesList[pn]));
+        tempImg.src = path.join(currentDir, filesList[pn]) + '?x=' + getRandomNum();
+        $('#title').text(path.join(currentDir, filesList[pn]));
     }
 }
 
@@ -363,7 +366,7 @@ $('#openFile').on('click', function () {
         title: "Select the file to open",
         filters: [{
             name: 'Files',
-            extensions: images
+            extensions: Filter
         },
         {
             name: 'All Files',
@@ -372,7 +375,7 @@ $('#openFile').on('click', function () {
         ]
     }, function (openedFile) {
         if (openedFile !== undefined && openedFile.length > 0) {
-            basedir = path.dirname(openedFile[0]);
+            currentDir = path.dirname(openedFile[0]);
             loadZip({ Name: openedFile[0] });
         }
     });
@@ -399,17 +402,16 @@ updateItemPageView = () => {
             index = fileN;
         }
     }
-    toggleView("FileViewer");
-
+    toggleView(1);
     selectItem(index);
 }
 function backToFileBrowser() {
     cleanUpViewer();
     updateFilePage(filename, pageNum, totalPage);
-    if (WinDrive.ListFiles(basedir).length === totalitem) {
+    if (WinDrive.ListFiles(currentDir).length === totalitem) {
         filesList = allFiles;
         $filescount.text('Files: ' + totalitem);
-        $('#title').text(basedir);
+        $('#title').text(currentDir);
         updateItemPageView();
     } else {
         loadDirectory('').then(() => {
@@ -460,9 +462,15 @@ tempImg.onload = function () {
     pgAnimation[config.pageAnimation]();
 }
 
-$(window).on('resize', rangePopup);
 $('#img-content img').css("transform", "scaleX(" + config.imgScale + ")");
 
-$('#img-toolbar').click((event) => {
-    event.stopPropagation();
-});
+imgViewerInit = () => {
+    $('#prev-file').on('click', prevFile);
+    $('#prev-img').on('click', prevImg);
+    $('#next-img').on('click', nextImg);
+    $('#next-file').on('click', nextFile);
+    $('#backtofilelist').on('click', backToFileBrowser);
+    $(window).on('resize', rangePopup);
+    $(document).on('keydown', ViewerKeyUp);
+    rangePopup();
+}

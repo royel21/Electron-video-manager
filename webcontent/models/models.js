@@ -69,6 +69,11 @@ const File = db.define('files', {
         timestamps: false
     });
 
+File.findByName = (file) =>{
+    return File.findOne({where:{Name: file.Name}, include:{model: Folder}});
+}
+
+
 const FavoriteFile = db.define('favoritefiles', {
     Id: {
         type: Sequelize.INTEGER,

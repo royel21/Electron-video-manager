@@ -1,7 +1,14 @@
-
 #image-viewer{
+    display: none;
     height: 100%;
     width: 100%;
+}
+
+#img-viewer
+{
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
 }
 
 #img-content{
@@ -23,6 +30,15 @@
     width: 70%;
 }
 
-body:-webkit-full-screen #img-content{
+#img-toolbar{
+    pointer-events: none;
+}
+
+body[viewer="2"]:-webkit-full-screen #img-content{
     height: 100%;
+}
+
+body[viewer="2"]:-webkit-full-screen .clock{
+  bottom: 50px;
+  right: 5px;
 }

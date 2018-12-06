@@ -11,14 +11,12 @@
     const rcunrar = require('rcunrar');
     const app = require('electron').remote.app
     const WinDrive = require('win-explorer');
-    const db = require(path.join(path.dirname(__dirname), './webcontent/entity/models'));
+    const db = require(path.join(path.dirname(__dirname), './webcontent/models/models'));
     var images = ['png', 'gif', 'jpg', 'jpeg', 'webp'];
-
-    let basedir;
     var count = 0;
 
     var startTime, endTime;
-
+    var currentDir = localStorage.getItem('currentDir');
     Storage.prototype.getObject = function (key) {
         var value = this.getItem(key);
         if (value == "undefined") return [];
@@ -119,19 +117,19 @@
                 switch (file.extension.toLocaleLowerCase()) {
                     case "zip":
                         {
-                            state = await ZipCover(file.FileName, coverP, data.basedir);
+                            state = await ZipCover(file.FileName, coverP, currentDir);
                             break;
                         }
                     case "rar":
                         {
-                            state = await RarCover(file.FileName, coverP, data.basedir);
+                            state = await RarCover(file.FileName, coverP, currentDir);
                             break;
                         }
                     case "mp4":
                     case "webm":
                     case "mkv":
                     case "avi": {
-                        state = await VideoThumb(path.join(data.basedir, file.FileName));
+                        state = await VideoThumb(path.join(currentDir, file.FileName));
                         break;
                     }
                 }
@@ -147,8 +145,8 @@
         }
     }
 
-    function RarCover(filename, coverP, basedir) {
-        var p = path.join(basedir, filename)
+    function RarCover(filename, coverP) {
+        var p = path.join(currentDir, filename)
         let rar = new rcunrar(p);
         var list = rar.ListFiles().sort((a, b) => {
             return String(a.Name).localeCompare(String(b.Name));
@@ -171,9 +169,9 @@
         });
     }
 
-    function ZipCover(filename, coverP, basedir) {
+    function ZipCover(filename, coverP) {
         var zip = new StreamZip({
-            file: path.join(basedir, filename),
+            file: path.join(currentDir, filename),
             storeEntries: true
         });
         return new Promise((resolve, reject) => {

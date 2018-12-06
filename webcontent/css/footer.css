@@ -13,6 +13,7 @@
     font-size: 1.8rem;
     font-weight: 500;
     z-index: 9;
+    transition: all .3s;
 }
 
 .footer>span {
@@ -162,8 +163,3 @@
 .modal span:active > i{
     transform: translateY(4px);
 }
-
-.unCorner{
-    border-radius: 0;
-}
-

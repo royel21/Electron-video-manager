@@ -17,9 +17,10 @@
     <link rel="stylesheet" href="./webcontent/css/fullscreen.css">
     <link rel="stylesheet" href="./webcontent/css/videoplayer.css">
     <link rel="stylesheet" href="./webcontent/css/sliders.css">
+    <link rel="stylesheet" href="./webcontent/css/share.css">
 </head>
 
-<body>
+<body viewer="1" wmaximize="false">
     <div id="popup"></div>
     <div class="clock">
         <span class="time metal linear"></span>
@@ -137,7 +138,7 @@
                 </span><span id="loading-msg">Please Wait</span>
                 <div class="loader"></div>
             </div>
-            <div id="video-viewer" class="text-center d-none">
+            <div id="video-viewer" class="text-center">
                 <video id="player" preload="auto" src=""></video>
                 <div class="text-center v-controls footer">
                     <div id="slider-container">
@@ -178,9 +179,9 @@
                 </div>
                 <span id="v-total-time">00:00:00</span>
             </div>
-            <div id="image-viewer" class="d-none">
+            <div id="image-viewer">
                 <div id="img-viewer">
-                    <div class="footer text-center">
+                    <div class="footer cancel-footer text-center">
                         <div class="text-center toolbar img-toolbar">
                             <span class="list-file-show"><i class="fas fa-clipboard-list"></i></span>
                             <span id="openFile">
@@ -247,7 +248,7 @@
                 <div id="file-list">
                 </div>
                 <span class="total-files"></span>
-                <div class="footer text-center">
+                <div class="footer text-center cancel-footer">
                     <div id="footer-toolbar" class="text-center toolbar">
                         <span class="list-file-show"><i class="fas fa-clipboard-list"></i></span>
                         <span class="openDir">
@@ -327,6 +328,7 @@
     <script src="./webcontent/js/sliders.js"></script>
     <script src="./webcontent/js/system.js"></script>
     <script src="./webcontent/js/utils.js"></script>
+    <script src="./webcontent/js/share.js"></script>
     <script src="./webcontent/js/page-animation.js"></script>
     <script src="./webcontent/js/viewer.js"></script>
     <script src="./webcontent/js/modal-config.js"></script>
@@ -336,6 +338,7 @@
     <script src="./webcontent/js/list-files.js"></script>
     <script src="./webcontent/js/list-scan-folder.js"></script>
     <script src="./webcontent/js/modal-search.js"></script>
+    <script src="./webcontent/js/filehelpers.js"></script>
     <script src="./webcontent/js/index.js"></script>
     <script src="./webcontent/js/popup.js"></script>
     <script src="./webcontent/js/moveElement.js"></script>

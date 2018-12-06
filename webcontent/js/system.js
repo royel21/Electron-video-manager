@@ -16,17 +16,7 @@ maxWindow = () => {
 }
 
 hideCorner = (state) => {
-    if (state === false) {
-        $('.main').removeClass('top-corner');
-        $('.menubar').removeClass('top-corner');
-        $('.btn-sys-close').removeClass('unCorner');
-        $('.footer').removeClass('unCorner');
-    } else {
-        $('.main').addClass('top-corner');
-        $('.menubar').addClass('top-corner');
-        $('.footer').addClass('unCorner');
-        $('.btn-sys-close').addClass('unCorner');
-    }
+    $('body').attr('wmaximize', state);
     isMaximized = state;
 }
 

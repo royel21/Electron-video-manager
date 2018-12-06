@@ -43,7 +43,7 @@ processRow = (event) => {
         processFile(li.dataset.title);
     } else {
         loadDirectory('', id);
-        toggleView("FileViewer");
+        toggleView(1);
     }
 }
 

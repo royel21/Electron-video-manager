@@ -28,7 +28,6 @@ body,
     padding: 44px 0;
 }
 
-
 #title-n{
     position: relative;
     flex-grow: 1;
@@ -104,18 +103,13 @@ body,
     height: 100%;
     overflow-y: auto;
 }
-#img-viewer
-{
-    width: 100%;
-    height: 100%;
-    overflow: hidden;
-}
 
 .hidden {
     display: none;
 }
-#file-browser{
-    height: 100%;
+
+#file-viewer{
+    display: none;
 }
 
 #file-list {
@@ -496,7 +490,7 @@ input[type=number]:focus {
 
 /*********************************************************/
 .top{
-    position: absolute;
+    position: fixed;
     height: 30px;
     right: 86px;
     bottom: 8px;

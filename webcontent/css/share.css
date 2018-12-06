@@ -1,0 +1,30 @@
+
+#file-browser{
+    display: none;
+}
+
+#file-browser{
+    display: none;
+}
+
+#file-browser{
+    display: none;
+}
+
+body[viewer="1"] #file-viewer {
+    display: block;
+}
+
+body[viewer="2"] #image-viewer {
+    display: block;
+}
+body[viewer="3"] #video-viewer {
+    display: block;
+}
+
+body[wmaximize="true"] .btn-sys-close,
+body[wmaximize="true"] .menubar,
+body[wmaximize="true"] .main,  
+body[wmaximize="true"] .footer {
+    border-radius: 0;
+}

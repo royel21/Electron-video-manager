@@ -1,3 +1,5 @@
+const { clipboard } = require('electron');
+
 var cpyFile;
 var $dialogDetails;
 
@@ -45,14 +47,14 @@ $('#cm-cp-name').click((e) => {
 });
 
 $('#cm-cp-path').click((e) => {
-    clipboard.writeText(path.join(basedir, cpyFile));
+    clipboard.writeText(path.join(currentDir, cpyFile));
     $cmenu.css({
         display: "none"
     });
 });
 $('#cm-zip-file').click((e) => {
     $('.fa-file-archive').removeClass('d-none');
-    createBackgroundWin('zip-file', { dir: path.join(basedir, cpyFile) });
+    createBackgroundWin('zip-file', { dir: path.join(currentDir, cpyFile) });
     compressingCount++;
     $cmenu.css({
         display: "none"
@@ -63,7 +65,7 @@ $('#cm-sh-details').click((e) => {
     db.File.findOne({ where: { Name: cpyFile } }).
         then(file => {
             hidedetails();
-            var tempf = WinDrive.ListFiles(path.join(basedir, cpyFile), [], true)[0];
+            var tempf = WinDrive.ListFiles(path.join(currentDir, cpyFile), [], true)[0];
             tempf.Page = file != null ? file.CurrentPage + 1 : 0;
             tempf.TotalPage = file != null ? file.TotalPage : 0;
             var date = new Date(tempf.LastModified);
@@ -99,8 +101,8 @@ hidedetails = () => {
 $('#cm-file-rename').click((e) => {
     dialogBox({ title: "New Name:", x: e.clientX, y: e.clientY, data: cpyFile, btn1: "Rename" }).then(result => {
         if (result.length > 0) {
-            var oldFile = path.join(basedir, cpyFile);
-            var newFile = path.join(basedir, result);
+            var oldFile = path.join(currentDir, cpyFile);
+            var newFile = path.join(currentDir, result);
             fs.renameSync(oldFile, newFile);
             var oldCover = path.join('./covers', cpyFile + ".jpg");
             if (fs.existsSync(oldCover)) {

@@ -2,7 +2,6 @@ body:-webkit-full-screen #file-browser{
     padding: 10px 0 10px 10px;
 }
 
-.top-corner,  
 body:-webkit-full-screen .menubar,
 body:-webkit-full-screen .footer{
     padding: 0;
@@ -55,4 +54,8 @@ body:-webkit-full-screen .img-toolbar {
     margin-right:200px;
     background-color: rgba(67, 66, 75, 0.7);
     border-radius: .5rem;
+}
+
+body:-webkit-full-screen .hide-footer{
+    bottom: -100px;
 }

@@ -28,7 +28,7 @@ $('#scan-list-show').click((e) => {
                             Id: id,
                             dir: dir[0]
                         }],
-                        filter: config.fileFilters
+                        filter: compressFilter
                     });
                     $('#scan-list').append(template('./template/folder-row.html', {
                         id,
@@ -43,7 +43,7 @@ $('#scan-list-show').click((e) => {
             console.log('reload')
             createBackgroundWin('reload-Db', {
                 folders: config.scanFolder,
-                filters: config.fileFilters
+                filters: compressFilter
             });
         });
 
@@ -54,14 +54,14 @@ $('#scan-list-show').click((e) => {
         positionModal(e, $modalScnList);
         $modalScnList.fadeIn('slow');
 
-        var $filterSelete = $modalScnList.find('#filter-select');
-        config.fileFilters.forEach(function (name, i) {
-            $filterSelete.append($(`<option value="${i}">${name}</option>"`));
-        });
+        // var $filterSelete = $modalScnList.find('#filter-select');
+        // compressFilter.forEach(function (name, i) {
+        //     $filterSelete.append($(`<option value="${i}">${name}</option>"`));
+        // });
 
         $modalScnList.on('dblclick', 'ul li', (event) => {
             var li = event.target.closest('li');
-            basedir = li.dataset.dir;
+            currentDir = li.dataset.dir;
             loadDirectory('');
         });
     }
@@ -78,55 +78,55 @@ $('.content').on('click', ' #scan-list .fa-trash-alt', (event) => {
 });
 
 
-$('.content').on('click', ' #scan-footer .fa-trash-alt', (event) => {
+// $('.content').on('click', ' #scan-footer .fa-trash-alt', (event) => {
 
-    var x = document.getElementById("filter-select");
-    if (x.value != "zip") {
-        config.fileFilters.splice(x.selectedIndex, 1);
-        x.remove(x.selectedIndex);
-    }
-});
+//     var x = document.getElementById("filter-select");
+//     if (x.value != "zip") {
+//         compressFilter.splice(x.selectedIndex, 1);
+//         x.remove(x.selectedIndex);
+//     }
+// });
 
-var $dialog;
+// var $dialog;
 
-$('.content').on('click', ' #scan-footer #add-filter', (e) => {
-    if ($dialog == undefined) {
-        $dialog = $(template('./template/create-dialog.html', {
-            title: "Create Filter",
-            btn1: "Create"
-        }));
+// $('.content').on('click', ' #scan-footer #add-filter', (e) => {
+//     if ($dialog == undefined) {
+//         $dialog = $(template('./template/create-dialog.html', {
+//             title: "Create Filter",
+//             btn1: "Create"
+//         }));
 
-        $('.content').prepend($dialog);
-        $dialog.find('#create').click(() => {
-            var name = $('#name').val();
-            var $filter = $modalScnList.find('#filter-select');
-            $filter.prepend($(`<option value="${name}" selected>${name}</option>"`));
-            if (!config.fileFilters.includes(name))
-                config.fileFilters.push(name);
-            config.fileFilters.sort();
-            hideDialog();
-        });
-        $dialog.find('#close').click(hideDialog);
-    }
+//         $('.content').prepend($dialog);
+//         $dialog.find('#create').click(() => {
+//             var name = $('#name').val();
+//             var $filter = $modalScnList.find('#filter-select');
+//             $filter.prepend($(`<option value="${name}" selected>${name}</option>"`));
+//             if (!config.fileFilters.includes(name))
+//                 config.fileFilters.push(name);
+//             config.fileFilters.sort();
+//             hideDialog();
+//         });
+//         $dialog.find('#close').click(hideDialog);
+//     }
 
-    $dialog.css({
-        zIndex: 999,
-        minHeight: 150,
-        height: 150,
-        left: -4000,
-        width: 300
-    });
-    $dialog.css({
-        left: e.clientX,
-        top: e.clientY - 177
-    });
-    $dialog.fadeIn('slow');
-});
+//     $dialog.css({
+//         zIndex: 999,
+//         minHeight: 150,
+//         height: 150,
+//         left: -4000,
+//         width: 300
+//     });
+//     $dialog.css({
+//         left: e.clientX,
+//         top: e.clientY - 177
+//     });
+//     $dialog.fadeIn('slow');
+// });
 
 
-hideDialog = function () {
-    $dialog.fadeOut('fast', () => {
-        $dialog.remove();
-        $dialog = undefined;
-    });
-};
+// hideDialog = function () {
+//     $dialog.fadeOut('fast', () => {
+//         $dialog.remove();
+//         $dialog = undefined;
+//     });
+// };
