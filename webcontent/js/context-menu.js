@@ -66,8 +66,8 @@ $('#cm-sh-details').click((e) => {
         then(file => {
             hidedetails();
             var tempf = WinDrive.ListFiles(path.join(currentDir, cpyFile), [], true)[0];
-            tempf.Page = file != null ? file.CurrentPage + 1 : 0;
-            tempf.TotalPage = file != null ? file.TotalPage : 0;
+            tempf.Page = file != null ? file.Current + 1 : 0;
+            tempf.Total = file != null ? file.Total : 0;
             var date = new Date(tempf.LastModified);
             tempf.Date = date.toLocaleDateString("en-US") + " " + date.toLocaleTimeString("en-US");
             tempf.Size = FormattBytes(tempf.Size);

@@ -1,4 +1,5 @@
 var modalconfig;
+isViewer = () => currentView === 1;
 
 sortFileBy = (a, b) => {
     var n1 = a.FileName.toLocaleUpperCase().replace(/[\{|\[]/g, "0");
@@ -64,7 +65,7 @@ sortElements = () => {
 showConfigModal = (e) => {
 
     if (modalconfig == undefined) {
-        modalconfig = $(template('./template/modal-config.html', { isViewer: isViewer() ? "" : "d-none", isfilebrowser: isViewer() ? "d-none" : "" }));
+        modalconfig = $(template('./template/modal-config.html', { isViewer: isViewer() ? "d-none" : "", isfilebrowser: isViewer() ? "" : "d-none" }));
 
         $('.content').prepend(modalconfig);
         modalconfig.find('#modal-close').click(() => {
@@ -72,7 +73,7 @@ showConfigModal = (e) => {
             modalconfig = undefined;
         });
     };
-    if (isViewer()) {
+    if (!isViewer()) {
         const imgWScale = document.getElementById('img-width');
 
         imgWScale.oninput = function () {
@@ -105,6 +106,7 @@ showConfigModal = (e) => {
         for (var key of sortType) {
             $sortSelect.append($(`<option value="${key}" ${key == config.sortBy ? "Selected" : ""}>${key.replace('-U', '&#8593;')
                 .replace('-D', '&#8595;')}</option>"`));
+                console.log(key)
         }
         $sortSelect.change(e => {
             config.sortBy = $sortSelect.val();

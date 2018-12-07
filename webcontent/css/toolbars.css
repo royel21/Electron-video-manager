@@ -23,22 +23,23 @@
 #scan-list-show .fa-clipboard {
     display: inline-block;
     position: relative;
-    top: -12px;
-    left: -10px;
+    top: -14px;
+    left: 1px;
+    font-size: 39px;
 }
 
 .sub-tools .fa-cog,
 #scan-list-show .fa-folder {
     position: absolute;
-    font-size: 16px;
+    font-size: 20px;
     top: 14px;
     left: 4.6px;
-    color: darkgray;
+    color: silver;
 }
 
 .sub-tools .fa-cog{
     left: 20px;
-    top: 10px;
+    top: 20px;
 }
 
 .sub-tools .tool-img-fb{
@@ -48,8 +49,8 @@
 }
 
 .sub-tools .fa-file .fa-cog{
-    top: 11px;
-    left: 3.8px;
+    top: 13px;
+    left: 4.8px;
 }
 
 .sub-tools .tool-img-fb,
@@ -63,14 +64,26 @@
 }
 
 .tool-config input:checked + .sub-tools .tool-img-fb{
-    top: -26px;
-    left: -10px;
-    transition: top .5s;
+    top: -34px;
+    left: -13px;
 }
 
+.tool-config input:checked + .sub-tools #tool-fb{
+    position: absolute;
+    top: -38px;
+    left: 9px;
+    font-size: 36px;
+}
+
+.tool-config input:checked + .sub-tools .fa-image{
+    display: inline-block;
+    background-color: black;
+    padding: 0px 2px;
+    border-radius: 5px;
+    font-size: 32px;
+}
 .tool-config input:checked + .sub-tools #scan-list-show{
     top: -78px;
-    transition: top .5s;
 }
 
 

@@ -163,8 +163,4 @@ $list_modal.on('dblclick', 'ul li', (event) => {
         console.log(f);
         loadZip(path.join(f.folder.Name, f.Name));
     });
-    //dir = path.join(li.dir, li.title);
-    // if (fs.existsSync(dir)) {
-    //     loadZip(dir);
-    // }
 });

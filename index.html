@@ -21,6 +21,7 @@
 </head>
 
 <body viewer="1" wmaximize="false">
+    <div id="file-name"><span class="title"></span></div>
     <div id="popup"></div>
     <div class="clock">
         <span class="time metal linear"></span>
@@ -30,7 +31,7 @@
             <i class="fas fa-home"></i>
         </span>
         <div id='title-n'>
-            <h5 id='title'>MangaViewer</h5>
+            <h5 class='title'>MangaViewer</h5>
             <div id="drag-region"></div>
         </div>
         <span id="btn-sys-min">
@@ -72,7 +73,7 @@
                     <div class="list-footer text-center">
                         <div class="input-group">
                             <button id="recent-clear" class="btn btn-secondary mr-1">Clear</button>
-                            <div class="input-group-text mx-1 px-1 font-weight-bold">
+                            <div class="input-group-text mr-1 px-1 font-weight-bold">
                                 <span id="recent-count">0/0</span>
                             </div>
                             <div class="input-group-prepend">
@@ -248,7 +249,7 @@
                 <div id="file-list">
                 </div>
                 <span class="total-files"></span>
-                <div class="footer text-center cancel-footer">
+                <div class="footer cancel-footer text-center ">
                     <div id="footer-toolbar" class="text-center toolbar">
                         <span class="list-file-show"><i class="fas fa-clipboard-list"></i></span>
                         <span class="openDir">

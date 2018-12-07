@@ -13,6 +13,9 @@
     const WinDrive = require('win-explorer');
     const db = require(path.join(path.dirname(__dirname), './webcontent/models/models'));
     var images = ['png', 'gif', 'jpg', 'jpeg', 'webp'];
+
+    fileFilter = ['mp4', 'mkv', 'avi', 'webm', 'ogg','zip', 'rar', 'cbr'];
+
     var count = 0;
 
     var startTime, endTime;
@@ -50,7 +53,7 @@
 
         PopulateDB = async (folder, files, id) => {
             var fis = files.filter((f) => {
-                return f.isDirectory || data.filters.includes(f.extension.toLocaleLowerCase())
+                return f.isDirectory || fileFilter.includes(f.extension.toLocaleLowerCase())
             });
 
             var f1 = await db.Folder.findOrCreate({

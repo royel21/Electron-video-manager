@@ -53,11 +53,11 @@ const File = db.define('files', {
         type: Sequelize.STRING,
         unique: true
     },
-    CurrentPage: {
+    Current: {
         type: Sequelize.INTEGER(5).UNSIGNED,
         defaultValue: 0
     },
-    TotalPage:{
+    Total:{
         type: Sequelize.INTEGER(5).UNSIGNED,
         defaultValue: 0
     },

@@ -104,7 +104,7 @@ loadDirectory = async (folder, id) => {
             var flist = document.getElementById('file-list');
             flist.innerHTML = "";
             flist.append(documentFragment);
-            $('#title').text(dir);
+            $('.title').text(dir);
             selectedIndex = 0;
             lazyLoad();
             setTimeout(() => {
@@ -150,7 +150,7 @@ returnFolder = async () => {
 }
 
 jumpToFile = (e) => {
-    if (!e.ctrlKey) {
+    if (currentView === 1 && !e.ctrlKey) {
         var char = String.fromCharCode(e.charCode);
         if (char.match(/^[0-9a-zA-Z|\[|(]+$/ig)) {
             var $firstEl = $('.items').filter(function () {
@@ -163,83 +163,85 @@ jumpToFile = (e) => {
 }
 
 keyboardHandler = (e) => {
-    var wasProcesed = false;
-    switch (e.keyCode) {
-        case 13:
-            {
-                if (e.ctrlKey) {
-                    setfullscreen();
-                } else {
-                    var $el = $(document.activeElement);
-                    var name = $el.data('name');
-
-                    if ($el.data('isfile')) {
-                        processFile(name);
+    if (currentView === 1) {
+        var wasProcesed = false;
+        switch (e.keyCode) {
+            case 13:
+                {
+                    if (e.ctrlKey) {
+                        setfullscreen();
                     } else {
-                        loadDirectory(name);
-                    }
-                }
-                wasProcesed = true;
-                break;
-            }
-        case 37:
-            {
-                if (e.ctrlKey) {
-                    JumpFolder(-1);
-                } else {
-                    if (selectedIndex > 0) {
-                        selectItem(selectedIndex - 1);
-                    } else {
-                        selectItem(totalitem - 1);
-                    }
-                }
-                wasProcesed = true;
-                break;
-            }
-        case 38:
-            {
-                if (e.ctrlKey) {
-                    returnFolder();
-                } else if (selectedIndex - calCol() >= 0) {
-                    selectItem(selectedIndex - calCol());
-                }
-                wasProcesed = true;
-                break;
-            }
-        case 39:
-            {
-                if (e.ctrlKey) {
-                    JumpFolder(1);
-                } else if (selectedIndex < totalitem - 1) {
-                    selectItem(selectedIndex + 1);
-                } else {
-                    selectItem(0);
-                }
-                wasProcesed = true;
-                break;
-            }
+                        var $el = $(document.activeElement);
+                        var name = $el.data('name');
 
-        case 40:
-            {
-                if (selectedIndex + calCol() < totalitem) {
-                    selectItem(selectedIndex + calCol());
+                        if ($el.data('isfile')) {
+                            processFile(name);
+                        } else {
+                            loadDirectory(name);
+                        }
+                    }
+                    wasProcesed = true;
+                    break;
                 }
+            case 37:
+                {
+                    if (e.ctrlKey) {
+                        JumpFolder(-1);
+                    } else {
+                        if (selectedIndex > 0) {
+                            selectItem(selectedIndex - 1);
+                        } else {
+                            selectItem(totalitem - 1);
+                        }
+                    }
+                    wasProcesed = true;
+                    break;
+                }
+            case 38:
+                {
+                    if (e.ctrlKey) {
+                        returnFolder();
+                    } else if (selectedIndex - calCol() >= 0) {
+                        selectItem(selectedIndex - calCol());
+                    }
+                    wasProcesed = true;
+                    break;
+                }
+            case 39:
+                {
+                    if (e.ctrlKey) {
+                        JumpFolder(1);
+                    } else if (selectedIndex < totalitem - 1) {
+                        selectItem(selectedIndex + 1);
+                    } else {
+                        selectItem(0);
+                    }
+                    wasProcesed = true;
+                    break;
+                }
+
+            case 40:
+                {
+                    if (selectedIndex + calCol() < totalitem) {
+                        selectItem(selectedIndex + calCol());
+                    }
+                    wasProcesed = true;
+                    break;
+                }
+            case 116: {
+                loadDirectory('');
                 wasProcesed = true;
                 break;
             }
-        case 116: {
-            loadDirectory('');
-            wasProcesed = true;
-            break;
         }
-    }
 
-    if (e.ctrlKey && e.keyCode == 70) {
-        showSearch(e);
-    }
+        if (e.ctrlKey && e.keyCode == 70) {
+            showSearch(e);
+        }
 
-    if (wasProcesed) {
-        consumeEvent(e);
+        if (wasProcesed) {
+            consumeEvent(e);
+        }
     }
 }
 
@@ -255,7 +257,7 @@ openDir = () => {
 };
 
 dropFile = function (e) {
-    if (e.dataTransfer.files.length > 0) {
+    if (currentView === 1 && e.dataTransfer.files.length > 0) {
         var f = e.dataTransfer.files[0];
         if (f != undefined) {
             if (fs.lstatSync(f.path).isDirectory()) {
@@ -324,7 +326,7 @@ $('#tool-folderNext').click(() => {
 });
 
 goToRoots = async () => {
-    $('#title').text("Home");
+    $('.title').text("Home");
     var diskIcon = './webcontent/image/hard-disk-256.png'
     $('#file-list').empty();
     var dir = currentDir;
@@ -400,62 +402,52 @@ $(() => {
             goToRoots();
         }
     });
-    // var count = 0;
-
-    // testFiles = async () => {
-    //     var fis = WinDrive.ListFilesRO("D:\\Temp\\Hmangas");
-    //    await PopulateDB(f.dir, fis);
-    //    console.log("Done");
-    // }
-
-    // PopulateDB = async (folder, files) => {
-    //     var fis = files.filter((f) => {
-    //         return f.isDirectory || config.fileFilter.indexOf(f.extension.toLocaleLowerCase()) > -1
-    //     });
-    //     for (var f of fis) {
-    //         try {
-    //             if (!f.isDirectory) {
-    //                 count++;
-    //                 var file = await db.File.findAll({
-    //                     where: {
-    //                         Name: {[db.Op.like]: "%" + f.FileName.replace(/ \[digital\]| \[chinese\]| \[Decensored\]|.zip|.rar/ig, "") + "%"}
-    //                     }
-    //                 });
-
-    //                 if (file.length > 1) {
-    //                     fileFound = fileFound.concat(file);
-    //                 }
-    //             } else {
-    //                 await PopulateDB(f.FileName, f.Files);
-    //             }
-    //         } catch (error) {
-    //             console.log(error);
-    //         }
-    //     }
-    // }
-
-    // db.init().then(() => {
-
-    //     testFiles();
-    // });
 });
 
-fileViewerCleanUp = () => {
-    $(document).off('keydown', keyboardHandler);
-    $(document).off('keypress', jumpToFile);
-    $(document).off('drop', '#file-list', dropFile);
-    $('.openDir').off('click', openDir);
-    $('.tool-folderUp').off('click', returnFolder);
-    $fviewer.find('#file-list').off('click', '.items', itemClick);
-    $fviewer.find('#file-list').off('dblclick', dbclick);
-}
+$(document).on('keypress', jumpToFile);
+$(document).on('drop', '#file-list', dropFile);
+$('.openDir').on('click', openDir);
+$('.tool-folderUp').on('click', returnFolder);
+$fviewer.find('#file-list').on('click', '.items', itemClick);
+$fviewer.find('#file-list').on('dblclick', dbclick);
+$(document).on('keydown', keyboardHandler);
 
-fileViewerInit = () => {
-    $(document).on('keypress', jumpToFile);
-    $(document).on('drop', '#file-list', dropFile);
-    $('.openDir').on('click', openDir);
-    $('.tool-folderUp').on('click', returnFolder);
-    $fviewer.find('#file-list').on('click', '.items', itemClick);
-    $fviewer.find('#file-list').on('dblclick', dbclick);
-    $(document).on('keydown', keyboardHandler);
-}
+
+// var count = 0;
+
+// testFiles = async () => {
+//     var fis = WinDrive.ListFilesRO("D:\\Temp\\Hmangas");
+//    await PopulateDB(f.dir, fis);
+//    console.log("Done");
+// }
+
+// PopulateDB = async (folder, files) => {
+//     var fis = files.filter((f) => {
+//         return f.isDirectory || config.fileFilter.indexOf(f.extension.toLocaleLowerCase()) > -1
+//     });
+//     for (var f of fis) {
+//         try {
+//             if (!f.isDirectory) {
+//                 count++;
+//                 var file = await db.File.findAll({
+//                     where: {
+//                         Name: {[db.Op.like]: "%" + f.FileName.replace(/ \[digital\]| \[chinese\]| \[Decensored\]|.zip|.rar/ig, "") + "%"}
+//                     }
+//                 });
+
+//                 if (file.length > 1) {
+//                     fileFound = fileFound.concat(file);
+//                 }
+//             } else {
+//                 await PopulateDB(f.FileName, f.Files);
+//             }
+//         } catch (error) {
+//             console.log(error);
+//         }
+//     }
+// }
+
+// db.init().then(() => {
+
+//     testFiles();
+// });

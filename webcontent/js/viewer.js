@@ -25,7 +25,7 @@ var backgroundLoader;
 
 updateFilePage = (file, page, totalPage) => {
     if (file != undefined && !isImage) {
-        return db.db.query(`UPDATE files set CurrentPage = ${page}, TotalPage = ${totalPage} WHERE Id = ${file.Id};`);
+        return db.db.query(`UPDATE files set Current = ${page}, Total = ${totalPage} WHERE Id = ${file.Id};`);
     }
 }
 
@@ -201,16 +201,16 @@ function loadZip(file) {
         pn: 0
     }
 
-    if (file.CurrentPage != undefined) {
+    if (file.Current != undefined) {
         var dir = path.join(file.folder.Name, file.Name);
         if (fs.existsSync(dir)) filename.path = dir;
         filename.Id = file.Id;
-        filename.pn = file.CurrentPage;
+        filename.pn = file.Current;
     }
 
     compressFile(filename.path, filename.pn).then(result => {
         if (result) {
-            if (file.CurrentPage == undefined) {
+            if (file.Current == undefined) {
                 var tempFile = WinDrive.ListFiles(filename.path, [], true)[0];
                 db.Folder.findOrCreate({
                     where: {
@@ -220,8 +220,8 @@ function loadZip(file) {
                     db.File.create({
                         Name: file.Name,
                         folderId: folder[0].Id,
-                        CurrentPage: 0,
-                        TotalPage: totalPage,
+                        Current: 0,
+                        Total: totalPage,
                         Size: tempFile.Size
                     }).then(f => {
                         updateRecents(f);
@@ -285,7 +285,6 @@ compressFile = async (filePath, pn) => {
             });
             await new Promise((resolve, reject) => {
                 zip.on('ready', () => {
-                    console.log(zip)
                     totalimg = Object.values(zip.entries()).sort((a, b) => {
                         return String(a.name).localeCompare(String(b.name));
                     }).filter(imgFilter);
@@ -300,7 +299,7 @@ compressFile = async (filePath, pn) => {
             viewerImg.src = getImage(pn);
             pageNum = pn;
             $('#loadingDiv').addClass('d-none');
-            $('#title').text(p);
+            $('.title').text(p);
             fileN = filesList.indexOf(p);
 
             $imgRange.attr('max', totalPage);
@@ -324,7 +323,7 @@ function loadImage(fname) {
     };
     isImage = true;
     viewerImg.src = path.join(currentDir, fname) + '?x=' + getRandomNum();
-    $('#title').text(path.join(currentDir, fname));
+    $('.title').text(path.join(currentDir, fname));
     pageNum = fileN = filesList.indexOf(fname);
     totalPage = filesList.length;
     $imgRange.attr('max', totalPage);
@@ -343,7 +342,7 @@ function showImage(pn) {
     } else {
         fileN = pn;
         tempImg.src = path.join(currentDir, filesList[pn]) + '?x=' + getRandomNum();
-        $('#title').text(path.join(currentDir, filesList[pn]));
+        $('.title').text(path.join(currentDir, filesList[pn]));
     }
 }
 
@@ -411,7 +410,7 @@ function backToFileBrowser() {
     if (WinDrive.ListFiles(currentDir).length === totalitem) {
         filesList = allFiles;
         $filescount.text('Files: ' + totalitem);
-        $('#title').text(currentDir);
+        $('.title').text(currentDir);
         updateItemPageView();
     } else {
         loadDirectory('').then(() => {

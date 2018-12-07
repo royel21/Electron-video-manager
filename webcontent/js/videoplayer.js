@@ -169,6 +169,11 @@ wheelScroll = (event) => {
     }
 };
 
+
+addRecentVideo = (video) => {
+    playerConfig.recentVideo.find(v=> v.Name === video.Name)
+}
+
 initPlayer = (v) => {
 
     Slider = new SliderRange();

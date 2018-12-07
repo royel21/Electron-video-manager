@@ -13,11 +13,9 @@ if (local.hasObject('config')) {
 toggleView = (view) => {
     currentView = view;
     $('body').attr("viewer", view);
-    if(view === 1) fileViewerInit();
 }
 
 processFile = (name) => {
-    fileViewerCleanUp();
     var ex = name.split('.').pop().toLocaleLowerCase();
     
     if (imagesFilter.includes(ex)) {
@@ -31,29 +29,31 @@ processFile = (name) => {
                 } else if (videoFilter.includes(ex)) {
                     initPlayer(f);
                 }
+                hideFooter();
             });
     }
 }
 
 consumeEvent = (e) => {
-    e.preventDefault();
     e.stopPropagation();
     e.cancelBubble = true;
-    console.log("event consume")
 }
 
 var mouseTimer = null, cursorVisible = true;
+showCursor = () =>{
+    $('.footer').removeClass('hide-footer');
+    $('#file-name').removeClass('d-none');
+    if (mouseTimer) {
+        window.clearTimeout(mouseTimer);
+    }
+    if (!cursorVisible) {
+        $(document.body).css({ cursor: "default" });
+        cursorVisible = true;
+    }
+}
 hideFooter = () => {
     if (document.webkitIsFullScreen) {
-        $('.footer').removeClass('hide-footer');
-        if (mouseTimer) {
-            window.clearTimeout(mouseTimer);
-        }
-        if (!cursorVisible) {
-            $(document.body).css({ cursor: "default" });
-            cursorVisible = true;
-        }
-
+        showCursor();
         mouseTimer = window.setTimeout(() => {
             var elClass = "hide-footer";
             mouseTimer = null;
@@ -63,12 +63,13 @@ hideFooter = () => {
 
             if (document.webkitIsFullScreen) {
                 $('.footer').addClass(elClass);
+                $('#file-name').addClass('d-none');
                 $(document.body).css({ cursor: "none" });
                 cursorVisible = false;
+            }else{
+                showCursor();
             }
-            console.log("test2",elClass)
         }, playerConfig.hideCtrSecond * 1000);
-        console.log("test1")
     }
 }
 

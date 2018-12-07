@@ -62,5 +62,9 @@
 
 body:-webkit-full-screen .clock{
   bottom: 10px;
-  right: 100px;
+  right: 15px;
+}
+
+body:-webkit-full-screen .clock .time{
+  font-size: 20px
 }

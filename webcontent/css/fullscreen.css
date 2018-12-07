@@ -59,3 +59,30 @@ body:-webkit-full-screen .img-toolbar {
 body:-webkit-full-screen .hide-footer{
     bottom: -100px;
 }
+
+body:-webkit-full-screen .top{
+    display: none;
+}
+
+body[viewer="3"]:-webkit-full-screen #file-name,
+body[viewer="2"]:-webkit-full-screen #file-name {
+      display: block;
+      position: fixed;
+      top: 7px;
+      right: 5px;
+      left: 5px;
+      z-index: 99;
+      color: white;
+      font-size: 27px;
+      text-align: center;
+}
+
+body[viewer="3"]:-webkit-full-screen #file-name span,
+body[viewer="2"]:-webkit-full-screen #file-name span{
+      display: inline-block;
+      background-color: rgba(67, 66, 75, 0.7);
+      padding: 2px 5px;
+      border-radius: 5px;
+      line-height: 1.5;
+      font-weight: bold;
+}

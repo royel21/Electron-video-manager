@@ -124,7 +124,7 @@ addToFav = async ($item, event) => {
             } else {
                 var file = WinDrive.ListFiles(path.join(currentDir, name), true)[0];
                 f[0].updateAttributes({
-                    CurrentPage: 0,
+                    Current: 0,
                     Size: file.Size,
                     folderId: folderId,
                     favoritefileId: config.favId
@@ -167,8 +167,8 @@ function CreateEl(file, diskIcon) {
     if (fav != undefined) {
         isFav = fav.isFav ? "in-fav fas" : "far";
         if (isFile && fav.Page > 0) {
-            page = `<span class="file-page ${fav.Page + 1 == fav.TotalPage ? "bg-primary" : "bg-danger"}" ` +
-                `data-pages="${fav.Page + 1}/${fav.TotalPage}" ></span>`
+            page = `<span class="file-page ${fav.Page + 1 == fav.Total ? "bg-primary" : "bg-danger"}" ` +
+                `data-pages="${fav.Page + 1}/${fav.Total}" ></span>`
         }
     } else {
         isFav = "far";
@@ -195,7 +195,7 @@ loadFavs = async () => {
     favs = fos.concat(fis).map(f => {
         var isFav = f.favoritefileId !== null;
         var Name = f.Name.length < 4 ? f.Name : path.basename(f.Name);
-        return { Name, Page: f.CurrentPage, isFav, TotalPage: f.TotalPage }
+        return { Name, Page: f.Current, isFav, Total: f.Total }
     });
 }
 

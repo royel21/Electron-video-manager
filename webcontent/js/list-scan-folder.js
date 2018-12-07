@@ -27,8 +27,7 @@ $('#scan-list-show').click((e) => {
                         folders: [{
                             Id: id,
                             dir: dir[0]
-                        }],
-                        filter: compressFilter
+                        }]
                     });
                     $('#scan-list').append(template('./template/folder-row.html', {
                         id,
@@ -42,8 +41,7 @@ $('#scan-list-show').click((e) => {
             $('#folder-reloading .fa-database').removeClass('d-none');
             console.log('reload')
             createBackgroundWin('reload-Db', {
-                folders: config.scanFolder,
-                filters: compressFilter
+                folders: config.scanFolder
             });
         });
 
@@ -53,11 +51,6 @@ $('#scan-list-show').click((e) => {
         });
         positionModal(e, $modalScnList);
         $modalScnList.fadeIn('slow');
-
-        // var $filterSelete = $modalScnList.find('#filter-select');
-        // compressFilter.forEach(function (name, i) {
-        //     $filterSelete.append($(`<option value="${i}">${name}</option>"`));
-        // });
 
         $modalScnList.on('dblclick', 'ul li', (event) => {
             var li = event.target.closest('li');
@@ -76,57 +69,3 @@ $('.content').on('click', ' #scan-list .fa-trash-alt', (event) => {
         Id: $li[0].id.replace('f-', '')
     });
 });
-
-
-// $('.content').on('click', ' #scan-footer .fa-trash-alt', (event) => {
-
-//     var x = document.getElementById("filter-select");
-//     if (x.value != "zip") {
-//         compressFilter.splice(x.selectedIndex, 1);
-//         x.remove(x.selectedIndex);
-//     }
-// });
-
-// var $dialog;
-
-// $('.content').on('click', ' #scan-footer #add-filter', (e) => {
-//     if ($dialog == undefined) {
-//         $dialog = $(template('./template/create-dialog.html', {
-//             title: "Create Filter",
-//             btn1: "Create"
-//         }));
-
-//         $('.content').prepend($dialog);
-//         $dialog.find('#create').click(() => {
-//             var name = $('#name').val();
-//             var $filter = $modalScnList.find('#filter-select');
-//             $filter.prepend($(`<option value="${name}" selected>${name}</option>"`));
-//             if (!config.fileFilters.includes(name))
-//                 config.fileFilters.push(name);
-//             config.fileFilters.sort();
-//             hideDialog();
-//         });
-//         $dialog.find('#close').click(hideDialog);
-//     }
-
-//     $dialog.css({
-//         zIndex: 999,
-//         minHeight: 150,
-//         height: 150,
-//         left: -4000,
-//         width: 300
-//     });
-//     $dialog.css({
-//         left: e.clientX,
-//         top: e.clientY - 177
-//     });
-//     $dialog.fadeIn('slow');
-// });
-
-
-// hideDialog = function () {
-//     $dialog.fadeOut('fast', () => {
-//         $dialog.remove();
-//         $dialog = undefined;
-//     });
-// };
