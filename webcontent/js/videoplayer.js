@@ -2,8 +2,7 @@ var volcontrol = document.getElementById('v-vol-control');
 var btnPlay = document.getElementById('v-play');
 var btnMuted = document.getElementById('v-mute');
 var player = document.getElementById('player');
-
-var $vplayer = $('#video-viewer');
+var vpreview = $('<video>')[0];
 var $vTotalTime = $('#v-total-time');
 
 var isPlayer = () => currentView == 3;
@@ -42,7 +41,7 @@ returnToFb = () => {
     $(window).off('wheel', wheelScroll);
     $(document).off('keydown', playerKeyHandler);
     if (Slider) {
-        Slider.setVideo("");
+        Slider.cleanUp();
         Slider = null;
     }
     videos = [];
@@ -56,7 +55,7 @@ playVideo = async (v) => {
     player.src = v.replace('#', '%23');
     $('#title').text(path.basename(v));
     player.play().catch(e => { });
-    Slider.setVideo(v);
+    vpreview.src = v;
 }
 
 player.onloadedmetadata = function (e) {
@@ -176,10 +175,18 @@ addRecentVideo = (video) => {
 
 initPlayer = (v) => {
 
-    Slider = new SliderRange();
+    Slider = new SliderRange('#slider-container');
     Slider.oninput = (value) => {
         player.currentTime = value;
     }
+
+    Slider.onPreview = (val)=>{
+        vpreview.currentTime = val;
+        Slider.setPreviewTitle(formatTime(val));
+    }
+
+    Slider.setPreviewContent(vpreview);
+
     var video = path.join(v.folder.Name, v.Name);
 
     $(window).on('wheel', wheelScroll);
@@ -187,6 +194,7 @@ initPlayer = (v) => {
         return path.join(v.folder.Name, vid.FileName);
     });
     videoIndex = videos.indexOf(video);
+
     if (local.hasObject('playerconfig')) {
         playerConfig = local.getObject('playerconfig');
     }

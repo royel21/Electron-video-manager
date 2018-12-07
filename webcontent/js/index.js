@@ -17,7 +17,7 @@ var filesList = [];
 var fileFound = [];
 var currentDir = "";
 var $loading = $('#folder-reloading');
-
+var setUp = true;
 ipcRenderer.on('thumb-create', (event, name) => {
     var item = $('.items:textequalto(' + name + ')').find('img')[0];
     if (item != undefined &&
@@ -403,16 +403,6 @@ $(() => {
         }
     });
 });
-
-$(document).on('keypress', jumpToFile);
-$(document).on('drop', '#file-list', dropFile);
-$('.openDir').on('click', openDir);
-$('.tool-folderUp').on('click', returnFolder);
-$fviewer.find('#file-list').on('click', '.items', itemClick);
-$fviewer.find('#file-list').on('dblclick', dbclick);
-$(document).on('keydown', keyboardHandler);
-
-
 // var count = 0;
 
 // testFiles = async () => {
@@ -451,3 +441,33 @@ $(document).on('keydown', keyboardHandler);
 
 //     testFiles();
 // });
+
+fileViewerCleanUp = () => {
+    setUp = true;
+    $(document).off('keydown', keyboardHandler);
+    $(document).off('keypress', jumpToFile);
+    $(document).off('drop', '#file-list', dropFile);
+    $('.openDir').off('click', openDir);
+    $('.tool-folderUp').off('click', returnFolder);
+    $fviewer.find('#file-list').off('click', '.items', itemClick);
+    $fviewer.find('#file-list').off('dblclick', dbclick);
+    $(document.body).off('click', () => { $cmenu.css({ display: "none" }); });
+    $(contentScroll).off('scroll', () => { hidedetails(); $cmenu.css({ display: "none" }) });
+    $(window).off('resize', () => { hidedetails(); $cmenu.css({ display: "none" }) });
+}
+
+fileViewerInit = () => {
+    if (setUp) {
+        setUp = false;
+        $(document).on('keypress', jumpToFile);
+        $(document).on('drop', '#file-list', dropFile);
+        $('.openDir').on('click', openDir);
+        $('.tool-folderUp').on('click', returnFolder);
+        $fviewer.find('#file-list').on('click', '.items', itemClick);
+        $fviewer.find('#file-list').on('dblclick', dbclick);
+        $(document).on('keydown', keyboardHandler);
+        $(document.body).on('click', () => { $cmenu.css({ display: "none" }); });
+        $(contentScroll).on('scroll', () => { hidedetails(); $cmenu.css({ display: "none" }) });
+        $(window).on('resize', () => { hidedetails(); $cmenu.css({ display: "none" }) });
+    }
+}

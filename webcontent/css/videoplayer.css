@@ -59,7 +59,7 @@ body[viewer="3"]:-webkit-full-screen .clock .time{
     width: 32.5px;
 }
 
-body:-webkit-full-screen .v-controls span{    
+body:-webkit-full-screen .v-controls > span{
     background-color: black;
 }
 
@@ -199,6 +199,7 @@ body:-webkit-full-screen #video-viewer{
     display: inline-block;
     position: absolute;
     top: 13px;
+    left: -2px;
     background-color: red;
     height: 4px;
     width: 38px;
@@ -208,11 +209,17 @@ body:-webkit-full-screen #video-viewer{
     border-radius: 4px;
 }
 
-#v-mute:checked + #mute-icon{transform: rotateZ(135deg) scale(1);}
+#v-mute:checked + #mute-icon{transform: rotateZ(45deg) scale(1);}
 body:not(:-webkit-full-screen) .v-controls{
     opacity: 1;
 }
 
 #slider-container{
     height: 30px;
+    margin: 0 30px;
+    margin-bottom: -2px;
+}
+
+#slider-container .rc-slider {
+   top: 9px;
 }

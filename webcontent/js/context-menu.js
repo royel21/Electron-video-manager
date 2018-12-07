@@ -122,10 +122,6 @@ $('#cm-file-rename').click((e) => {
     });
 });
 
-$(document.body).click(() => { $cmenu.css({ display: "none" }); });
-$(contentScroll).scroll(() => { hidedetails(); $cmenu.css({ display: "none" }) });
-$(window).resize(() => { hidedetails(); $cmenu.css({ display: "none" }) });
-
 dialogBox = (data, cb) => {
     return new Promise((resolve, reject) => {
         var $dialog = $(template('./template/create-dialog.html', {

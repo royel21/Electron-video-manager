@@ -22,7 +22,8 @@ var loadingNext = false;
 var $viewer = $('#image-viewer');
 var $input;
 var backgroundLoader;
-
+var imageSlider = null;
+var imgPrev = $('<img>')[0];
 updateFilePage = (file, page, totalPage) => {
     if (file != undefined && !isImage) {
         return db.db.query(`UPDATE files set Current = ${page}, Total = ${totalPage} WHERE Id = ${file.Id};`);
@@ -48,7 +49,7 @@ function cleanUpViewer() {
         clearInterval(backgroundLoader);
         backgroundLoader = undefined;
     }
-    
+
     if (rar != null) rar = null;
     backImages = [];
     totalimg = [];
@@ -155,7 +156,7 @@ $imgRange.on('input', (event) => {
             pageNum = totalPage - 1;
         }
         viewImage(pageNum);
-        rangePopup();
+        //rangePopup();
         LoadNextImage = true;
     }
 });
@@ -188,6 +189,25 @@ viewImage = (pn) => {
     viewerImg.src = getImage(pn);
 }
 /***********************************************************/
+setUpRange = () => {
+    imageSlider = new SliderRange('#image-seek');
+    imageSlider.min = 0;
+    imageSlider.max = totalPage - 1;
+    imageSlider.value = pageNum;
+    imageSlider.oninput = (val) => {
+        pageNum = Math.round(val);
+        console.log(pageNum);
+        viewImage(pageNum);
+        LoadNextImage = true;
+    }
+    imageSlider.setPreviewContent(imgPrev);
+    imageSlider.onPreview = (val) =>{
+        var v = Math.round(val);
+        console.log(Math.round(v));
+        imgPrev.src = getImage(v);
+        imageSlider.setPreviewTitle(v+1);
+    }
+}
 
 function loadZip(file) {
     loadingNext = true;
@@ -304,7 +324,7 @@ compressFile = async (filePath, pn) => {
 
             $imgRange.attr('max', totalPage);
             $imgRange.val(pageNum + 1);
-
+            setUpRange();
             imgViewerInit();
             toggleView(2);
             LoadNextImage = true;
@@ -469,7 +489,7 @@ imgViewerInit = () => {
     $('#next-img').on('click', nextImg);
     $('#next-file').on('click', nextFile);
     $('#backtofilelist').on('click', backToFileBrowser);
-    $(window).on('resize', rangePopup);
+    //$(window).on('resize', rangePopup);
     $(document).on('keydown', ViewerKeyUp);
-    rangePopup();
+    // rangePopup();
 }

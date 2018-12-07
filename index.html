@@ -142,19 +142,7 @@
             <div id="video-viewer" class="text-center">
                 <video id="player" preload="auto" src=""></video>
                 <div class="text-center v-controls footer">
-                    <div id="slider-container">
-                        <div class="slider">
-                            <div class="slider-track">
-                                <div class="slider-progress"></div>
-                            </div>
-                            <span class="slider-thumb"></span>
-                            <span id="slider-preview" data-time="00:00">
-                                <video id="v-preview" src=""></video>
-                                <span class="v-preview-arrow">
-                                </span>
-                            </span>
-                        </div>
-                    </div>
+                    <div id="slider-container"></div>
                     <span id="v-exit-to-fb">
                         <i class="fas fa-arrow-circle-up"></i>
                     </span>
@@ -198,9 +186,10 @@
                                 <i class="fas fa-angle-left"></i>
                             </span>
                             <span id="page-n" class="pages">0/0</span>
-                            <span id="seeker">
-                                <input id="img-seek" type="range" min="1" value="1" step="1">
-                                <output id="seek-numb"></output>
+                            <span id="image-seek">
+                                <!-- <input id="img-seek" type="range" min="1" value="1" step="1">
+                                <output id="seek-numb"></output> -->
+                               
                             </span>
                             <span id="next-img">
                                 <i class="fas fa-angle-right"></i>

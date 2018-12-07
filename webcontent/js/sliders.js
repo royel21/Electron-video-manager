@@ -1,52 +1,75 @@
-var sld12232 = $('.slider')[0];
-var $slider_track = $('.slider .slider-track');
-var $slider_trackProgress = $('.slider .slider-progress');
-var $slider_thumb = $('.slider .slider-thumb');
-var player = $('#player')[0];
-var isSliderThumbPressed = false;
+// var sld12232 = $('.slider')[0];
+// var $slider_track = $('.slider .slider-track');
+// var $slider_trackProgress = $('.slider .slider-progress');
+// var $slider_thumb = $('.slider .slider-thumb');
+// var isSliderThumbPressed = false;
 
-getOffset = () => sld12232.offsetLeft + 12.5;
-
-offsetW = () => Math.floor(sld12232.offsetWidth - 13);
 
 class SliderRange {
-    constructor(video) {
+    constructor(el) {
         this.oninput = null;
+        this.onPreview = null;
         this._value = 50;
         this._min = 0;
         this._max = 100;
-        this.vpreview = $('#v-preview')[0];
+        this.$element = $(el);
+        this.isSliderThumbPressed = false;
+        this.$slider = $(`<div id="-${new Date().getTime()}" class="rc-slider">
+                <div class="rc-track">
+                    <div class="rc-progress"></div>
+                </div>
+                <span class="rc-thumb"></span>
+                <span class="rc-preview" data-title="00:00">
+                    <span class="rc-preview-content"></span>
+                    <div><span class="rc-preview-title"></div>
+                    <span class="rc-preview-arrow">
+                    </span>
+                </span></div>`);
 
-        $slider_track.mousedown((e) => {
-            isSliderThumbPressed = true;
-            this.updateValue(e.pageX - getOffset());
-            console.log("click")
+        this.$element.empty().append(this.$slider);
+
+        this.$slider.find('.rc-track').mousedown((e) => {
+            this.isSliderThumbPressed = true;
+            this.updateValue(e.pageX - this.getOffset());
         });
 
-        $slider_thumb.mousedown((e) => {
-            isSliderThumbPressed = true;
+        this.$slider.find('.rc-thumb').mousedown((e) => {
+            this.isSliderThumbPressed = true;
         });
 
         $(document).mousemove((ev) => {
-            if (isSliderThumbPressed) {
-                var newPos = Math.floor(ev.pageX - getOffset());
-                if (newPos > -11 && newPos < offsetW()) {
+            if (this.isSliderThumbPressed) {
+                var newPos = Math.floor(ev.pageX - this.getOffset());
+                if (newPos > -11 && newPos < this.offsetW()) {
                     this.updateValue(newPos);
                 }
             }
         });
-        
-        $slider_track.mousemove((ev) => {
-            var newPos = Math.floor(ev.pageX - getOffset());
-            this.vpreview.currentTime = Number(newPos.map(-10, offsetW() - 1, this.min, this.max).toFixed(2));
-            $('#slider-preview').css({ left: newPos-30 }).attr('data-time',formatTime(this.vpreview.currentTime));
+
+        this.$slider.find('.rc-track').on('mousemove', (ev) => {
+            if (this.onPreview) {
+                var newPos = Math.floor(ev.pageX - this.getOffset());
+                var current = Number(newPos.map(-10, this.offsetW() - 1, this.min, this.max).toFixed(2));
+                this.$slider.find('.rc-preview').css({ display: "block", left: newPos - 36 });
+                this.onPreview(current);
+            }
         });
 
-        $(document).mouseup(() => isSliderThumbPressed = false);
+        this.$slider.mouseleave(() => this.$slider.find('.rc-preview').css({ display: "none" }));
+        this.$slider.find('.rc-thumb').mouseenter(() => this.$slider.find('.rc-preview').css({ display: "none" }));
+        $(document).mouseup(() => this.isSliderThumbPressed = false);
 
         $(window).on('resize', () => {
             this.updatePos();
         });
+    }
+
+    getOffset() {
+        return this.$slider[0].offsetLeft + 12.5;
+    }
+
+    offsetW() {
+        return Math.floor(this.$slider[0].offsetWidth) - 13;
     }
 
     get max() {
@@ -73,11 +96,20 @@ class SliderRange {
 
     set value(val) {
         this._value = val < this.min ? this.min : val > this.max ? this.max : val;
+        console.log(this.min, this.max, this._value)
         this.updatePos();
     }
 
+    setPreviewContent(el) {
+        this.$slider.find('.rc-preview-content').empty().append(el);
+    }
+
+    setPreviewTitle(text){
+        this.$slider.find('.rc-preview-title').text(text);
+    }
+
     updateValue(val) {
-        this._value = Number(val.map(-10, offsetW() - 1, this.min, this.max).toFixed(2));
+        this._value = Number(val.map(-10, this.offsetW() - 1, this.min, this.max).toFixed(2));
         if (this.oninput) {
             this.oninput(this._value);
         }
@@ -86,12 +118,12 @@ class SliderRange {
 
     updatePos() {
         if (typeof this._value === "number") {
-            $slider_thumb.css({ left: this._value.map(this._min, this._max, -10, offsetW() - 1) });
-            $slider_trackProgress.css({ width: this._value.map(this._min, this._max, 0, 100) + "%" });
+            this.$slider.find('.rc-thumb').css({ left: this._value.map(this._min, this._max, -10, this.offsetW() - 1) });
+            this.$slider.find('.rc-progress').css({ width: this._value.map(this._min, this._max, 0, 100) + "%" });
         }
     }
 
-    setVideo(v){
-        this.vpreview.src = v;
+    cleanUp() {
+        this.$element.empty();
     }
 }

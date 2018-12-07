@@ -34,6 +34,10 @@
     pointer-events: none;
 }
 
+#image-seek{
+    flex-grow: 1;
+}
+
 body[viewer="2"]:-webkit-full-screen #img-content{
     height: 100%;
 }

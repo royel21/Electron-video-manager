@@ -13,6 +13,7 @@ if (local.hasObject('config')) {
 toggleView = (view) => {
     currentView = view;
     $('body').attr("viewer", view);
+    view === 1 ? fileViewerInit() : fileViewerCleanUp();
 }
 
 processFile = (name) => {
@@ -73,6 +74,6 @@ hideFooter = () => {
     }
 }
 
-$('.cancel-footer').on('mousedown click mouseup keyup keydown keypress', consumeEvent);
+$('.cancel-footer').on('mousedown click keyup keydown keypress', consumeEvent);
 $(document).on('mousemove', hideFooter);
 $(document).on('webkitfullscreenchange', hideFooter);
