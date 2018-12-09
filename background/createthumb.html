@@ -14,7 +14,7 @@
     const db = require(path.join(path.dirname(__dirname), './webcontent/models/models'));
     var images = ['png', 'gif', 'jpg', 'jpeg', 'webp'];
 
-    fileFilter = ['mp4', 'mkv', 'avi', 'webm', 'ogg','zip', 'rar', 'cbr'];
+    fileFilter = ['mp4', 'mkv', 'avi', 'webm', 'ogg', 'zip', 'rar', 'cbr'];
 
     var count = 0;
 
@@ -57,9 +57,13 @@
             });
 
             var f1 = await db.Folder.findOrCreate({
-                where: { Name: folder }
+                where: {
+                    Name: folder
+                }
             });
-            f1[0].updateAttributes({ folderId: id });
+            f1[0].updateAttributes({
+                folderId: id
+            });
 
             var files = [];
             var foundFiles = [];
@@ -131,10 +135,11 @@
                     case "mp4":
                     case "webm":
                     case "mkv":
-                    case "avi": {
-                        state = await VideoThumb(path.join(currentDir, file.FileName));
-                        break;
-                    }
+                    case "avi":
+                        {
+                            state = await VideoThumb(path.join(currentDir, file.FileName));
+                            break;
+                        }
                 }
                 if (state) {
                     fromWindow.webContents.send('thumb-create', file.FileName);
@@ -185,8 +190,7 @@
                 });
 
                 var firstImg = entries.find(e => {
-                    return images.includes(e.name.toLocaleLowerCase().split(
-                        '.').pop()) &&
+                    return images.includes(e.name.toLocaleLowerCase().split('.').pop()) &&
                         e.size > 1024 * 30
                 });
 
@@ -240,11 +244,11 @@
     zip = async (data, fromWindow) => {
         zipper.sync.zip(data.dir).compress().save(data.dir + '.zip');
         //fs.removeSync(data.dir);
-        fromWindow.webContents.send('zip-done',
-            {
-                file: WinDrive.ListFiles(path.dirname(data.dir))
-                    .find((f) => f.FileName === path.basename(data.dir) + '.zip'), dir: data.dir
-            });
+        fromWindow.webContents.send('zip-done', {
+            file: WinDrive.ListFiles(path.dirname(data.dir))
+                .find((f) => f.FileName === path.basename(data.dir) + '.zip'),
+            dir: data.dir
+        });
         window.close();
     }
 </script>

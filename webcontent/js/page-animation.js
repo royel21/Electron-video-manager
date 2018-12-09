@@ -1,7 +1,6 @@
 updatePageNum = () => {
     tempImg.src = "";
-    $imgRange.val(pageNum + 1);
-    rangePopup(pageNum, fileN);
+    imageSlider.value = currentManga.Current;
     isChange = true;
     LoadNextImage = true;
     console.timeEnd('i');

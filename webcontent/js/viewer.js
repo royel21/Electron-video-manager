@@ -11,9 +11,7 @@ const tempImg = document.getElementById('temp-img');
 const $filescount = $('.total-files');
 const $imgRange = $('#img-seek');
 /***********************************************************/
-var pageNum = 0;
 var totalimg = [];
-var filename;
 var fileN = 0;
 var backImages = [];
 var isChange = true;
@@ -24,11 +22,7 @@ var $input;
 var backgroundLoader;
 var imageSlider = null;
 var imgPrev = $('<img>')[0];
-updateFilePage = (file, page, totalPage) => {
-    if (file != undefined && !isImage) {
-        return db.db.query(`UPDATE files set Current = ${page}, Total = ${totalPage} WHERE Id = ${file.Id};`);
-    }
-}
+var currentManga;
 
 /***********************************************************/
 function imgFilter(entry) {
@@ -49,7 +43,6 @@ function cleanUpViewer() {
         clearInterval(backgroundLoader);
         backgroundLoader = undefined;
     }
-
     if (rar != null) rar = null;
     backImages = [];
     totalimg = [];
@@ -62,19 +55,18 @@ function cleanUpViewer() {
     $('#backtofilelist').off('click', backToFileBrowser);
 }
 
-$(window).on('beforeunload', (e) => {
-    updateFilePage(filename, pageNum, totalPage).then(() => {
-    });
-});
+saveImageViewer = async () => {
+    await updateFile(currentManga);
+}
 
 /***********************************************************/
 prevImg = () => {
     if (!loadingNext) {
-        if (pageNum > 0) {
+        if (currentManga.Current > 0) {
             direction = false;
             $(tempImg).stop();
             if (LoadNextImage) {
-                showImage(--pageNum);
+                showImage(--currentManga.Current);
             }
         } else {
             prevFile();
@@ -84,11 +76,11 @@ prevImg = () => {
 /***********************************************************/
 nextImg = () => {
     if (!loadingNext) {
-        if (pageNum < totalPage - 1) {
+        if (currentManga.Current < totalPage - 1) {
             direction = true;
             $(tempImg).stop();
             if (LoadNextImage) {
-                showImage(++pageNum);
+                showImage(++currentManga.Current);
             }
         } else {
             nextFile();
@@ -116,28 +108,26 @@ $('#page-n').on('click', function () {
 
     if (totalPage !== 0 && $input == undefined) {
         this.textContent = "";
-        $input = $(`<input type="number" value=${(pageNum + 1)}
+        $input = $(`<input type="number" value=${(currentManga.Current + 1)}
                          style="width:70px; padding:0" min=1 
                          max=${totalPage}>`).appendTo($(this)).focus();
 
         $input.on('keyup', (event) => {
             if (event.keyCode === 13) {
-                pageNum = parseInt($input.val()) - 1;
+                currentManga.Current = parseInt($input.val()) - 1;
 
-                if (pageNum > totalPage - 1) {
-                    pageNum = totalPage - 1;
+                if (currentManga.Current > totalPage - 1) {
+                    currentManga.Current = totalPage - 1;
                 }
-                isChange = false;
-                $imgRange.val(pageNum + 1);
-                viewImage(pageNum);
-                isChange = true;
+                imageSlider.value = currentManga.Current;
+                viewImage(currentManga.Current);
                 LoadNextImage = true;
             }
             event.stopPropagation();
         });
         $input.focusout(() => {
             $input = undefined;
-            $('.pages').text(String(pageNum + 1).padStart(totalPage > 99 ? 3 : 2, '0') + "/" + totalPage);
+            $('.pages').text(String(currentManga.Current + 1).padStart(totalPage > 99 ? 3 : 2, '0') + "/" + totalPage);
         })
         $input.keydown((e) => {
             e.stopPropagation()
@@ -148,65 +138,31 @@ $('#page-n').on('click', function () {
     }
 });
 
-$imgRange.on('input', (event) => {
-
-    if (isChange) {
-        pageNum = event.target.value - 1;
-        if (pageNum > totalPage - 1) {
-            pageNum = totalPage - 1;
-        }
-        viewImage(pageNum);
-        //rangePopup();
-        LoadNextImage = true;
-    }
-});
-
-rangePopup = () => {
-    if ($('#seeker')[0].style.display != 'none') {
-        var newPoint, newPlace;
-        // Cache this for efficiency
-
-        // Measure width of range input
-        width = $('#seeker').width();
-
-        // Figure out placement percentage between left and right of input
-        newPoint = ($imgRange.val() - 1) / (totalPage - 1);
-
-        newPlace = (width * newPoint.toFixed(3));
-
-        $imgRange.next("output")
-            .css({
-                left: newPlace,
-                marginLeft: newPoint.map(0.0, 1.0, -9, -33)
-            }).text($imgRange.val());
-    }
-
-    $filescount.text('Files: ' + (fileN + 1) + '/' + filesList.length);
-    $('.pages').text(String(pageNum + 1).padStart(totalPage > 99 ? 3 : 2, '0') + "/" + totalPage);
-}
-
 viewImage = (pn) => {
     viewerImg.src = getImage(pn);
+    $filescount.text('Files: ' + (fileN + 1) + '/' + filesList.length);
+    $('.pages').text(String(currentManga.Current + 1).padStart(totalPage > 99 ? 3 : 2, '0') + "/" + totalPage);
 }
 /***********************************************************/
 setUpRange = () => {
-    imageSlider = new SliderRange('#image-seek');
+    if (imageSlider == null) {
+        imageSlider = new SliderRange('#image-seek');
+
+        imageSlider.oninput = (val) => {
+            currentManga.Current = Math.round(val);
+            viewImage(currentManga.Current);
+            LoadNextImage = true;
+        }
+        imageSlider.onPreview = (val) => {
+            var v = Math.round(val);
+            imgPrev.src = getImage(v);
+            imageSlider.setPreviewTitle(v + 1);
+        }
+        imageSlider.setPreviewContent(imgPrev);
+    }
     imageSlider.min = 0;
     imageSlider.max = totalPage - 1;
-    imageSlider.value = pageNum;
-    imageSlider.oninput = (val) => {
-        pageNum = Math.round(val);
-        console.log(pageNum);
-        viewImage(pageNum);
-        LoadNextImage = true;
-    }
-    imageSlider.setPreviewContent(imgPrev);
-    imageSlider.onPreview = (val) =>{
-        var v = Math.round(val);
-        console.log(Math.round(v));
-        imgPrev.src = getImage(v);
-        imageSlider.setPreviewTitle(v+1);
-    }
+    imageSlider.value = currentManga.Current;
 }
 
 function loadZip(file) {
@@ -214,80 +170,37 @@ function loadZip(file) {
     isImage = false;
     cleanUpViewer();
     $('#loadingDiv').removeClass('d-none');
-    updateFilePage(filename, pageNum, totalPage);
+    updateFile(currentManga);
 
-    filename = {
-        path: path.join(currentDir, file.Name),
-        pn: 0
-    }
+    updateItemProgress(currentManga);
+    currentManga = {
+        Id: file.Id,
+        Name: file.Name,
+        dir: file.folder.Name,
+        Current: file.Current == undefined ? 0 : file.Current,
+        Total: 0
+    };
 
-    if (file.Current != undefined) {
-        var dir = path.join(file.folder.Name, file.Name);
-        if (fs.existsSync(dir)) filename.path = dir;
-        filename.Id = file.Id;
-        filename.pn = file.Current;
-    }
-
-    compressFile(filename.path, filename.pn).then(result => {
+    compressFile().then(result => {
         if (result) {
             if (file.Current == undefined) {
-                var tempFile = WinDrive.ListFiles(filename.path, [], true)[0];
-                db.Folder.findOrCreate({
-                    where: {
-                        Name: currentDir
-                    }
-                }).then(folder => {
-                    db.File.create({
-                        Name: file.Name,
-                        folderId: folder[0].Id,
-                        Current: 0,
-                        Total: totalPage,
-                        Size: tempFile.Size
-                    }).then(f => {
-                        updateRecents(f);
-                        loadingNext = false;
-                        filename.Id = f.Id;
-                    });
+                var tempFile = WinDrive.ListFiles(currentManga.dir, [], true)[0];
+                tempFile.Total = totalPage;
+                tempFile.DirName = currentDir;
+                db.File.findOrCreateNew(tempFile).then(f => {
+                    updateRecentMangas(f);
+                    loadingNext = false;
                 });
             } else {
-                updateRecents(file);
-                loadingNext = false;
+                updateRecentMangas(file);
             }
+            loadingNext = false;
         }
     });
 }
 
-updateRecents = async (file) => {
-
-    if (config.recents.find(f => {
-        return f.Id == file.Id;
-    }) == undefined) {
-        config.recents.unshift({
-            Id: file.Id,
-            Name: file.Name
-        });
-    } else {
-        var lastFile = config.recents.removeById({
-            Id: file.Id
-        });
-        config.recents.unshift(lastFile);
-    }
-
-    if (config.recents.length > config.recentMax) config.recents.pop();
-
-    if (!$('#recent').hasClass('d-none')) {
-
-        var li = $('#list-recent #file-' + file.Id)[0];
-        if (li == undefined) {
-            $('#list-recent').prepend(createEntry(file), true);
-        } else {
-            $(li).prependTo($('#list-recent'));
-        }
-        $('#recent-count').text(config.recents.length + "/" + config.recentMax);
-    }
-};
-/*******************Compress File**************************************/
-compressFile = async (filePath, pn) => {
+compressFile = async () => {
+    var filePath = path.join(currentManga.dir, currentManga.Name);
 
     if (fs.existsSync(filePath)) {
 
@@ -312,43 +225,52 @@ compressFile = async (filePath, pn) => {
                 });
             });
         }
-
         if (totalimg.length > 0) {
-            var p = path.basename(filePath);
-            totalPage = totalimg.length;
-            viewerImg.src = getImage(pn);
-            pageNum = pn;
+            
+            currentManga.Total = totalPage = totalimg.length;
             $('#loadingDiv').addClass('d-none');
-            $('.title').text(p);
-            fileN = filesList.indexOf(p);
+            $('.title').text(currentManga.Name);
 
-            $imgRange.attr('max', totalPage);
-            $imgRange.val(pageNum + 1);
+            if (!filesList.length) {
+                filesList = WinDrive.ListFiles(currentManga.dir, compressFilter)
+                    .map(f => f.FileName);
+            }
+            fileN = filesList.indexOf(currentManga.Name);
             setUpRange();
+            viewImage(currentManga.Current);
             imgViewerInit();
             toggleView(2);
             LoadNextImage = true;
             return true;
         }
     }
-
     $('#loadingDiv').addClass('d-none');
     backToFileBrowser();
     return false;
 }
+
+updateRecentMangas = (file) => {
+    var tempM = config.recents.removeByName(currentManga);
+    if (tempM != undefined) currentManga = tempM;
+
+    config.recents.unshift(currentManga);
+    if (config.recents.length > config.recentMax) config.recents.pop();
+
+    if ($('#recent').is(':visible')) {
+        var $li = $('#list-recent #file-' + file.Id);
+        $('#list-recent li').eq(0).after($li[0] == undefined ? createEntry(file, true) : $li.remove());
+        $('#recent-count').text(config.recents.length + "/" + config.recentMax);
+    }
+}
+
+/*******************Compress File**************************************/
 /***********************************************************/
 function loadImage(fname) {
-    filename = {
-        path: path.join(currentDir, fname)
-    };
     isImage = true;
     viewerImg.src = path.join(currentDir, fname) + '?x=' + getRandomNum();
     $('.title').text(path.join(currentDir, fname));
-    pageNum = fileN = filesList.indexOf(fname);
+    currentManga.Current = fileN = filesList.indexOf(fname);
     totalPage = filesList.length;
-    $imgRange.attr('max', totalPage);
-    $imgRange.val(1);
-    imgViewerInit();
     toggleView(2);
 }
 
@@ -364,6 +286,9 @@ function showImage(pn) {
         tempImg.src = path.join(currentDir, filesList[pn]) + '?x=' + getRandomNum();
         $('.title').text(path.join(currentDir, filesList[pn]));
     }
+
+    $filescount.text('Files: ' + (fileN + 1) + '/' + filesList.length);
+    $('.pages').text(String(currentManga.Current + 1).padStart(totalPage > 99 ? 3 : 2, '0') + "/" + totalPage);
 }
 
 getImage = function (pn) {
@@ -384,18 +309,20 @@ $('#openFile').on('click', function () {
     dialog.showOpenDialog(mainWindow, {
         title: "Select the file to open",
         filters: [{
-            name: 'Files',
-            extensions: Filter
-        },
-        {
-            name: 'All Files',
-            extensions: ['*']
-        }
+                name: 'Files',
+                extensions: Filter
+            },
+            {
+                name: 'All Files',
+                extensions: ['*']
+            }
         ]
     }, function (openedFile) {
         if (openedFile !== undefined && openedFile.length > 0) {
             currentDir = path.dirname(openedFile[0]);
-            loadZip({ Name: openedFile[0] });
+            loadZip({
+                Name: openedFile[0]
+            });
         }
     });
 });
@@ -407,36 +334,22 @@ $viewer.mousedown(event => {
 });
 
 /******************************************************/
-updateItemPageView = () => {
-    var $item, index;
-    if (filename.path != undefined) {
-        $item = $('.items:textequalto(' + path.basename(filename.path) + ')');
-        if (pageNum > 0 && !isImage) {
-            var $itemf = $item.find('.item-file');
-            $itemf.find('.file-page').remove();
-            $itemf.append(`<span class="file-page ${pageNum + 1 == totalPage ? "bg-primary" : "bg-danger"}"` +
-                ` data-pages="${pageNum + 1}/${totalPage}"></span>`);
-            index = $('.items').index($item[0])
-        } else {
-            index = fileN;
-        }
-    }
-    toggleView(1);
-    selectItem(index);
-}
-function backToFileBrowser() {
+
+async function backToFileBrowser() {
     cleanUpViewer();
-    updateFilePage(filename, pageNum, totalPage);
+    updateFile(currentManga);
     if (WinDrive.ListFiles(currentDir).length === totalitem) {
         filesList = allFiles;
         $filescount.text('Files: ' + totalitem);
         $('.title').text(currentDir);
-        updateItemPageView();
     } else {
-        loadDirectory('').then(() => {
-            updateItemPageView();
-        });
+        await loadDirectory('');
     }
+    selectItem(updateItemProgress(currentManga));
+    toggleView(1);
+
+    currentManga = undefined;
+    imageSlider = null;
 }
 
 /****Viewer Config****/
@@ -489,7 +402,5 @@ imgViewerInit = () => {
     $('#next-img').on('click', nextImg);
     $('#next-file').on('click', nextFile);
     $('#backtofilelist').on('click', backToFileBrowser);
-    //$(window).on('resize', rangePopup);
     $(document).on('keydown', ViewerKeyUp);
-    // rangePopup();
 }

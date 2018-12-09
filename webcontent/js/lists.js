@@ -39,7 +39,7 @@ processRow = (event) => {
     var id = li.id.replace("file-", "");
     var ul_id = li.closest('ul').id
     if ($(li).data('isfile')) {
-        if (ul_id != "list-recent") filesList = listofFile;
+        filesList = ul_id != "list-recent" ? listofFile : [];
         processFile(li.dataset.title);
     } else {
         loadDirectory('', id);

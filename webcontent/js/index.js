@@ -18,6 +18,7 @@ var fileFound = [];
 var currentDir = "";
 var $loading = $('#folder-reloading');
 var setUp = true;
+
 ipcRenderer.on('thumb-create', (event, name) => {
     var item = $('.items:textequalto(' + name + ')').find('img')[0];
     if (item != undefined &&

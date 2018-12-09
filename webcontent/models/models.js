@@ -31,17 +31,16 @@ const Folder = db.define('folders', {
         unique: true,
         allowNull: false
     },
-    folderId:{
+    folderId: {
         type: Sequelize.INTEGER,
-        references:{
+        references: {
             model: "folders",
             key: "Id"
         }
     }
-},
-    {
-        timestamps: false
-    })
+}, {
+    timestamps: false
+})
 
 const File = db.define('files', {
     Id: {
@@ -57,22 +56,46 @@ const File = db.define('files', {
         type: Sequelize.INTEGER(5).UNSIGNED,
         defaultValue: 0
     },
-    Total:{
+    Total: {
         type: Sequelize.INTEGER(5).UNSIGNED,
         defaultValue: 0
     },
     Size: {
         type: Sequelize.INTEGER.UNSIGNED
     }
-},
-    {
-        timestamps: false
-    });
+}, {
+    timestamps: false
+});
 
-File.findByName = (file) =>{
-    return File.findOne({where:{Name: file.Name}, include:{model: Folder}});
+File.findByName = (file) => {
+    return File.findOne({
+        where: {
+            Name: file.Name
+        },
+        include: {
+            model: Folder
+        }
+    });
 }
 
+File.findOrCreateNew = (file) => {
+    return new Promise((resolve, reject) => {
+        Folder.findOrCreate({
+            where: {
+                Name: file.DirName
+            }
+        }).then(folder => {
+            File.create({
+                Name: file.FileName,
+                folderId: folder[0].Id,
+                Total: file.Total,
+                Size: file.Size
+            }).then(f => {
+                resolve(f);
+            });
+        });
+    });
+}
 
 const FavoriteFile = db.define('favoritefiles', {
     Id: {
@@ -85,8 +108,8 @@ const FavoriteFile = db.define('favoritefiles', {
         unique: true
     }
 }, {
-        timestamps: false
-    });
+    timestamps: false
+});
 
 File.belongsTo(Folder);
 Folder.hasMany(File);
@@ -96,8 +119,14 @@ FavoriteFile.hasMany(Folder);
 
 init = async () => {
     if (!fs.existsSync(dbPath)) {
-        await db.sync({ logging: true });
-        await FavoriteFile.findOrCreate({ where: { Name: "Folders" } });
+        await db.sync({
+            logging: true
+        });
+        await FavoriteFile.findOrCreate({
+            where: {
+                Name: "Folders"
+            }
+        });
     }
 }
 

@@ -5,17 +5,6 @@ const dialog = app.dialog;
 const fs = require('fs-extra');
 const path = require('path');
 const local = localStorage;
-var config = {
-    recents: [],
-    recentMax: 50,
-    favId: 1,
-    lastDir: "",
-    scanFolder: [],
-    imgScale: 0.6,
-    sortBy: "",
-    pageAnimation: "Slide",
-    animDuration: 200
-};
 
 compressFilter = ['zip', 'rar','cbr'];
 videoFilter = ['mp4', 'mkv', 'avi', 'webm','ogg'];
@@ -92,6 +81,16 @@ Array.prototype.removeById = function (obj) {
     var i = this.length;
     while (i--) {
         if (this[i] instanceof Object && this[i].Id == obj.Id) {
+            return this.splice(i, 1)[0];
+        }
+    }
+}
+
+
+Array.prototype.removeByName = function (obj) {
+    var i = this.length;
+    while (i--) {
+        if (this[i] instanceof Object && this[i].Name.toUpperCase().localeCompare(obj.Name.toUpperCase()) == 0) {
             return this.splice(i, 1)[0];
         }
     }

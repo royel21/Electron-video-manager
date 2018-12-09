@@ -167,12 +167,13 @@ function CreateEl(file, diskIcon) {
     if (fav != undefined) {
         isFav = fav.isFav ? "in-fav fas" : "far";
         if (isFile && fav.Page > 0) {
-            page = `<span class="file-page ${fav.Page + 1 == fav.Total ? "bg-primary" : "bg-danger"}" ` +
-                `data-pages="${fav.Page + 1}/${fav.Total}" ></span>`
+            page = createSpan(file.FileName, fav.Page, fav.Total); 
         }
     } else {
         isFav = "far";
     }
+
+    
     var div = document.createElement('div');
     div.innerHTML =
         `<div data-isfile="${isFile}" data-name="${file.FileName}" tabindex="0" data-size="${file.Size}" data-mdate="${file.LastModified}" data-ex="${file.extension}" class="items" >

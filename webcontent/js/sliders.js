@@ -1,10 +1,3 @@
-// var sld12232 = $('.slider')[0];
-// var $slider_track = $('.slider .slider-track');
-// var $slider_trackProgress = $('.slider .slider-progress');
-// var $slider_thumb = $('.slider .slider-thumb');
-// var isSliderThumbPressed = false;
-
-
 class SliderRange {
     constructor(el) {
         this.oninput = null;
@@ -49,9 +42,9 @@ class SliderRange {
         this.$slider.find('.rc-track').on('mousemove', (ev) => {
             if (this.onPreview) {
                 var newPos = Math.floor(ev.pageX - this.getOffset());
-                var current = Number(newPos.map(-10, this.offsetW() - 1, this.min, this.max).toFixed(2));
-                this.$slider.find('.rc-preview').css({ display: "block", left: newPos - 36 });
-                this.onPreview(current);
+                var current = Number(newPos.map(-10, this.offsetW(), this.min, this.max).toFixed(2));
+                this.$slider.find('.rc-preview').css({ display: "block", left: newPos - 37 });
+                this.onPreview(current < this.min ? this.min : current > this.max ? this.max : current);
             }
         });
 
@@ -69,7 +62,7 @@ class SliderRange {
     }
 
     offsetW() {
-        return Math.floor(this.$slider[0].offsetWidth) - 13;
+        return Math.floor(this.$slider[0].offsetWidth) - 14;
     }
 
     get max() {
@@ -96,7 +89,6 @@ class SliderRange {
 
     set value(val) {
         this._value = val < this.min ? this.min : val > this.max ? this.max : val;
-        console.log(this.min, this.max, this._value)
         this.updatePos();
     }
 
@@ -104,12 +96,13 @@ class SliderRange {
         this.$slider.find('.rc-preview-content').empty().append(el);
     }
 
-    setPreviewTitle(text){
+    setPreviewTitle(text) {
         this.$slider.find('.rc-preview-title').text(text);
     }
 
     updateValue(val) {
-        this._value = Number(val.map(-10, this.offsetW() - 1, this.min, this.max).toFixed(2));
+        var val = Number(val.map(-10, this.offsetW(), this.min, this.max).toFixed(2));
+        this._value = val < this.min ? this.min : val > this.max ? this.max : val;
         if (this.oninput) {
             this.oninput(this._value);
         }
@@ -118,8 +111,10 @@ class SliderRange {
 
     updatePos() {
         if (typeof this._value === "number") {
-            this.$slider.find('.rc-thumb').css({ left: this._value.map(this._min, this._max, -10, this.offsetW() - 1) });
-            this.$slider.find('.rc-progress').css({ width: this._value.map(this._min, this._max, 0, 100) + "%" });
+            setTimeout(() => {
+                this.$slider.find('.rc-thumb').css({ left: this._value.map(this._min, this._max, -10, this.offsetW()) });
+                this.$slider.find('.rc-progress').css({ width: this._value.map(this._min, this._max, 0, 100) + "%" });
+            });
         }
     }
 

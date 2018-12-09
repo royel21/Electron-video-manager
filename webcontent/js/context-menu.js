@@ -133,11 +133,17 @@ dialogBox = (data, cb) => {
         $('.content').prepend($dialog);
         $dialog.find('#create').click(() => {
             resolve($nameBox.val());
-            hideCreateFav();
+            $dialog.fadeOut('fast', () => {
+                $dialog.remove();
+                $dialog = undefined;
+            });
         });
         $dialog.find('#close').click(() => {
             hideCreateFav();
-            resolve("");
+            $dialog.fadeOut('fast', () => {
+                $dialog.remove();
+                $dialog = undefined;
+            });
         });
 
         $dialog.css({
