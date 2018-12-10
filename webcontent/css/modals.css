@@ -235,3 +235,20 @@ ul, label {
 #modal-search #search-found {
     pointer-events: none;  
 }
+
+#sort-select,
+#sort-select option{
+    font-weight:bold;
+    font-family:Arial, Font Awesome\ 5 Free;
+    color: black;
+}
+
+#sort-select{
+    color: brown;
+}
+.m-body .list-icon{
+    font-size: 20px;
+    margin-right: 3px;
+    font-weight:bold;
+    font-family:Arial, Font Awesome\ 5 Free;
+}
