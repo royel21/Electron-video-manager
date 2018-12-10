@@ -39,15 +39,21 @@ body[viewer="3"]:-webkit-full-screen .clock .time {
     padding-bottom: 5px;
 }
 
+body[viewer="3"]:-webkit-full-screen #v-control-2{
+    display: inline-block;
+    padding: 5px 0px 5px 5px;
+    background-color: rgba(0,0,0,0.4);
+    border-radius: 5px;
+}
+
 .hide-vcontrols {
     opacity: 0;
 }
 
-.v-controls>*,
-.v-controls>*>* {
+.v-controls > *,
+.v-controls > * > * {
     position: initial;
     left: initial;
-    cursor: pointer;
 }
 
 .v-controls span {
@@ -57,10 +63,13 @@ body[viewer="3"]:-webkit-full-screen .clock .time {
     border-radius: 50%;
     height: 30px;
     width: 32.5px;
+    margin: 0 5px;
 }
 
-body:-webkit-full-screen .v-controls>span {
+body:-webkit-full-screen .footer > span i {
     background-color: black;
+    padding: 2px 4px;
+    border-radius: 5px;
 }
 
 .v-controls span i {
@@ -134,19 +143,32 @@ body:-webkit-full-screen #video-viewer {
     content: "\f28b";
 }
 
-.v-controls .v-vol {
-    position: absolute;
-    right: 10px;
-    bottom: 5px;
+.v-controls .v-vol *{
+    cursor: pointer;
 }
 
+.v-controls .v-vol {
+    width: max-content;
+}
+
+.v-controls .v-vol label{
+    position: relative;
+    top: -4px;
+    width: 45px;
+    height: 40px;
+}
+
+.v-controls .v-vol label i{
+    position: relative;
+    top: 5px;
+}
 
 .v-controls .v-vol #v-vol-control {
-    position: absolute;
+    position: relative;
     width: auto;
     height: 8px;
-    top: 10px;
-    right: 40px;
+    top: -6px;
+    right: 0;
 }
 
 #v-vol-control::-webkit-slider-thumb {
@@ -161,15 +183,16 @@ body:-webkit-full-screen #video-viewer {
 #mute-icon {
     display: inline-block;
     position: absolute;
-    top: 13px;
-    left: -2px;
+    top: 18px;
+    left: 0px;
     background-color: red;
     height: 4px;
-    width: 38px;
+    width: 40px;
     pointer-events: none;
     transition: all .3s;
     border-radius: 4px;
-    transform: rotateZ(45deg)  scaleX(0);
+    transform: rotateZ(360deg)  scaleX(0);
+    z-index: 5;
 }
 
 .vol-ctrl:checked+#mute-icon {
@@ -191,9 +214,10 @@ body:not(:-webkit-full-screen) .v-controls {
 }
 
 .v-controls .vol-show{
-    position: fixed;
+     position: fixed;
     transform: rotate(270deg);
-    bottom: 146px;
+    bottom: 126px;
+    right: -50px;
 }
 
 .footer .popup-caction{

@@ -8,7 +8,7 @@
     <link rel="stylesheet" href="./webcontent/css/index.css">
     <link rel="stylesheet" href="./webcontent/css/index.1.css">
     <link rel="stylesheet" href="./webcontent/css/viewer.css">
-    <link rel="stylesheet" href="./webcontent/css/lists.css">
+    <link rel="stylesheet" href="./webcontent/css/modals.css">
     <link rel="stylesheet" href="./webcontent/css/footer.css">
     <link rel="stylesheet" href="./webcontent/css/clock.css">
     <link rel="stylesheet" href="./webcontent/css/resize.css">
@@ -28,42 +28,42 @@
     </div>
     <nav class="menubar text-light text-left">
         <span id="btn-home">
-            <i class="fas fa-home"></i>
+            <i class="fas fa-home popup-msg" data-title="Go To Root"></i>
         </span>
         <div id='title-n'>
             <h5 class='title'>MangaViewer</h5>
             <div id="drag-region"></div>
         </div>
-        <span id="btn-sys-min">
+        <span id="btn-sys-min" class="popup-msg" data-title="Minimixe Window">
             <i class="fas fa-window-minimize"></i>
         </span>
-        <span id="btn-sys-max">
+        <span id="btn-sys-max" class="popup-msg" data-title="Maximize Window">
             <i class="fas fa-window-restore"></i>
         </span>
-        <span class="btn-sys-close">
+        <span class="btn-sys-close popup-msg" data-title="Close Window">
             <i class="fas fa-window-close"></i>
         </span>
     </nav>
     <div class="main">
-        <div class="content">
-            <div id="modal-list-file" class="modal card bg-dark resize">
-                <div id="list-file-header" class="nav nav-tabs move pt-1 pl-1 dialog-header">
-                    <span class="nav-item">
-                        <input id="tab-recent" name="list-tab" type="radio" class="d-none">
-                        <label class="nav-link active" for="tab-recent">Recents</label>
-                    </span>
-                    <span>
-                        <input id="tab-files" name="list-tab" type="radio" class="d-none">
-                        <label class="nav-link" for="tab-files">Files</label>
-                    </span>
-                    <span>
-                        <input id="tab-favorite" name="list-tab" type="radio" class="d-none">
-                        <label class="nav-link" for="tab-favorite">
-                            <i class="fa fa-star"></i>
-                        </label>
-                    </span>
-                    <span id="list-file-hide" class="btn-hide"><i class="far fa-times-circle"></i></span>
-                </div>
+        <div class="modal modal-list-file card bg-dark resize">
+            <div id="list-file-header" class="nav nav-tabs move pt-1 pl-1 dialog-header">
+                <span class="nav-item">
+                    <input id="tab-recent" name="list-tab" type="radio" class="d-none">
+                    <label class="nav-link active" for="tab-recent">Recents</label>
+                </span>
+                <span>
+                    <input id="tab-files" name="list-tab" type="radio" class="d-none">
+                    <label class="nav-link" for="tab-files">Files</label>
+                </span>
+                <span>
+                    <input id="tab-favorite" name="list-tab" type="radio" class="d-none">
+                    <label class="nav-link" for="tab-favorite">
+                        <i class="fa fa-star"></i>
+                    </label>
+                </span>
+                <span id="list-file-hide" class="btn-hide"><i class="far fa-times-circle"></i></span>
+            </div>
+            <div class="m-body .cancel-footer">
                 <div id="recent" class="tab-content">
                     <div class="list-file-content">
                         <ul id="list-recent" class="list-group-flush text-dark">
@@ -105,7 +105,7 @@
                             </div>
                             <input type="text" name="" id="files-filter" class="form-control" placeholder="Search"
                                 style="
-                            border-radius: 0px 5px 5px 0px;" required>
+                                border-radius: 0px 5px 5px 0px;" required>
                             <span id="btn-search-clear"><i class="fas fa-times-circle"></i></span>
                         </div>
                     </div>
@@ -135,6 +135,8 @@
                     </div>
                 </div>
             </div>
+        </div>
+        <div class="content">
             <div id="loadingDiv" class=" d-none">
                 </span><span id="loading-msg">Please Wait</span>
                 <div class="loader"></div>
@@ -143,38 +145,40 @@
                 <video id="player" preload="auto" src=""></video>
                 <div class="text-center v-controls footer">
                     <div id="slider-container"></div>
-                    <span id="v-exit-to-fb">
-                        <i class="fas fa-arrow-circle-up popup-msg" data-title="Back To File Browser"></i>
-                    </span>
-                    <span class="list-file-show">
-                        <i class="fas fa-clipboard-list popup-msg" data-title="Open File List"></i>
-                    </span>
-                    <span class="openFile">
-                        <i class="fas fa-folder-open popup-msg" data-title="Open File"></i>
-                    </span>
-                    <span id="v-prev">
-                        <i class="far fa-arrow-alt-circle-left popup-msg" data-title="Previous Video"></i>
-                    </span>
-                    <span id="v-play-pause">
-                        <label for="v-play">
-                            <input id="v-play" type="checkbox">
-                            <i class="far fa-play-circle popup-msg" data-title=""></i>
-                        </label>
-                    </span>
-                    <span id="v-next">
-                        <i class="far fa-arrow-alt-circle-right popup-msg" data-title="Next Video"></i>
-                    </span>
-                    <span class="btn-fullscr">
-                        <i class="fas fa-expand-arrows-alt popup-msg" data-title="Full Screen"></i>
-                    </span>
-                    <span class="v-vol">
-                        <input id="v-vol-control" class="range" type="range" min="0" step="0.01" value="0.5" max="1">
-                        <label for="v-mute">
-                            <input type="checkbox" id="v-mute" class="vol-ctrl">
-                            <span id="mute-icon"></span>
-                            <i class="fas fa-volume-up popup-msg" data-title="Mute"></i>
-                        </label>
-                    </span>
+                    <div id="v-control-2">
+                        <span id="v-exit-to-fb">
+                            <i class="fas fa-arrow-circle-up popup-msg" data-title="Back To File Browser"></i>
+                        </span>
+                        <span class="list-file-show">
+                            <i class="fas fa-clipboard-list popup-msg" data-title="Open Recent Files"></i>
+                        </span>
+                        <span class="openFile">
+                            <i class="fas fa-folder-open popup-msg" data-title="Open File"></i>
+                        </span>
+                        <span id="v-prev">
+                            <i class="far fa-arrow-alt-circle-left popup-msg" data-title="Previous Video"></i>
+                        </span>
+                        <span id="v-play-pause">
+                            <label for="v-play">
+                                <input id="v-play" type="checkbox">
+                                <i class="far fa-play-circle popup-msg" data-title=""></i>
+                            </label>
+                        </span>
+                        <span id="v-next">
+                            <i class="far fa-arrow-alt-circle-right popup-msg" data-title="Next Video"></i>
+                        </span>
+                        <span class="btn-fullscr">
+                            <i class="fas fa-expand-arrows-alt popup-msg" data-title="Full Screen"></i>
+                        </span>
+                        <span class="v-vol">
+                            <input id="v-vol-control" class="range popup-msg" data-title="Change Volume" type="range" min="0" step="0.01" value="0.5" max="1">
+                            <label for="v-mute">
+                                <input type="checkbox" id="v-mute" class="vol-ctrl">
+                                <span id="mute-icon"></span>
+                                <i class="fas fa-volume-up popup-msg" data-title="Mute"></i>
+                            </label>
+                        </span>
+                    </div>
                 </div>
                 <span id="v-total-time">00:00:00</span>
             </div>
@@ -182,7 +186,7 @@
                 <div id="img-viewer">
                     <div class="footer cancel-footer text-center">
                         <div class="text-center toolbar img-toolbar">
-                            <span class="list-file-show"><i class="fas fa-clipboard-list popup-msg" data-title="Open File List"></i></span>
+                            <span class="list-file-show"><i class="fas fa-clipboard-list popup-msg" data-title="Open Recent Files"></i></span>
                             <span class="openFile">
                                 <i class="fas fa-folder-open popup-msg" data-title="Open File"></i>
                             </span>
@@ -235,8 +239,9 @@
             <div id="file-viewer">
                 <div id="context-menu">
                     <ul>
+                        <li id="cm-open-with-default">Open In Default</li>
                         <li id="cm-cp-name">Copy Name</li>
-                        <li id="cm-cp-path">copy Path</li>
+                        <li id="cm-cp-path">Copy Path</li>
                         <li id="cm-file-rename">Rename</li>
                         <li id="cm-zip-file">Zip File</li>
                         <li id="cm-sh-details">Show Details</li>
@@ -247,7 +252,7 @@
                 <span class="total-files"></span>
                 <div class="footer cancel-footer text-center ">
                     <div id="footer-toolbar" class="text-center toolbar">
-                        <span class="list-file-show"><i class="fas fa-clipboard-list popup-msg" data-title="Open File List"></i></span>
+                        <span class="list-file-show"><i class="fas fa-clipboard-list popup-msg" data-title="Open Recent Files"></i></span>
                         <span class="openDir">
                             <i class="fas fa-folder-open popup-msg" data-title="Open Directory"></i>
                         </span>

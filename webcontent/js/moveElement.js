@@ -1,4 +1,4 @@
-var elToMove = null;
+var modal = null;
 var offset = {
     x: 0,
     y: 0,
@@ -10,14 +10,14 @@ var zindex = 100;
 
 $('body').on('mousedown', '.move', (e) => {
     if ($(e.target).hasClass('move')) {
-        elToMove = $(e.target).closest('.modal')[0];
-        offset.x = e.clientX - elToMove.offsetLeft;
-        offset.y = e.clientY - elToMove.offsetTop;
-        offset.w = $(elToMove).width();
-        offset.h = $(elToMove).height();
+        modal = $(e.target).closest('.modal')[0];
+        offset.x = e.clientX - modal.offsetLeft;
+        offset.y = e.clientY - modal.offsetTop;
+        offset.w = $(modal).width();
+        offset.h = $(modal).height();
         isPressed = true;
         zindex++;
-        $(elToMove).css({
+        $(modal).css({
             zIndex: zindex
         });
     }
@@ -47,7 +47,7 @@ $(document).mousemove((me) => {
     if (isPressed) {
         var left = (me.clientX - offset.x);
         var top = (me.clientY - offset.y);
-        moveEl(elToMove, left, top, offset.w, offset.h)
+        moveEl(modal, left, top, offset.w, offset.h)
     }
 });
 
@@ -55,15 +55,22 @@ $(document).mouseup((e) => {
     isPressed = false;
 });
 
-$(window).on('resize webkitfullscreenchange', () => {
-    $('.move').each((index, el) => {
-        elToMove = $(el).closest('.modal')[0];
-        moveEl(elToMove, elToMove.offsetLeft, elToMove.offsetTop, $(elToMove).width(), $(elToMove).height());
+$(()=>{
+
+    $(window).on('resize webkitfullscreenchange', (e) => {
+        $('.move').each((index, el) => {
+            if ($(el).closest('.modal').css('visibility') == "visible") {
+                modal = $(el).closest('.modal')[0];
+                moveEl(modal, modal.offsetLeft, modal.offsetTop, $(modal).width(), $(modal).height());
+                modal = null;
+            }
+        });
     });
+
+    var $clock = $('.time').text(new Date().toLocaleTimeString('en-US'));
+    
+    setInterval(() => {
+        $clock.text(new Date().toLocaleTimeString('en-US'));
+    }, 1000);
+
 });
-
-var $clock = $('.time').text(new Date().toLocaleTimeString('en-US'));
-
-var timerID = setInterval(() => {
-    $clock.text(new Date().toLocaleTimeString('en-US'));
-}, 1000);

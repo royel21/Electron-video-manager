@@ -9,7 +9,7 @@ var config = {
     lastDir: "",
     scanFolder: [],
     imgScale: 0.6,
-    sortBy: "",
+    sortBy: "Name-D",
     pageAnimation: "Slide",
     animDuration: 200,
     volume: 0,
@@ -29,7 +29,13 @@ window.onbeforeunload = (e) => {
 }
 
 if (local.hasObject('config')) {
-    config = local.getObject('config');
+    var oldConfig = local.getObject('config');
+    for(var key in config){
+        if(oldConfig[key] == undefined){
+            oldConfig[key] = config[key];
+        }
+    }
+    config = oldConfig;
 }
 
 toggleView = (view) => {
@@ -179,23 +185,28 @@ consumeEvent = (e) => {
     e.cancelBubble = true;
 }
 dropFile = function (e) {
-    if (currentView === 1 && e.dataTransfer.files.length > 0) {
+    if (e.dataTransfer.files.length > 0) {
         var f = e.dataTransfer.files[0];
         if (f != undefined) {
             if (fs.lstatSync(f.path).isDirectory()) {
-                currentDir = f.path;
+                currentDir = f.path
                 loadDirectory('');
             } else {
-                var name = path.basename(f.path);
-                processFile(name);
+                processFile(f.name);
             }
         }
     }
-    consumeEvent(e);
+    e.preventDefault();
+    e.stopPropagation();
 };
-$(document).on('drop', '#file-list', dropFile);
 
-$('.cancel-footer, .modal').on('mousedown click keyup keydown keypress wheel', consumeEvent);
+document.ondrop = dropFile;
+$(document).on('dragover',  (e)=>{
+    e.preventDefault();
+    e.stopPropagation();
+});
+
+$('.cancel-footer').on('mousedown click keyup keydown keypress wheel', consumeEvent);
 
 $(document).on('webkitfullscreenchange', () => {
     if (document.webkitIsFullScreen) {

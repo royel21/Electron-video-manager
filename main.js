@@ -18,7 +18,7 @@ function createWin() {
     win = new BrowserWindow({
         title: "MangaViewer",
         minHeight: 580,
-        minWidth: 1080,
+        minWidth: 750,
         show: false,
         transparent: true,
         frame: false,
@@ -47,7 +47,7 @@ function createWin() {
         }
     });
     win.openDevTools();
-    // win.setAlwaysOnTop(true);
+    win.setAlwaysOnTop(true);
 }
 
 ipcMain.on('console-log', (event, msg) => {

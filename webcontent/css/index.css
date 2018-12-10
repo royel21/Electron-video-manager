@@ -22,6 +22,7 @@ body,
 }
 
 .main {
+    position: relative;
     background-color: #14243d;
     background: radial-gradient(ellipse at center, #14243d 0%,#030611 100%);
     border-radius: 1.1em;
@@ -522,8 +523,8 @@ input[type=number]:focus {
 
 #context-menu{
     display: none;
-    background-color: rgba(52,58,64,0.99);
-    width: 120px;
+    background-color: rgba(52,58,64,0.8);
+    width: 145px;
     color: white;
     position: fixed;
     top: 100px;
@@ -533,7 +534,7 @@ input[type=number]:focus {
 
 #context-menu li{
     list-style-type: none;
-    padding: 5px;
+    padding: 5px 11px;
     cursor: pointer;
 }
 

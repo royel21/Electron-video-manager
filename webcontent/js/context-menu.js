@@ -1,4 +1,5 @@
 const { clipboard } = require('electron');
+const shell = require('electron').shell;
 
 var cpyFile;
 var $dialogDetails;
@@ -30,15 +31,22 @@ $('#file-list').on('mousedown', '.items', (e) => {
         $cmenu.css({
             display: "block"
         });
-        if ($(e.target.closest(".items")).data('isfile')) {
-            $('#cm-file-rename').css({ display: "block" });
-        } else {
-            $('#cm-file-rename').css({ display: "none" });
-        }
-        cpyFile = $(e.target.closest(".items")).data('name');
+        var $item = $(e.target.closest(".items"));
+       
+        $('#cm-zip-file').css({ display: $item.data('isfile') ? "none" : "block" });
+        $('#cm-file-rename').css({ display: $item.data('isfile') ? "block" : "none" });
+        $('#cm-open-with-default').css({ display: $item.data('isfile') ? "block" : "none" });
+
+        cpyFile = $item.data('name');
     }
 });
 
+$('#cm-open-with-default').click((e) => {
+    shell.openItem(path.join(currentDir, cpyFile));
+    $cmenu.css({
+        display: "none"
+    });
+});
 $('#cm-cp-name').click((e) => {
     clipboard.writeText(formatName(cpyFile, 0).split('.')[0]);
     $cmenu.css({
@@ -66,15 +74,14 @@ $('#cm-sh-details').click((e) => {
         then(file => {
             hidedetails();
             var tempf = WinDrive.ListFiles(path.join(currentDir, cpyFile), [], true)[0];
-            if(videoFilter.includes(tempf.extension))
-            {
+            if (videoFilter.includes(tempf.extension)) {
                 tempf.Page = file != null ? formatTime(file.Current) : 0;
                 tempf.Total = file != null ? formatTime(file.Total) : 0;
-            }else{
+            } else {
                 tempf.Page = file != null ? file.Current + 1 : 0;
                 tempf.Total = file != null ? file.Total : 0;
             }
-            
+
             var date = new Date(tempf.LastModified);
             tempf.Date = date.toLocaleDateString("en-US") + " " + date.toLocaleTimeString("en-US");
             tempf.Size = FormattBytes(tempf.Size);

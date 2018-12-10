@@ -1,19 +1,30 @@
-.modal-body {
-    padding: 0 .2rem;
-    height: 100%;
+.m-body {
+    min-height: calc(100% - 46px);
+    height: calc(100% - 46px);
 }
 
-#modal-list-file {
-    display: none;
+.modal-list-file {
+    display: flex;
+    min-height: 350px;
     height: calc(80% - 90px);
     max-height: 800px;
     bottom: 46px;
     font-size: 14px;
     border-radius: 1%;
+    left: -100%;
+    transition:visibility 0.3s linear,opacity 0.3s linear;
+    visibility: hidden;
+    opacity: 0;
+}
+
+.show-modal{
+    visibility: visible;
+    left: 0;
+    opacity: 1;
 }
 
 .tab-content{
-    height: calc(100% - 49px);
+    height: calc(100% - 2px);
 }
 
 .list-group-item {

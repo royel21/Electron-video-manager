@@ -1,19 +1,13 @@
 var listofFile = []
-var $list_modal = $('#modal-list-file');
+var $list_modal = $('.modal-list-file');
 
 $('.list-file-show').click((event) => {
-    if ($list_modal[0].style.display != "flex") {
-        loadRecent();
-        $list_modal.fadeIn('slow', () => {
-            $list_modal.css({
-                display: 'flex'
-            });
-        });
-    }
+    loadRecent();
+    $list_modal.addClass('show-modal');
 });
 
 $('#list-file-hide').click(() => {
-    $list_modal.fadeOut('fast');
+    $list_modal.removeClass('show-modal');
     hideCreateFav($fav_dialog);
 });
 

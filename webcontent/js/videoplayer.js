@@ -119,7 +119,7 @@ playerKeyHandler = (e) => {
             }
         case 32:
             {
-                player.paused ? player.play() : player.pause();
+                player.paused ? player.play().catch(e => {}) : player.pause();
                 break;
             }
         case 37:
@@ -152,7 +152,7 @@ pauseOrPlay = () =>{
     var playPause = "Play";
     if(btnPlay.checked)
     {
-        player.play();
+        player.play().catch(e => {});
     }else{
         player.pause();
         playPause = "Pause";
