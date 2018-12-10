@@ -8,7 +8,6 @@ var totalFiles = 0;
 /**************************************/
 
 loadNewPage = async (page) => {
-    console.time("bcf");
     var val = $('#files-filter').val().toLowerCase();
     var begin = ((page - 1) * numberPerPage);
     var files = await db.File.findAndCount({
@@ -25,7 +24,6 @@ loadNewPage = async (page) => {
     numberOfPages = Math.ceil(files.count / numberPerPage);
     $('#file-found').html(files.count);
     $('#current-page').text((numberOfPages < 1 ? 0 : currentPage) + '/' + numberOfPages);
-    console.timeEnd("bcf");
 }
 
 $('#prev-list-page').click((e) => {
@@ -58,10 +56,6 @@ $('#current-page').on('click', function () {
                          max=${numberOfPages}>`)
             .appendTo($(this)).focus();
 
-        $input.click((event) => {
-            event.stopPropagation();
-            event.preventDefault();
-        });
         $input.on('focusout', (e) => {
             $('#current-page').text(currentPage + '/' + numberOfPages);
         });
@@ -75,10 +69,6 @@ $('#current-page').on('click', function () {
                 $input = null;
                 loadNewPage(currentPage);
             }
-            event.stopPropagation();
-        });
-        $input.on('keydown', (event) => {
-            event.stopPropagation();
         });
         $input.focus();
     }
@@ -124,18 +114,18 @@ removeRow = (li, id) => {
     });
 }
 
-$('#files .list-file-content').on('scroll',(event)=>{
-    // if($(event.target).scrollTop() > $('#list-files').height()-300)
-    // {
-    //     if (currentPage < numberOfPages) {
-    //         loadNewPage(++currentPage);
-    //         $('#list-files').find('li').get(1).focus();
-    //     }
-    // }else if($(event.target).scrollTop() < 1)
-    // {
-    //     if (currentPage > 1) {
-    //         loadNewPage(--currentPage);
-    //         $('#list-files').find('li').last().focus();
-    //     }
-    // }
-});
+// $('#files .list-file-content').on('scroll',(event)=>{
+//     if($(event.target).scrollTop() > $('#list-files').height()-300)
+//     {
+//         if (currentPage < numberOfPages) {
+//             loadNewPage(++currentPage);
+//             $('#list-files').find('li').get(1).focus();
+//         }
+//     }else if($(event.target).scrollTop() < 1)
+//     {
+//         if (currentPage > 1) {
+//             loadNewPage(--currentPage);
+//             $('#list-files').find('li').last().focus();
+//         }
+//     }
+// });

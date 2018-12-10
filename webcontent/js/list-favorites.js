@@ -24,10 +24,6 @@ $('#fav-create').click((e) => {
             });
         });
         $fav_dialog.find('#close').click(() => { hideCreateFav($fav_dialog) });
-
-        $nameBox.keydown((e) => { e.stopPropagation() });
-        $nameBox.keypress((e) => { e.stopPropagation() });
-
         $fav_dialog.css({
             zIndex: 999,
             minHeight: 150,
@@ -117,7 +113,7 @@ loadFavFiles = async () => {
         });
         $deleteFav.removeClass("d-none");
     }
-    $('#fav-found').text(files.length == 0 ? "" : files.length);
+    $('#fav-found').text(files.length ? files.length : "");
     loadList('list-favs', files, isFile);
 }
 

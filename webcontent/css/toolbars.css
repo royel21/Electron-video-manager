@@ -6,16 +6,21 @@
     display: none;
 }
 
+
+.tool-config label .fa-cog:active {
+    transform: rotateZ(90deg);
+}
+
 .sub-tools{
-    display: none;
+    display: inline-block;
     position: absolute;
     top: 0;
-    left: 0px;
+    left: -1px;
 }
+
 #scan-list-show {
     position: relative;
     display: inline-block;
-    font-size: 34px;
 }
 
 #tool-fb .fa-file,
@@ -28,7 +33,6 @@
     font-size: 39px;
 }
 
-.sub-tools .fa-cog,
 #scan-list-show .fa-folder {
     position: absolute;
     font-size: 20px;
@@ -37,93 +41,69 @@
     color: silver;
 }
 
-.sub-tools .fa-cog{
-    left: 20px;
-    top: 20px;
-}
-
-.sub-tools .tool-img-fb{
-    position: absolute;
-    top: 8px;
-    left: 4px;
-}
-
-.sub-tools .fa-file .fa-cog{
-    top: 13px;
-    left: 4.8px;
-}
-
 .sub-tools .tool-img-fb,
 .sub-tools #scan-list-show{
     position: absolute;
-    top: 0px;
+    top: 13px;
+    visibility: hidden;
+    transition: all 0.3s;
+    width: 30px;
+    height: 30px;
 }
 
-.tool-config input:checked + .sub-tools{
-    display: inline-block;
-}
-
-.tool-config input:checked + .sub-tools .tool-img-fb{
-    top: -34px;
+.sub-tools #tool-img{
+    top: 0;
     left: -13px;
 }
-
-.tool-config input:checked + .sub-tools #tool-fb{
-    position: absolute;
-    top: -38px;
-    left: 9px;
-    font-size: 36px;
-}
-
-.tool-config input:checked + .sub-tools .fa-image{
+.sub-tools #tool-img .fa-image{
     display: inline-block;
-    background-color: black;
-    padding: 0px 2px;
     border-radius: 5px;
-    font-size: 32px;
-}
-.tool-config input:checked + .sub-tools #scan-list-show{
-    top: -78px;
+    padding: 0px 3px;
+    background-color: brown;
+    font-size: 32px
 }
 
-
-.sub-tools span:active > i{
+.sub-tools #tool-img .fa-cog{
+    position: absolute;
+    font-size: 20px;
+    top: 20px;
+    left: 15px;
+}
+.sub-tools span:active{
     transform: translateY(4px);
 }
 
-.tool-config label .fa-cog:active {
-    transform: rotateZ(90deg);
-}
-#file-browser .tool-config .sub-tools span,
-#viewer .tool-config .sub-tools span{
-    position: absolute;
-    margin: 0;
-    padding: 5px;
-    background-color: grey;
-    height: 26px;
-    border-radius: 4px;
-    width: 35px;
-}
-
-#viewer .tool-config .sub-tools .fa-image{
-    position: absolute;
-    top: -1px;
-    left: 3px;
-}
-
-#file-browser .tool-config .sub-tools span
-{
-    left: 9px;
-    height: 40px;
-    width: 32px;
-}
-
-#file-browser .tool-config .sub-tools #tool-fb {
-    top: -34px;
-    height: 35px;
+#tool-fb{
+    top: 9px;
+    left: 10px;
 }
 
 #tool-fb .fa-file{
     top: -10px;
     left: -8px;
+}
+
+#tool-fb .fa-cog{
+    position: absolute;
+    font-size: 24px;
+    top: 11px;
+    left: 2px;
+    color: gray;
+}
+
+.tool-config input:checked + .sub-tools .tool-img-fb{
+    visibility: visible;
+}
+
+.tool-config input:checked + .sub-tools #tool-fb{
+    top: -32px;
+}
+
+.tool-config input:checked + .sub-tools #tool-img{
+    top: -38px;
+}
+
+.tool-config input:checked + .sub-tools #scan-list-show{
+    top: -75px;
+    visibility: visible;
 }

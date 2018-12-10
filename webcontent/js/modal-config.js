@@ -106,7 +106,6 @@ showConfigModal = (e) => {
         for (var key of sortType) {
             $sortSelect.append($(`<option value="${key}" ${key == config.sortBy ? "Selected" : ""}>${key.replace('-U', '&#8593;')
                 .replace('-D', '&#8595;')}</option>"`));
-                console.log(key)
         }
         $sortSelect.change(e => {
             config.sortBy = $sortSelect.val();

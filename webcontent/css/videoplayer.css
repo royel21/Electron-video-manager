@@ -47,6 +47,7 @@ body[viewer="3"]:-webkit-full-screen .clock .time {
 .v-controls>*>* {
     position: initial;
     left: initial;
+    cursor: pointer;
 }
 
 .v-controls span {
@@ -71,6 +72,10 @@ body:-webkit-full-screen .v-controls>span {
     transform: scale(1.2)
 }
 
+.v-controls span i.fa-volume-up:active {
+    transform: scale(1)
+}
+
 #v-total-time {
     position: fixed;
     left: 10px;
@@ -79,6 +84,7 @@ body:-webkit-full-screen .v-controls>span {
     color: white;
     z-index: 10;
     font-weight: bold;
+    z-index: 1000;
 }
 
 body:-webkit-full-screen #v-total-time {
@@ -160,14 +166,14 @@ body:-webkit-full-screen #video-viewer {
     background-color: red;
     height: 4px;
     width: 38px;
-    transform: rotateZ(135deg) scale(0);
     pointer-events: none;
     transition: all .3s;
     border-radius: 4px;
+    transform: rotateZ(45deg)  scaleX(0);
 }
 
 .vol-ctrl:checked+#mute-icon {
-    transform: rotateZ(45deg) scale(1);
+    transform: rotateZ(45deg) scaleX(1);
 }
 
 body:not(:-webkit-full-screen) .v-controls {
@@ -188,4 +194,28 @@ body:not(:-webkit-full-screen) .v-controls {
     position: fixed;
     transform: rotate(270deg);
     bottom: 146px;
+}
+
+.footer .popup-caction{
+    position: relative;
+    height: 0;
+    width: 0;
+    display: initial;
+}
+
+.footer .popup-caction:after{
+    content: attr(data-title);
+    display: none;
+    position: absolute;
+    top: -50px;
+    left: -45px;
+    width: max-content;
+    padding: 2px 5px;
+    background-color: red;
+    border-radius: 5px;
+    z-index: 5;
+}
+
+.footer span:hover .popup-caction:after{
+    display: inline-block;
 }

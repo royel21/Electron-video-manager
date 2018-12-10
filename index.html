@@ -144,25 +144,35 @@
                 <div class="text-center v-controls footer">
                     <div id="slider-container"></div>
                     <span id="v-exit-to-fb">
-                        <i class="fas fa-arrow-circle-up"></i>
+                        <i class="fas fa-arrow-circle-up popup-msg" data-title="Back To File Browser"></i>
                     </span>
-                    <span id="v-prev"><i class="far fa-arrow-alt-circle-left"></i></i></span>
+                    <span class="list-file-show">
+                        <i class="fas fa-clipboard-list popup-msg" data-title="Open File List"></i>
+                    </span>
+                    <span class="openFile">
+                        <i class="fas fa-folder-open popup-msg" data-title="Open File"></i>
+                    </span>
+                    <span id="v-prev">
+                        <i class="far fa-arrow-alt-circle-left popup-msg" data-title="Previous Video"></i>
+                    </span>
                     <span id="v-play-pause">
                         <label for="v-play">
                             <input id="v-play" type="checkbox">
-                            <i class="far fa-play-circle"></i>
+                            <i class="far fa-play-circle popup-msg" data-title=""></i>
                         </label>
                     </span>
-                    <span id="v-next"><i class="far fa-arrow-alt-circle-right"></i></i></span>
+                    <span id="v-next">
+                        <i class="far fa-arrow-alt-circle-right popup-msg" data-title="Next Video"></i>
+                    </span>
                     <span class="btn-fullscr">
-                        <i class="fas fa-expand-arrows-alt"></i>
+                        <i class="fas fa-expand-arrows-alt popup-msg" data-title="Full Screen"></i>
                     </span>
                     <span class="v-vol">
                         <input id="v-vol-control" class="range" type="range" min="0" step="0.01" value="0.5" max="1">
                         <label for="v-mute">
                             <input type="checkbox" id="v-mute" class="vol-ctrl">
                             <span id="mute-icon"></span>
-                            <i class="fas fa-volume-up"></i>
+                            <i class="fas fa-volume-up popup-msg" data-title="Mute"></i>
                         </label>
                     </span>
                 </div>
@@ -172,46 +182,43 @@
                 <div id="img-viewer">
                     <div class="footer cancel-footer text-center">
                         <div class="text-center toolbar img-toolbar">
-                            <span class="list-file-show"><i class="fas fa-clipboard-list"></i></span>
-                            <span id="openFile">
-                                <i class="fas fa-folder-open"></i>
+                            <span class="list-file-show"><i class="fas fa-clipboard-list popup-msg" data-title="Open File List"></i></span>
+                            <span class="openFile">
+                                <i class="fas fa-folder-open popup-msg" data-title="Open File"></i>
                             </span>
                             <span id="backtofilelist">
-                                <i class="fas fa-arrow-circle-up"></i>
+                                <i class="fas fa-arrow-circle-up popup-msg" data-title="Back To File Browser"></i>
                             </span>
                             <span id="prev-file">
-                                <i class="fas fa-angle-double-left"></i>
+                                <i class="fas fa-angle-double-left popup-msg" data-title="Previous File"></i>
                             </span>
                             <span id="prev-img">
-                                <i class="fas fa-angle-left"></i>
+                                <i class="fas fa-angle-left popup-msg" data-title="Previous Page"></i>
                             </span>
                             <span id="page-n" class="pages">0/0</span>
                             <span id="image-seek">
-                                <!-- <input id="img-seek" type="range" min="1" value="1" step="1">
-                                <output id="seek-numb"></output> -->
-
                             </span>
                             <span id="next-img">
-                                <i class="fas fa-angle-right"></i>
+                                <i class="fas fa-angle-right popup-msg" data-title="Next Page"></i>
                             </span>
                             <span id="next-file">
-                                <i class="fas fa-angle-double-right"></i>
+                                <i class="fas fa-angle-double-right popup-msg" data-title="Next File"></i>
                             </span>
                             <span class="tool-config">
                                 <label for="hide-tools">
-                                    <i class="fas fa-cog"></i>
+                                    <i class="fas fa-cog popup-msg" data-title="Open Tools"></i>
                                 </label>
                                 <input id="hide-tools" type="checkbox">
                                 <span class="sub-tools">
                                     <span id="tool-img" class="tool-img-fb">
                                         <i class="fas fa-image">
-                                            <i class="fas fa-cog"></i>
+                                            <i class="fas fa-cog popup-msg" data-title="Image Viewer Config"></i>
                                         </i>
                                     </span>
                                 </span>
                             </span>
                             <span class="btn-fullscr">
-                                <i class="fas fa-expand-arrows-alt"></i>
+                                <i class="fas fa-expand-arrows-alt popup-msg" data-title="Full Screen"></i>
                             </span>
                         </div>
                     </div>
@@ -240,22 +247,22 @@
                 <span class="total-files"></span>
                 <div class="footer cancel-footer text-center ">
                     <div id="footer-toolbar" class="text-center toolbar">
-                        <span class="list-file-show"><i class="fas fa-clipboard-list"></i></span>
+                        <span class="list-file-show"><i class="fas fa-clipboard-list popup-msg" data-title="Open File List"></i></span>
                         <span class="openDir">
-                            <i class="fas fa-folder-open"></i>
+                            <i class="fas fa-folder-open popup-msg" data-title="Open Directory"></i>
                         </span>
                         <span id="tool-folderPrev">
-                            <i class="fas fa-arrow-circle-left"></i>
+                            <i class="fas fa-arrow-circle-left popup-msg" data-title="Jump to Previous Folder"></i>
                         </span>
                         <span class="tool-folderUp">
-                            <i class="fas fa-arrow-circle-up"></i>
+                            <i class="fas fa-arrow-circle-up popup-msg" data-title="Go Up"></i>
                         </span>
                         <span id="tool-folderNext">
-                            <i class="fas fa-arrow-circle-right"></i>
+                            <i class="fas fa-arrow-circle-right popup-msg" data-title="Jump to Next Folder"></i>
                         </span>
                         <span class="tool-config">
                             <label for="hide-tools-2">
-                                <i class="fas fa-cog"></i>
+                                <i class="fas fa-cog popup-msg" data-title="Open Files Tools"></i>
                             </label>
                             <input id="hide-tools-2" type="checkbox">
                             <span class="sub-tools">
@@ -272,14 +279,12 @@
                             </span>
                         </span>
                         <span class="btn-fullscr">
-                            <i class="fas fa-expand-arrows-alt"></i>
+                            <i class="fas fa-expand-arrows-alt popup-msg" data-title="Full Screen"></i>
                         </span>
-                        <span class="top">
-                            <span class="check-top">
-                                <input id="win-top3" type="checkbox">
-                                <label for="win-top3"></label>
-                            </span>
-                        </span>
+                        <label class="top popup-msg" for="win-top3" data-title="Always On Top">
+                            <input id="win-top3" type="checkbox">
+                            <span id="on-top-cicle"></span>Top
+                        </label>
                     </div>
                 </div>
                 <div id="modal-search" class="modal bg-dark text-light card drag-config">

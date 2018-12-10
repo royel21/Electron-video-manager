@@ -18,7 +18,7 @@
 
 .list-group-item {
     white-space: nowrap;
-    padding: 5px;
+    padding: 0.4rem 0.5rem;
     overflow: hidden;
     text-overflow: ellipsis;
 }
@@ -27,14 +27,12 @@
     overflow-y: auto;
     text-align: left;
     height: calc(100% - 50px);
-}
-
-#modal-scan-folder .list-file-content{
-    height: calc(100% - 94px);
+    padding-left: 4px;
 }
 
 .list-footer {
     padding: 5px;
+    border-top: 1px solid;
 }
 
 .list-footer .input-group {
@@ -43,11 +41,15 @@
 }
 
 .list-file-content::-webkit-scrollbar {
-    width: 20px;
+    width: 15px;
 }
 
 .list-file-content::-webkit-scrollbar-track {
     margin: 0;
+}
+
+.list-file-content::-webkit-scrollbar:hidden ul{
+    padding: 10px;
 }
 
 .list-file-content::-webkit-scrollbar-thumb {
@@ -63,10 +65,6 @@
 .list-group-item:hover {
     opacity: .85;
     cursor: pointer;
-}
-
-.list-group-item:active {
-    opacity: .95;
 }
 
 .list-footer .input-group-text {
@@ -95,13 +93,8 @@
     padding: 0 5px;
 }
 
-.list-group-item {
-    pointer-events: all;
-}
-
 .list-group-item span.list-text {
     pointer-events: none;
-    color: red
 }
 
 .list-group li .fa-trash-alt {
@@ -122,10 +115,6 @@
 .btn-hide {
     left: inherit;
     right: 10px;
-}
-#list-file-header{
-    /* min-height: 39px; */
-    /* border-bottom: 1px solid; */
 }
 
 #list-file-header label:not(.active) {
@@ -149,7 +138,7 @@
 
 .list-group-item:focus{
     outline: none;
-    background-color: rgba(0,0,0,0.6);
+    opacity: 0.70;
 }
 
 ul, label {
@@ -170,8 +159,7 @@ ul, label {
 .list-text,
 .modal .title{
     pointer-events: none;
-    min-height: 350px;
-    min-width: 400px;
+    line-height: 2.5;
 }
 
 #folder-reloading {
@@ -215,7 +203,7 @@ ul, label {
 #files-filter + span{
     display: none;
 }
-/*empty input*/
+
 #files-filter:valid + span{
     display:inline-block;
 }

@@ -1,13 +1,14 @@
-
-const { ipcRenderer } = require('electron');
+const {
+    ipcRenderer
+} = require('electron');
 const WinDrive = require('win-explorer');
 const dialog = app.dialog;
 const fs = require('fs-extra');
 const path = require('path');
 const local = localStorage;
 
-compressFilter = ['zip', 'rar','cbr'];
-videoFilter = ['mp4', 'mkv', 'avi', 'webm','ogg'];
+compressFilter = ['zip', 'rar', 'cbr'];
+videoFilter = ['mp4', 'mkv', 'avi', 'webm', 'ogg'];
 imagesFilter = ['png', 'gif', 'jpg', 'jpeg', 'webp', 'bmp'];
 
 const BrowserWindow = app.BrowserWindow;
@@ -28,7 +29,7 @@ createBackgroundWin = (event, data) => {
         win.webContents.on('did-finish-load', () => {
             try {
                 win.webContents.send(e, d, windowID);
-            } catch (error) { }
+            } catch (error) {}
         });
         win.on('closed', (e) => {
             win = null;
@@ -70,7 +71,7 @@ Storage.prototype.getObject = function (key) {
 }
 
 Storage.prototype.hasObject = (key) => {
-    return  local.getObject(key) != null && !$.isEmptyObject(local.getObject(key));
+    return local.getObject(key) != null && !$.isEmptyObject(local.getObject(key));
 }
 
 Number.prototype.map = function (in_min, in_max, out_min, out_max) {

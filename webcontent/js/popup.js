@@ -1,4 +1,3 @@
-
 var $popup = $('#popup')
 
 popupHide = (event) => {
@@ -9,12 +8,13 @@ popupHide = (event) => {
 }
 
 popupShow = (event) => {
-    if ($(event.target).hasClass('popup-msg')){
+    if ($(event.target).hasClass('popup-msg')) {
         var rect = event.target.getBoundingClientRect();
-        $popup.text(event.target.textContent).css({
+        var msg = event.target.dataset.title;
+        $popup.css({
             display: "block",
             top: -3000,
-        });
+        }).text(msg == undefined ? event.target.textContent : msg);
 
         var top = rect.top + 8 + rect.height;
         if (top + $popup.height() + 10 > window.innerHeight) {
@@ -24,10 +24,11 @@ popupShow = (event) => {
 
         $popup.css({
             top,
-            left: (rect.x + rect.width / 2) - ($popup.width() / 2)
+            left: (rect.x + rect.width / 2) - ($popup.width() / 2) - 9
         });
     }
 }
 
-$('body').on('mouseenter', '.popup-msg', popupShow);
+$('body').on('mousemove wheel', '.popup-msg', popupShow);
+$('.footer .popup-msg').on('mousemove', popupShow);
 $('body').on('mouseleave', '.popup-msg', popupHide);

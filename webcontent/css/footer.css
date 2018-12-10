@@ -14,6 +14,7 @@
     font-weight: 500;
     z-index: 9;
     transition: all .3s;
+    z-index: 999;
 }
 
 .footer>span {
@@ -24,7 +25,7 @@
 
 .img-toolbar {
     display: flex;
-    margin-left:230px;
+    margin-left:220px;
     margin-right:10px;
     z-index: 10;
     pointer-events: all;
@@ -36,9 +37,11 @@
 }
 
 #page-n {
+    position: relative;
+    display: inline-block;
     font-size: 20px;
-    align-self: center;
-    width: 70px;
+    height: 33px;
+    top: -4px;
 }
 
 #footer-toolbar {
@@ -142,20 +145,25 @@
 }
 
 @media all and (max-width: 780px) {
-    #seeker {
+    #image-seek {
         display: none;
+    }
+    .img-toolbar{
+        margin: 0;
+        margin-left: 50px;
+        display: inline-block;
     }
 }
 
 @media all and (max-width: 700px) {
-    #prev-file, #next-file {
+    #prev-img, #next-img {
         display: none;
     }
 }
 
 .modal span:hover > i,
-.footer div label:hover > i,
-.footer div span:hover > i{
+.footer label:hover > i,
+.footer span:hover > i{
     cursor: pointer;
     text-shadow: 0px 0px 20px rgb(53, 237, 243);
 }
@@ -163,4 +171,45 @@
 .footer div > span:active > i,
 .modal span:active > i{
     transform: translateY(4px);
+}
+
+.footer label input{
+    display: none;
+}
+
+/*********************************************************/
+.footer .top{
+   position: fixed;
+   right: 14px;
+   width: 76px;
+   height: 38px;
+   cursor: pointer;
+   font-size: 23px;
+   text-align: right;
+}
+
+.footer .top:after {
+    content: " ";
+    min-width: 26px;
+    min-height: 26px;
+    background: wheat;
+    border-radius: 100%;
+    position: absolute;
+    left: 2px;
+    top: 6px;
+}
+
+#on-top-cicle{
+    position: absolute;
+    height: 20px;
+    width: 20px;
+    top: 9px;
+    left: 5px;
+    background-color: #333;
+    border-radius: 50%;
+    z-index: 10;
+    transition: all .25s;
+}
+.footer .top input[type=checkbox]:checked + #on-top-cicle {
+    background-color: honeydew;
 }

@@ -9,7 +9,6 @@ var videoIcon = path.join('./webcontent/image/video.png');
 var $cmenu = $('#context-menu');
 var favs = [];
 var folderId = null;
-var supportedFiles = ['png', 'gif', 'jpg', 'jpeg', 'webp', 'bmp', 'rar', 'zip', 'mp4', 'mkv', 'avi', 'webm', 'ogg'];
 var backgroundImage = [];
 var compressingCount = 0;
 var $fviewer = $('#file-viewer');
@@ -68,7 +67,7 @@ ipcRenderer.on('zip-done', (e, result) => {
 });
 
 loadDirectory = async (folder, id) => {
-    var dir = folder != '' ? path.join(currentDir, folder) : currentDir;
+    var dir = folder != '' ? path.join(currentDir, folder+"") : currentDir;
     var fol = await db.Folder.findOne({
         where: { $or: [{ Id: id }, { Name: dir }] }
     });
@@ -249,28 +248,12 @@ keyboardHandler = (e) => {
 openDir = () => {
     var dir = dialog.showOpenDialog(mainWindow, {
         title: "Select the folder",
-        properties: ['openDirectory']
+        properties: ['openDirectory', 'openFile']
     });
     if (dir) {
         currentDir = dir[0];
         loadDirectory('');
     }
-};
-
-dropFile = function (e) {
-    if (currentView === 1 && e.dataTransfer.files.length > 0) {
-        var f = e.dataTransfer.files[0];
-        if (f != undefined) {
-            if (fs.lstatSync(f.path).isDirectory()) {
-                currentDir = f.path;
-                loadDirectory('');
-            } else {
-                var name = path.basename(f.path);
-                processFile(name);
-            }
-        }
-    }
-    consumeEvent(e);
 };
 
 dbclick = (e) => {
@@ -447,7 +430,6 @@ fileViewerCleanUp = () => {
     setUp = true;
     $(document).off('keydown', keyboardHandler);
     $(document).off('keypress', jumpToFile);
-    $(document).off('drop', '#file-list', dropFile);
     $('.openDir').off('click', openDir);
     $('.tool-folderUp').off('click', returnFolder);
     $fviewer.find('#file-list').off('click', '.items', itemClick);
@@ -461,7 +443,6 @@ fileViewerInit = () => {
     if (setUp) {
         setUp = false;
         $(document).on('keypress', jumpToFile);
-        $(document).on('drop', '#file-list', dropFile);
         $('.openDir').on('click', openDir);
         $('.tool-folderUp').on('click', returnFolder);
         $fviewer.find('#file-list').on('click', '.items', itemClick);

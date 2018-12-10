@@ -1,6 +1,12 @@
 var elToMove = null;
-var offset = { x: 0, y: 0, w: 0, h: 0 };
+var offset = {
+    x: 0,
+    y: 0,
+    w: 0,
+    h: 0
+};
 var isPressed = false;
+var zindex = 100;
 
 $('body').on('mousedown', '.move', (e) => {
     if ($(e.target).hasClass('move')) {
@@ -10,8 +16,13 @@ $('body').on('mousedown', '.move', (e) => {
         offset.w = $(elToMove).width();
         offset.h = $(elToMove).height();
         isPressed = true;
+        zindex++;
+        $(elToMove).css({
+            zIndex: zindex
+        });
     }
 });
+
 function moveEl(el, left, top, w, h) {
     if (left < 0) {
         left = 1;
@@ -40,9 +51,11 @@ $(document).mousemove((me) => {
     }
 });
 
-$(document).mouseup((e) => { isPressed = false; });
+$(document).mouseup((e) => {
+    isPressed = false;
+});
 
-$(window).on('resize', () => {
+$(window).on('resize webkitfullscreenchange', () => {
     $('.move').each((index, el) => {
         elToMove = $(el).closest('.modal')[0];
         moveEl(elToMove, elToMove.offsetLeft, elToMove.offsetTop, $(elToMove).width(), $(elToMove).height());
@@ -52,5 +65,5 @@ $(window).on('resize', () => {
 var $clock = $('.time').text(new Date().toLocaleTimeString('en-US'));
 
 var timerID = setInterval(() => {
-   $clock.text(new Date().toLocaleTimeString('en-US'));
+    $clock.text(new Date().toLocaleTimeString('en-US'));
 }, 1000);

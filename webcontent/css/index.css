@@ -10,7 +10,8 @@ html {
 	top: 0;
 	left: 0;
 	width: 100%;
-	height: 100%;
+    height: 100%;
+    overflow: hidden;
 }
 
 body,
@@ -216,7 +217,7 @@ body,
 
 .total-files,
 #page-n2 {
-    z-index: 10;
+    z-index: 9999;
     position: fixed;
     left: 10px;
     bottom: 0;
@@ -491,60 +492,6 @@ input[type=number]:focus {
 
 #file-browser .toolbar-control{
     display: none;
-}
-
-/*********************************************************/
-.top{
-    position: fixed;
-    height: 30px;
-    right: 86px;
-    bottom: 8px;
-}
-
-.check-top {
-    min-width: 20px;
-    min-height: 20px;
-    background: #ddd;
-    border-radius: 100%;
-    position: absolute;
-    left: 2px;
-    top: 6px;
-}
-
-.toolbar-control .check-top {
-    left: -8px;
-}
-
-.check-top input[type=checkbox]{
-    display: none;
-}
-
-.check-top label {
-    display: block;
-    min-width: 15px;
-    min-height: 15px;
-    border-radius: 100px;
-    transition: all .15s ease;
-    cursor: pointer;
-    position: absolute;
-    top: 2.3px;
-    left: 2.7px;
-    z-index: 1;
-    background: #333;
-    box-shadow: inset 0px 1px 3px rgba(0,0,0,0.5);
-    margin: 0;
-}
-
-.check-top label:after {
-    content: "Top";
-    position: absolute;
-    left: 25px;
-    top: -16px;
-    font-size: 29px;
-}
-
-.check-top input[type=checkbox]:checked + label {
-    background: #26ca28;
 }
 
 .select-style{

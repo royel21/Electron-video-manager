@@ -1,9 +1,8 @@
 updatePageNum = () => {
     tempImg.src = "";
-    imageSlider.value = currentManga.Current;
-    isChange = true;
+    if(currentFile !== undefined)
+    imageSlider.value = currentFile.Current;
     LoadNextImage = true;
-    console.timeEnd('i');
 }
 
 noneAnimation = () => {

@@ -14,23 +14,6 @@ var vDuration = "";
 var Slider = null;
 var muted = false;
 
-var playerConfig = {
-    volume: 0,
-    isMuted: false,
-    paused: true,
-    hideCtrSecond: 1,
-    recents: []
-};
-var recentVideos = playerConfig.recents;
-
-var currentVideo;
-
-updateRecentVideos = () => {
-    var tempV = recentVideos.removeByName(currentVideo);
-    if (tempV != undefined) currentVideo = tempV;
-    recentVideos.unshift(currentVideo);
-    if (recentVideos.length > config.recentMax) recentVideos.pop();
-}
 
 $('#v-next').click(() => {
     if (videoIndex < videos.length - 1) {
@@ -44,9 +27,8 @@ $('#v-prev').click(() => {
     }
 });
 
-returnToFb = () => {
-    updateFile(currentVideo);
-    updateItemProgress(currentVideo);
+playerCleanUp = () => {
+    updateFile(currentFile);
     $(window).off('wheel', wheelScroll);
     $(document).off('keydown', playerKeyHandler);
 
@@ -57,20 +39,24 @@ returnToFb = () => {
     savePlayerConfig();
     videos = [];
     player.src = "";
+}
+returnToFb = () => {
+    playerCleanUp();
+    updateItemProgress(currentFile);
     toggleView(1);
 }
 
 $('#v-exit-to-fb').click(returnToFb);
 
 playVideo = async (v) => {
-    updateItemProgress(currentVideo);
-    updateFile(currentVideo);
+    updateItemProgress(currentFile);
+    updateFile(currentFile);
     var videoDir = v.folder.Name;
     var video = path.join(videoDir, v.Name.replace('#', '%23'))
     player.src = video;
     vpreview.src = video;
 
-    currentVideo = {
+    currentFile = {
         Id: v.Id,
         Name: v.Name,
         Current: v.Current,
@@ -82,16 +68,19 @@ playVideo = async (v) => {
         tempFile.DirName = videoDir;
         tempFile.Total = 0;
         db.File.findOrCreateNew(tempFile).then(f => {
-            if (f) currentVideo.Id = f.Id;
+            if (f) {
+                currentFile.Id = f.Id;
+                currentFile.Size = f.Size;
+            }
         });
-        currentVideo.Current = 0;
+        currentFile.Current = 0;
     }
 
-    player.currentTime = currentVideo.Current;
+    player.currentTime = currentFile.Current;
     player.play().catch(e => {});
-    if (playerConfig.paused) player.pause();
+    if (config.paused) player.pause();
     $('.title').text(v.Name);
-    updateRecentVideos();
+    updateRecents();
 }
 
 player.onloadedmetadata = function (e) {
@@ -101,13 +90,7 @@ player.onloadedmetadata = function (e) {
 
     vDuration = formatTime(player.duration);
     $vTotalTime.text(formatTime(0) + "/" + vDuration);
-
-    player.muted = playerConfig.isMuted;
-    btnMuted.checked = playerConfig.isMuted;
-
-    volcontrol.value = player.volume = playerConfig.volume;
-
-    currentVideo.Total = player.duration;
+    currentFile.Total = player.duration;
 }
 
 $(player).dblclick((e) => {
@@ -117,7 +100,7 @@ $(player).dblclick((e) => {
 player.ontimeupdate = (e) => {
     if (Slider) Slider.value = Math.floor(player.currentTime);
     $vTotalTime.text(formatTime(player.currentTime) + "/" + vDuration)
-    currentVideo.Current = player.currentTime;
+    currentFile.Current = player.currentTime;
 }
 
 player.onended = function () {
@@ -165,16 +148,23 @@ playerKeyHandler = (e) => {
             }
     }
 }
+pauseOrPlay = () =>{
+    var playPause = "Play";
+    if(btnPlay.checked)
+    {
+        player.play();
+    }else{
+        player.pause();
+        playPause = "Pause";
+    }
+    $('.fa-play-circle').attr('data-title', playPause);
+    $popup.text(playPause);
+}
 
 $(player).click((e) => {
     if (e.which == 1) {
-        if (player.paused) {
-            player.play();
-        } else {
-            player.pause();
-        }
-        btnPlay.checked = !player.paused;
-        hideFooter();
+        btnPlay.checked = player.paused;
+        pauseOrPlay();
     }
 });
 
@@ -182,12 +172,16 @@ volcontrol.oninput = (e) => {
     muted = false;
     player.volume = volcontrol.value;
 }
+player.onplay = player.onpause = hideFooter;
 
-btnPlay.onchange = () => btnPlay.checked ? player.play() : player.pause();
+
+btnPlay.onchange = pauseOrPlay;
 
 btnMuted.onchange = () => {
     muted = true;
-    player.muted = btnMuted.checked ? true : false;
+    player.muted = btnMuted.checked;
+    $popup.text(btnMuted.checked ? "Mute" : "Unmute");
+    $('.fa-volume-up').attr('data-title', btnMuted.checked ? "Unmute" : "Mute");
 }
 
 var volTimer = null;
@@ -195,6 +189,7 @@ var volTimer = null;
 player.onvolumechange = function (e) {
     if (!muted) {
         player.muted = btnMuted.checked = (player.volume == 0);
+        $('.fa-volume-up').attr('data-title', btnMuted.checked ? "Unmute" : "Mute");
     }
 
     if ($('.footer').hasClass('hide-footer') && document.webkitIsFullScreen) {
@@ -225,10 +220,6 @@ wheelScroll = (event) => {
 
 initPlayer = (v) => {
     if (Slider === null) {
-        if (local.hasObject('playerconfig')) {
-            playerConfig = local.getObject('playerconfig', playerConfig);
-            console.log(playerConfig)
-        }
         Slider = new SliderRange('#slider-container');
         Slider.oninput = (value) => {
             player.currentTime = value;
@@ -247,23 +238,23 @@ initPlayer = (v) => {
         videoIndex = videos.indexOf(v.Name);
         $(document).on('keydown', playerKeyHandler);
         $(window).on('wheel', wheelScroll);
+        $('.fa-play-circle').attr('data-title', config.paused ? "Play" : "Pause");
+        $('.fa-volume-up').attr('data-title', btnMuted.checked ? "Unmute" : "Mute");
+        
+        player.muted = btnMuted.checked = config.isMuted;
+        player.volume = volcontrol.value = config.volume;
+
         toggleView(3);
-    } else {
-        playerConfig.volume = player.volume;
-        playerConfig.isMuted = player.muted;
-        playerConfig.paused = player.paused;
-        console.log(playerConfig)
     }
 
     playVideo(v);
 }
 
-savePlayerConfig = () => {
-    if (recentVideos.length > 0) {
-        playerConfig.volume = player.volume;
-        playerConfig.isMuted = player.muted;
-        playerConfig.paused = player.paused;
-        local.setObject('playerconfig', playerConfig);
+savePlayerConfig = async () => {
+    if (currentView === 3) {
+        config.volume = player.volume;
+        config.isMuted = player.muted;
+        config.paused = player.paused;
     }
-    ipcRenderer.send('console-log', "playerConfig");
+    await updateFile(currentFile);
 }

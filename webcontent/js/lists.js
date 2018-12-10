@@ -1,14 +1,6 @@
 var listofFile = []
 var $list_modal = $('#modal-list-file');
 
-
-$list_modal.keydown((e) => {
-    e.stopPropagation()
-});
-$list_modal.keypress((e) => {
-    e.stopPropagation()
-});
-
 $('.list-file-show').click((event) => {
     if ($list_modal[0].style.display != "flex") {
         loadRecent();
@@ -25,10 +17,7 @@ $('#list-file-hide').click(() => {
     hideCreateFav($fav_dialog);
 });
 
-$list_modal.on('dblclick', '#delete-list', (event) => {
-    event.stopPropagation();
-    event.preventDefault();
-});
+$list_modal.on('dblclick', '#delete-list', consumeEvent);
 
 $list_modal.on('click', 'ul li', (event) => {
     $(event.target).focus();
@@ -88,8 +77,6 @@ $list_modal.on('keydown', 'ul li', (event) => {
                 break;
             }
     }
-    event.stopPropagation();
-    event.preventDefault();
 });
 
 $list_modal.on('dblclick', 'ul li', processRow);

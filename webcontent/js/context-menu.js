@@ -66,8 +66,15 @@ $('#cm-sh-details').click((e) => {
         then(file => {
             hidedetails();
             var tempf = WinDrive.ListFiles(path.join(currentDir, cpyFile), [], true)[0];
-            tempf.Page = file != null ? file.Current + 1 : 0;
-            tempf.Total = file != null ? file.Total : 0;
+            if(videoFilter.includes(tempf.extension))
+            {
+                tempf.Page = file != null ? formatTime(file.Current) : 0;
+                tempf.Total = file != null ? formatTime(file.Total) : 0;
+            }else{
+                tempf.Page = file != null ? file.Current + 1 : 0;
+                tempf.Total = file != null ? file.Total : 0;
+            }
+            
             var date = new Date(tempf.LastModified);
             tempf.Date = date.toLocaleDateString("en-US") + " " + date.toLocaleTimeString("en-US");
             tempf.Size = FormattBytes(tempf.Size);
