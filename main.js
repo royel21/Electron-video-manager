@@ -7,13 +7,14 @@ const {
 const os = require('os');
 const fs = require('fs-extra');
 const path = require('path');
+const db = require('./webcontent/models/models');
 
 // require('electron-reload')(__dirname, {
 //     electron: path.join(__dirname, 'node_modules', '.bin', 'electron')
 // });
 
 let win;
-
+var closeNow = false;
 function createWin() {
     win = new BrowserWindow({
         title: "MangaViewer",
@@ -24,13 +25,20 @@ function createWin() {
         frame: false,
     });
     //win.setMenu(null);
-    win.loadURL('file://' + __dirname + '/index.html');
+    win.loadURL('file://' + __dirname + '/index.1.html');
     win.on('ready-to-show', () => {
         win.show();
     });
 
 
-    win.on('close', () => {
+    win.on('close', (e) => {
+        // if (closeNow) {
+        //     app.quit();
+        // } else {
+        //     e.preventDefault();
+        //     win.webContents.send('save-file', "");
+        //     closeNow = true;
+        // }
         app.quit();
     });
 
@@ -46,7 +54,7 @@ function createWin() {
             app.quit();
         }
     });
-    // win.openDevTools();
+    win.openDevTools();
     // win.setAlwaysOnTop(true);
 }
 
@@ -54,8 +62,15 @@ ipcMain.on('console-log', (event, msg) => {
     console.log(msg);
 });
 
+
+ipcMain.on('close', (event, file) => {
+    console.log(file);
+    app.quit();
+});
+
 app.commandLine.appendSwitch("--disable-http-cache");
-app.on('close', () => {
+
+app.on('close', (e) => {
     win = null;
 });
 //Create the window when electron is ready
@@ -66,9 +81,10 @@ app.on('ready', createWin);
 
 if (!fs.existsSync(path.join(__dirname, 'covers'))) {
     fs.mkdirSync(path.join(__dirname, 'covers'));
+    fs.mkdirSync(path.join(__dirname, 'covers/videos'));
 }
 
-var dbPath = path.join(os.homedir(),'./.mangas-common/');
+var dbPath = path.join(os.homedir(), './.mangas-common/');
 
 if (!fs.existsSync(dbPath)) {
     fs.mkdirsSync(dbPath);

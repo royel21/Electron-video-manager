@@ -115,7 +115,8 @@
     });
 
     createThumb = async (data, fromWindowId) => {
-        let fromWindow = BrowserWindow.fromId(fromWindowId)
+        let fromWindow = BrowserWindow.fromId(fromWindowId);
+        timer = new Date();
         try {
             for (const file of data.files) {
 
@@ -145,7 +146,7 @@
                     fromWindow.webContents.send('thumb-create', file.FileName);
                 }
             }
-            fromWindow.webContents.send("error", 'Thumbnail Create');
+            fromWindow.webContents.send("error", 'Thumbnail Create:' + (new Date() - timer));
             window.close();
         } catch (error) {
             console.log(error)
@@ -214,13 +215,21 @@
     ffmpeg.setFfmpegPath(ffmstatic.path) //Argument path is a string with the full path to the ffmpeg binary.
     ffmpeg.setFfprobePath(ffpstatic.path) //Argument path is a string with the full path to the ffprobe binary.
 
-    VideoThumb = (vfile) => {
-        return new Promise((resolve, rejected) => {
+    VideoThumb = async (vfile) => {
+        await takeScreenShot(vfile, "20%", 0);
+        await takeScreenShot(vfile, "40%", 1);
+        await takeScreenShot(vfile, "60%", 2);
+        await takeScreenShot(vfile, "80%", 3);
+        return true;
+    }
+    takeScreenShot = async (vfile, time, num) => {
+        await new Promise((resolve, rejected) => {
             try {
                 ffmpeg(vfile).screenshots({
-                    timestamps: ["26.9%"],
-                    filename: '%f',
-                    folder: './covers/',
+                    timestamps: [time],
+                    // count: 4,
+                    filename: '%f-' + num,
+                    folder: './covers/videos',
                     size: '240x?'
                 }).on('end', () => {
                     resolve(true);
@@ -230,7 +239,6 @@
             }
         });
     }
-
     ipc.on('zip-file', (e, data, id) => {
         var fromWindow = BrowserWindow.fromId(id);
         if (!fs.existsSync(data.dir + '.zip')) {

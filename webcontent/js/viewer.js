@@ -150,7 +150,6 @@ setUpRange = () => {
 function loadZip(file) {
     loadingNext = true;
     isImage = false;
-    updateFile(currentFile);;
     updateItemProgress(currentFile);
     $('#loadingDiv').removeClass('d-none');
     currentFile = {

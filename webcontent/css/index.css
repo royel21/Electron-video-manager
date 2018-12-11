@@ -147,11 +147,11 @@ body,
     position: absolute;
     bottom: 5px;
     right: 5px;
-    height: 30px;
-    padding: 4px 8px;
+    height: 26px;
+    padding: 0px 4px 0 9px;
     color: white;
     background-color: inherit;
-    border-radius: 0 0 5px 0;
+    border-radius: 25px 0 5px 0;
 }
 
 .item-file:hover{

@@ -10,9 +10,8 @@ var totalTime;
 var videoIndex = 0;
 var videos = [];
 var hour = false;
-var vDuration = "";
+var vDuration = false;
 var Slider = null;
-var muted = false;
 
 
 $('#v-next').click(() => {
@@ -77,7 +76,7 @@ playVideo = async (v) => {
     }
 
     player.currentTime = currentFile.Current;
-    player.play().catch(e => {});
+    player.play().catch(e => { });
     if (config.paused) player.pause();
     $('.title').text(v.Name);
     updateRecents();
@@ -98,9 +97,11 @@ $(player).dblclick((e) => {
 });
 
 player.ontimeupdate = (e) => {
-    if (Slider) Slider.value = Math.floor(player.currentTime);
-    $vTotalTime.text(formatTime(player.currentTime) + "/" + vDuration)
-    currentFile.Current = player.currentTime;
+    if (vDuration) {
+        Slider.value = Math.floor(player.currentTime);
+        $vTotalTime.text(formatTime(player.currentTime) + "/" + vDuration)
+        currentFile.Current = player.currentTime;
+    }
 }
 
 player.onended = function () {
@@ -110,7 +111,7 @@ player.onended = function () {
 }
 
 playerKeyHandler = (e) => {
-    console.log(e.keyCode)
+
     switch (e.keyCode) {
         case 13:
             {
@@ -119,41 +120,38 @@ playerKeyHandler = (e) => {
             }
         case 32:
             {
-                player.paused ? player.play().catch(e => {}) : player.pause();
+                player.paused ? player.play().catch(e => { }) : player.pause();
                 break;
             }
         case 37:
             {
-                player.currentTime -= event.ctrlKey ? 12  : 6;
+                player.currentTime -= event.ctrlKey ? 12 : 6;
                 break;
             }
         case 38:
             {
                 volcontrol.value = player.volume + (event.ctrlKey ? 0.05 : 0.01);
-                muted = false;
                 player.volume = volcontrol.value;
                 break;
             }
         case 39:
             {
-                player.currentTime += event.ctrlKey ? 12  : 6;
+                player.currentTime += event.ctrlKey ? 12 : 6;
                 break;
             }
         case 40:
             {
                 volcontrol.value -= Number(event.ctrlKey ? 0.05 : 0.01);
-                muted = false;
                 player.volume = volcontrol.value;
                 break;
             }
     }
 }
-pauseOrPlay = () =>{
+pauseOrPlay = () => {
     var playPause = "Play";
-    if(btnPlay.checked)
-    {
-        player.play().catch(e => {});
-    }else{
+    if (btnPlay.checked) {
+        player.play().catch(e => { });
+    } else {
         player.pause();
         playPause = "Pause";
     }
@@ -169,7 +167,6 @@ $(player).click((e) => {
 });
 
 volcontrol.oninput = (e) => {
-    muted = false;
     player.volume = volcontrol.value;
 }
 player.onplay = player.onpause = hideFooter;
@@ -178,19 +175,13 @@ player.onplay = player.onpause = hideFooter;
 btnPlay.onchange = pauseOrPlay;
 
 btnMuted.onchange = () => {
-    muted = true;
     player.muted = btnMuted.checked;
-    $popup.text(btnMuted.checked ? "Mute" : "Unmute");
     $('.fa-volume-up').attr('data-title', btnMuted.checked ? "Unmute" : "Mute");
 }
 
 var volTimer = null;
 
 player.onvolumechange = function (e) {
-    if (!muted) {
-        player.muted = btnMuted.checked = (player.volume == 0);
-        $('.fa-volume-up').attr('data-title', btnMuted.checked ? "Unmute" : "Mute");
-    }
 
     if ($('.footer').hasClass('hide-footer') && document.webkitIsFullScreen) {
         $('.v-vol').addClass('vol-show');
@@ -207,7 +198,6 @@ player.onvolumechange = function (e) {
 wheelScroll = (event) => {
     // deltaY obviously records vertical scroll, deltaX and deltaZ exist too
     if (isPlayer()) {
-        muted = false;
         if (event.originalEvent.deltaY < 0) {
             volcontrol.value = player.volume + 0.05;
             player.volume = volcontrol.value;
@@ -240,21 +230,19 @@ initPlayer = (v) => {
         $(window).on('wheel', wheelScroll);
         $('.fa-play-circle').attr('data-title', config.paused ? "Play" : "Pause");
         $('.fa-volume-up').attr('data-title', btnMuted.checked ? "Unmute" : "Mute");
-        
+
         player.muted = btnMuted.checked = config.isMuted;
         player.volume = volcontrol.value = config.volume;
-
         toggleView(3);
     }
-
+    Slider.value = 0;
     playVideo(v);
 }
 
-savePlayerConfig = async () => {
+savePlayerConfig = () => {
     if (currentView === 3) {
         config.volume = player.volume;
         config.isMuted = player.muted;
         config.paused = player.paused;
     }
-    await updateFile(currentFile);
 }

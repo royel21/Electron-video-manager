@@ -19,14 +19,14 @@ var $loading = $('#folder-reloading');
 var setUp = true;
 
 ipcRenderer.on('thumb-create', (event, name) => {
-    var item = $('.items:textequalto(' + name + ')').find('img')[0];
+    var item = $('.items:textequalto(' + name + ')')[0];
     if (item != undefined &&
-        item.offsetTop < $(window).height() + $(item).closest('.items').height()) {
+        item.offsetTop < $(window).height() + item.offsetHeight) {
+        var isVideo = videoFilter.includes(item.dataset.ex);
+        var icon = (isVideo ? './covers/videos/' + name + '-0.png' : './covers/' + name + '.jpg');
 
-        var icon = './covers/' + name.replace('#', '%23') +
-            (videoFilter.includes(name.split('.').pop()) ? '.png' : '.jpg');
-        item.dataset.src = icon;
-        item.src = icon;
+        $(item).find('img')[0].dataset.src = icon;
+        $(item).find('img')[0].src = icon;
     }
 });
 
@@ -38,9 +38,10 @@ ipcRenderer.on('error', (event, msg) => {
     } else
         if (String(msg).includes("Thumbnail Create")) {
             --processRunning;
-            if (processRunning == 0)
+            if (processRunning == 0) {
                 $loading.find('.fa-folder').addClass('d-none');
-            backgroundImage = [];
+                backgroundImage = [];
+            }
         }
 });
 
@@ -67,7 +68,7 @@ ipcRenderer.on('zip-done', (e, result) => {
 });
 
 loadDirectory = async (folder, id) => {
-    var dir = folder != '' ? path.join(currentDir, folder+"") : currentDir;
+    var dir = folder != '' ? path.join(currentDir, folder + "") : currentDir;
     var fol = await db.Folder.findOne({
         where: { $or: [{ Id: id }, { Name: dir }] }
     });
@@ -110,9 +111,10 @@ loadDirectory = async (folder, id) => {
             setTimeout(() => {
 
                 var tFiles = files.filter(f => {
-                    var fv = path.resolve("./covers", f.FileName);
+                    var isVideo = videoFilter.includes(f.extension);
+                    var icon = (isVideo ? './covers/videos/' + f.FileName + '-1.png' : './covers/' + f.FileName + '.jpg');
                     return compressFilter.concat(videoFilter).includes(f.extension) &&
-                        !fs.existsSync(fv + ".jpg") && !fs.existsSync(fv + ".png") && backgroundImage.find(f2 => f2.FileName === f.FileName) == undefined
+                        !fs.existsSync(icon) && backgroundImage.find(f2 => f2.FileName === f.FileName) == undefined
                 });
 
                 if (tFiles.length > 0) {
@@ -425,9 +427,36 @@ $(() => {
 
 //     testFiles();
 // });
+var previewTimer = null;
+var imgIndex = 0;
+var el = null;
+startItemPreview = (e) => {
+    if (videoFilter.includes($(e.target).closest('.items').data('ex'))) {
+        var img = $(e.target).closest('.items').find('img')[0];
+        if (img != undefined && !previewTimer && img.src.split('-0.png').length > 1) {
+            var iname = img.dataset.src = img.src;
+            iname = iname.split('-0.png')[0];
+            previewTimer = setInterval(() => {
+                imgIndex = (imgIndex + 1) % 4;
+                img.src = iname + '-' + imgIndex + '.png';
+            }, 300);
+        }
+        el = img;
+    }
+}
 
+stopItemPreview = () => {
+    clearInterval(previewTimer);
+    previewTimer = null;
+    imgIndex = 0;
+    if (el) {
+        el.src = el.dataset.src;
+        el = null;
+    }
+}
 fileViewerCleanUp = () => {
     setUp = true;
+    stopItemPreview();
     $(document).off('keydown', keyboardHandler);
     $(document).off('keypress', jumpToFile);
     $('.openDir').off('click', openDir);
@@ -437,6 +466,8 @@ fileViewerCleanUp = () => {
     $(document.body).off('click', () => { $cmenu.css({ display: "none" }); });
     $(contentScroll).off('scroll', () => { hidedetails(); $cmenu.css({ display: "none" }) });
     $(window).off('resize', () => { hidedetails(); $cmenu.css({ display: "none" }) });
+    $fviewer.find('#file-list').off('mouseenter', '.items', startItemPreview);
+    $fviewer.find('#file-list').off('mouseleave', '.items', stopItemPreview);
 }
 
 fileViewerInit = () => {
@@ -451,5 +482,7 @@ fileViewerInit = () => {
         $(document.body).on('click', () => { $cmenu.css({ display: "none" }); });
         $(contentScroll).on('scroll', () => { hidedetails(); $cmenu.css({ display: "none" }) });
         $(window).on('resize', () => { hidedetails(); $cmenu.css({ display: "none" }) });
+        $fviewer.find('#file-list').on('mouseenter', '.items', startItemPreview);
+        $fviewer.find('#file-list').on('mouseleave', '.items', stopItemPreview);
     }
 }

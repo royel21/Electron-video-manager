@@ -73,6 +73,7 @@ $('#cm-sh-details').click((e) => {
     db.File.findOne({ where: { Name: cpyFile } }).
         then(file => {
             hidedetails();
+            console.log(file);
             var tempf = WinDrive.ListFiles(path.join(currentDir, cpyFile), [], true)[0];
             if (videoFilter.includes(tempf.extension)) {
                 tempf.Page = file != null ? formatTime(file.Current) : 0;

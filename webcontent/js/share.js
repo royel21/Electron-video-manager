@@ -22,11 +22,17 @@ var currentView = 1;
 var currentDir = "";
 var currentFile;
 window.onbeforeunload = (e) => {
+    // if (savePlayerConfig != undefined) savePlayerConfig();
+    // local.setObject('config', config);
+}
+
+ipcRenderer.on('save-file',(e)=>{
     if (savePlayerConfig != undefined) savePlayerConfig();
     local.setObject('config', config);
-    delete config.recents
-    ipcRenderer.send('console-log', config);
-}
+    updateFile(currentFile).then(()=>{
+        ipcRenderer.send('close',currentFile);
+    });
+});
 
 if (local.hasObject('config')) {
     var oldConfig = local.getObject('config');
@@ -51,8 +57,8 @@ processFile = (name) => {
         loadImage(name);
     } else {
         db.File.findByName({
-                Name: name
-            })
+            Name: name
+        })
             .then((f) => {
                 if (f == null) f = {
                     Name: name,
@@ -79,21 +85,21 @@ $('.openFile').on('click', function () {
     dialog.showOpenDialog(mainWindow, {
         title: "Select the file to open",
         filters: [{
-                name: 'All Files',
-                extensions: ['*']
-            },
-            {
-                name: 'Images',
-                extensions: ['jpg', 'png', 'gif', 'bmp']
-            },
-            {
-                name: 'Movies',
-                extensions: ['mkv', 'avi', 'mp4', 'ogg']
-            },
-            {
-                name: 'Mangas',
-                extensions: ['zip', 'rar']
-            }
+            name: 'All Files',
+            extensions: ['*']
+        },
+        {
+            name: 'Images',
+            extensions: ['jpg', 'png', 'gif', 'bmp']
+        },
+        {
+            name: 'Movies',
+            extensions: ['mkv', 'avi', 'mp4', 'ogg']
+        },
+        {
+            name: 'Mangas',
+            extensions: ['zip', 'rar']
+        }
         ],
         properties: ['openFile']
     }, function (openedFile) {
@@ -147,24 +153,25 @@ formatTime = (time) => {
         String(min).padStart(2, "0") + ':' + String(sec).padStart(2, "0");
 }
 
-createSpan = (name, current, total) => {
-    if (videoFilter.includes(name.split('.').pop())) {
-        current = formatTime(current);
-        total = formatTime(total);
-    }
-    return `<span class="file-page ${current == total ? "bg-primary" : "bg-danger"}"` +
-        ` data-pages="${current}/${total}"></span>`;
-}
-
 updateItemProgress = (file) => {
+    updateFile(file);
     if (file != undefined) {
-        var $item, index;
+        let $item, index;
         if (file.Name != undefined) {
             $item = $('.items:textequalto(' + file.Name + ')');
-            if (file.Current > 0 && !isImage) {
-                var $itemf = $item.find('.item-file');
-                $itemf.find('.file-page').remove();
-                $itemf.append(createSpan(file.Name, file.Current + 1, file.Total));
+            if (file.Current > 0 && !imagesFilter.includes($item.data('ex'))) {
+                let $itemf = $item.find('.item-file');
+                let current = file.Current, total = file.Total;
+                if (videoFilter.includes($item.data('ex'))) {
+                    current = formatTime(current);
+                    total = formatTime(total);
+                }else{
+                    current++;
+                }
+                $itemf.find('.file-page').attr('data-pages', current+'/'+total);
+                $itemf.find('.file-page').addClass('bg-danger');
+                if (current + 1 >= total)
+                    $itemf.find('.file-page').toggleClass('bg-primary bg-danger');
             }
             index = $('.items').index($item[0]);
         }
@@ -172,14 +179,14 @@ updateItemProgress = (file) => {
     }
 }
 
-updateFile = (file) => {
-    if (file != undefined && file.Id != undefined && !imagesFilter.includes(file.Name.toLocaleLowerCase().split('.').pop())) {
-        return db.db.query(`UPDATE files set Current = ${file.Current}, Total = ${file.Total} WHERE Id = ${file.Id};`)
+updateFile = async (file) => {
+    if (file != undefined && file.Id != undefined) {
+        await db.db.query(`UPDATE files set Current = ${file.Current}, Total = ${file.Total} WHERE Id = ${file.Id};`);
     }
 }
 
 updateRecents = () => {
-    var tempM = config.recents.removeByName(currentFile);
+    let tempM = config.recents.removeByName(currentFile);
     if (tempM != undefined) currentFile = tempM;
 
     config.recents.unshift(currentFile);

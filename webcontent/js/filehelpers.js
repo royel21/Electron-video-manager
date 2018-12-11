@@ -151,6 +151,7 @@ function CreateEl(file, diskIcon) {
     var isFile = !file.isDirectory;
     var img = diskIcon === undefined ? isFile ? zipIcon : folderIcon : diskIcon;
     var isImage = false;
+    var isVideo = false;
     if (isFile) {
         var ex = file.extension.toLocaleLowerCase();
         if (imagesFilter.includes(ex)) {
@@ -158,22 +159,31 @@ function CreateEl(file, diskIcon) {
             img = path.join(currentDir, file.FileName).replace('#', '%23');
         } else if (videoFilter.includes(ex)) {
             img = videoIcon;
+            isVideo = true;
         }
     }
 
     var fav = favs.find(f => f.Name === file.FileName);
     var isFav;
-    var page = " ";
+    var current, total;
+    var page = "";
+    var pageCLass = "";
     if (fav != undefined) {
         isFav = fav.isFav ? "in-fav fas" : "far";
         if (isFile && fav.Page > 0) {
-            page = createSpan(file.FileName, fav.Page, fav.Total); 
+            current = fav.Page, total = fav.Total;
+            pageCLass = (current+1) >= total ? "bg-primary" : "bg-danger";
+            if (isVideo) {
+                current = formatTime(current);
+                total = formatTime(total);
+            }
+            page = `${current}/${total}`
         }
     } else {
         isFav = "far";
     }
 
-    
+
     var div = document.createElement('div');
     div.innerHTML =
         `<div data-isfile="${isFile}" data-name="${file.FileName}" tabindex="0" data-size="${file.Size}" data-mdate="${file.LastModified}" data-ex="${file.extension}" class="items" >
@@ -184,7 +194,8 @@ function CreateEl(file, diskIcon) {
                     </div>
                     <div class="item-cover"><span><img draggable="false" data-src="${img}" src=""/></span></div>
                     <div class="item-name">${file.FileName}</div>
-                    ${page}
+                    <span class="file-page ${pageCLass}"
+                        data-pages="${page}"></span>
                 </div>
             </div>`;
     return div.firstElementChild;
@@ -209,7 +220,7 @@ lazyLoad = () => {
 
                 var ds = entry.target.dataset;
                 var isVideo = videoFilter.includes(ds.ex);
-                var icon = './covers/' + ds.name + (isVideo ? '.png' : '.jpg');
+                var icon = (isVideo ? './covers/videos/' + ds.name + '-0.png' : './covers/' + ds.name + '.jpg');
 
                 if (fs.existsSync(icon)) {
                     lazyCover.src = icon.replace('#', '%23');

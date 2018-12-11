@@ -29,6 +29,7 @@ popupShow = (event) => {
     }
 }
 
-$('body').on('mousemove wheel', '.popup-msg', popupShow);
+$('body').on('mousemove', '.popup-msg', popupShow);
 $('.footer .popup-msg').on('mousemove', popupShow);
-$('body').on('mouseleave', '.popup-msg', popupHide);
+$('.footer .popup-msg').on('click', popupHide);
+$('body').on('mouseleave wheel', '.popup-msg', popupHide);
