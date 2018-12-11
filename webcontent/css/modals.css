@@ -104,7 +104,7 @@
 }
 
 .list-group-item span.list-text {
-    /* pointer-events: none; */
+    pointer-events: none;
 }
 
 .list-group li .fa-trash-alt {
