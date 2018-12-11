@@ -27,7 +27,7 @@ $('#v-prev').click(() => {
     }
 });
 
-playerCleanUp = () => {
+playerCleanUp = async () => {
     updateFile(currentFile);
     $(window).off('wheel', wheelScroll);
     $(document).off('keydown', playerKeyHandler);
@@ -41,9 +41,9 @@ playerCleanUp = () => {
     player.src = "";
 }
 returnToFb = () => {
+    toggleView(1);
     playerCleanUp();
     updateItemProgress(currentFile);
-    toggleView(1);
 }
 
 $('#v-exit-to-fb').click(returnToFb);
@@ -124,7 +124,7 @@ playerKeyHandler = (e) => {
             }
         case 37:
             {
-                player.currentTime -= event.ctrlKey ? 15 : 5;
+                player.currentTime -= event.ctrlKey ? 12  : 6;
                 break;
             }
         case 38:
@@ -136,7 +136,7 @@ playerKeyHandler = (e) => {
             }
         case 39:
             {
-                player.currentTime += event.ctrlKey ? 15 : 5;
+                player.currentTime += event.ctrlKey ? 12  : 6;
                 break;
             }
         case 40:

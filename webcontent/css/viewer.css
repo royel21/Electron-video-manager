@@ -47,3 +47,28 @@ body[viewer="2"]:-webkit-full-screen .clock{
   bottom: 50px;
   right: 5px;
 }
+
+
+
+.range {
+    -webkit-appearance: none;
+    width: max-content;
+    height: 5px;
+    border-radius: 5px;
+    background: #d3d3d3;
+    outline: none;
+    -webkit-transition: .2s;
+    transition: opacity .2s;
+}
+
+.range::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 20px;
+    height: 20px;
+    border-radius: 50%; 
+    color: #fff;
+    background-color: #007bff;
+    border-color: #007bff;
+    cursor: pointer;
+}

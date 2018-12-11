@@ -76,7 +76,11 @@ $list_modal.on('keydown', 'ul li', (event) => {
 $list_modal.on('dblclick', 'ul li', processRow);
 
 createEntry = (value, isFile) => {
-    var listIcon = videoFilter.includes(value.Name.toLowerCase().split('.').pop()) ?"&#xf1c8;":"&#xf1c6;";
+    var listIcon = "&#xf07b";
+    if (isFile) {
+
+        var listIcon = videoFilter.includes(value.Name.toLowerCase().split('.').pop()) ? "&#xf1c8;" : "&#xf1c6;";
+    }
     var div = document.createElement('div');
     div.innerHTML = `<li id="file-${value.Id}" class="list-group-item popup-msg" data-isFile="${isFile}" data-title="${value.Name}" tabindex="0">` +
         `<span id="delete-list"><i class="fas fa-trash-alt fa-1x"></i></span>` +

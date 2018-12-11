@@ -1,7 +1,3 @@
-#footer-toolbar span i.fa-folder {
-    transform: translateY(0);
-}
-
 #popup {
     display: none;
     position: absolute;
@@ -33,21 +29,4 @@
 #popup.popup-top:after {
     top: auto;
     bottom: -6px
-}
-
-#modal-scan-folder {
-    display: none;
-}
-
-.dialog-header {
-    font-size: 18px;
-    border-bottom: 1px solid rgba(0, 0, 0, .125);
-    cursor: -webkit-grab;
-}
-.dialog-header:active{
-    cursor: -webkit-grabbing;
-}
-
-.modal .card-body{
-    height: 70%;
 }

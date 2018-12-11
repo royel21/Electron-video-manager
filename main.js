@@ -46,8 +46,8 @@ function createWin() {
             app.quit();
         }
     });
-    win.openDevTools();
-    win.setAlwaysOnTop(true);
+    // win.openDevTools();
+    // win.setAlwaysOnTop(true);
 }
 
 ipcMain.on('console-log', (event, msg) => {

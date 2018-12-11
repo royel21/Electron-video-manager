@@ -4,11 +4,7 @@
         <span id="modal-close" class="btn-hide"><i class="far fa-times-circle"></i></span>
     </div>
     <div id="modal-body">
-        <div id="viewer-config" class="card-body {isviewer}">
-            <div>
-                <label for="img-width">Image ScaleX: <span id="img-width-val"></span></label>
-                <input id="img-width" class="slider" type="range" min="0.0" max="1.0" step="0.01" value="0.63" name="imgw" />
-            </div>
+        <div id="viewer-config" class="card-body {isviewer} cancel-footer">
             <div class="input-group mt-2">
                 <div class="input-group-prepend">
                     <div class="select-style">Page Animation:</div>
@@ -18,9 +14,15 @@
             </div>
             <div class="input-group mt-2">
                 <div class="input-group-prepend">
-                    <div class="select-style">Slide Duration ms: </span></div>
+                    <div class="select-style">Animation Duration: </span></div>
                 </div>
                 <input id="anim-duration" type="number" class="form-control mr-1" min="0" step="50"></span>
+            </div>
+            <div class="input-group mt-2">
+                <div class="input-group-prepend">
+                    <div class="select-style">Scale Width: </span></div>
+                </div>
+                <input id="scale-img-w" type="number" class="form-control mr-1" min="0" max="1" step="0.05"></span>
             </div>
         </div>
         <div id="viewer-config" class="card-body {isfilebrowser}">
@@ -34,7 +36,8 @@
                     <option value="Date-D">&#xf162; Date</option>
                     <option value="Date-U">&#xf163; Date</option>
                     <option value="Size-D">&#xf160; Size</option>
-                    <option value="Size-U">&#xf161; Size</option></select>
+                    <option value="Size-U">&#xf161; Size</option>
+                </select>
             </div>
         </div>
     </div>

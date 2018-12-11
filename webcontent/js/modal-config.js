@@ -74,16 +74,6 @@ showConfigModal = (e) => {
         });
     };
     if (!isViewer()) {
-        const imgWScale = document.getElementById('img-width');
-
-        imgWScale.oninput = function () {
-            config.imgScale = this.value;
-            $('#img-content img').css("transform", "scaleX(" + config.imgScale + ")");
-            $('#img-width-val').text(config.imgScale);
-        }
-
-        imgWScale.value = config.imgScale;
-        $('#img-width-val').text(config.imgScale);
         //Animation Selection
         var $animSelect = modalconfig.find('#anim-select');
         for (var key in pgAnimation) {
@@ -98,6 +88,15 @@ showConfigModal = (e) => {
         $animDuration.change((e) => {
             config.animDuration = e.target.value;
         });
+        
+        
+        const imgScaleW = document.getElementById('scale-img-w');
+        imgScaleW.onchane = function () {
+            config.imgScale = this.value;
+            $('#img-content img').css("transform", "scaleX(" + config.imgScale + ")");
+        }
+
+        imgScaleW.value = config.imgScale;
 
     } else {
 

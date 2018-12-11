@@ -34,7 +34,6 @@ body[viewer="3"]:-webkit-full-screen .clock .time {
     bottom: 0px;
     left: 0;
     right: 0;
-    background-color: rgba(67, 66, 75, 1);
     font-size: initial;
     padding-bottom: 5px;
 }
@@ -148,9 +147,22 @@ body:-webkit-full-screen #video-viewer {
 }
 
 .v-controls .v-vol {
+    position: absolute;
+    width: max-content;
+    right: 0px;
+}
+
+body[viewer="3"]:-webkit-full-screen .v-controls .v-vol {
+    position: relative;
     width: max-content;
 }
 
+body[viewer="3"]:-webkit-full-screen .v-controls .vol-show{
+    position: fixed;
+   transform: rotate(270deg);
+   bottom: 126px;
+   right: -50px;
+}
 .v-controls .v-vol label{
     position: relative;
     top: -4px;
@@ -211,13 +223,6 @@ body:not(:-webkit-full-screen) .v-controls {
 
 #slider-container .rc-slider {
     top: 9px;
-}
-
-.v-controls .vol-show{
-     position: fixed;
-    transform: rotate(270deg);
-    bottom: 126px;
-    right: -50px;
 }
 
 .footer .popup-caction{

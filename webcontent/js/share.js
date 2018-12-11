@@ -30,8 +30,8 @@ window.onbeforeunload = (e) => {
 
 if (local.hasObject('config')) {
     var oldConfig = local.getObject('config');
-    for(var key in config){
-        if(oldConfig[key] == undefined){
+    for (var key in config) {
+        if (oldConfig[key] == undefined) {
             oldConfig[key] = config[key];
         }
     }
@@ -78,12 +78,23 @@ $('.openFile').on('click', function () {
 
     dialog.showOpenDialog(mainWindow, {
         title: "Select the file to open",
-        filters: [
-            {name: 'All Files', extensions: ['*']},
-            {name: 'Images', extensions: ['jpg', 'png', 'gif', 'bmp']},
-            {name: 'Movies', extensions: ['mkv', 'avi', 'mp4','ogg']},
-            {name: 'Mangas', extensions: ['zip','rar']}
-          ],
+        filters: [{
+                name: 'All Files',
+                extensions: ['*']
+            },
+            {
+                name: 'Images',
+                extensions: ['jpg', 'png', 'gif', 'bmp']
+            },
+            {
+                name: 'Movies',
+                extensions: ['mkv', 'avi', 'mp4', 'ogg']
+            },
+            {
+                name: 'Mangas',
+                extensions: ['zip', 'rar']
+            }
+        ],
         properties: ['openFile']
     }, function (openedFile) {
         if (openedFile !== undefined && openedFile.length > 0) {
@@ -115,6 +126,7 @@ hideFooter = () => {
                     cursor: "default"
                 });
             } else {
+                $('.v-vol').addClass('vol-show');
                 $('.footer').addClass("hide-footer");
                 $(document.body).css({
                     cursor: "none"
@@ -201,7 +213,7 @@ dropFile = function (e) {
 };
 
 document.ondrop = dropFile;
-$(document).on('dragover',  (e)=>{
+$(document).on('dragover', (e) => {
     e.preventDefault();
     e.stopPropagation();
 });
