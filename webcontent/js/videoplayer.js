@@ -17,12 +17,16 @@ var update = false;
 $('#v-next').click(() => {
     if (videoIndex < videos.length - 1) {
         processFile(videos[++videoIndex]);
+    }else{
+        returnToFb();
     }
 });
 
 $('#v-prev').click(() => {
     if (videoIndex > 0) {
         processFile(videos[--videoIndex]);
+    }else{
+        returnToFb();
     }
 });
 
@@ -112,6 +116,8 @@ player.onended = function () {
             processFile(videos[++videoIndex]);
             clearTimeout(waitEnd);
         }, 3000)
+    }else{
+        returnToFb();
     }
 }
 
