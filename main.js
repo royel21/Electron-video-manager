@@ -25,21 +25,21 @@ function createWin() {
         frame: false,
     });
     //win.setMenu(null);
-    win.loadURL('file://' + __dirname + '/index.1.html');
+    win.loadURL('file://' + __dirname + '/index.html');
     win.on('ready-to-show', () => {
         win.show();
     });
 
 
     win.on('close', (e) => {
-        // if (closeNow) {
-        //     app.quit();
-        // } else {
-        //     e.preventDefault();
-        //     win.webContents.send('save-file', "");
-        //     closeNow = true;
-        // }
-        app.quit();
+        if (closeNow) {
+            app.quit();
+        } else {
+            e.preventDefault();
+            win.webContents.send('save-file', "");
+            closeNow = true;
+        }
+        // app.quit();
     });
 
     //This is used in mac for recreate the window

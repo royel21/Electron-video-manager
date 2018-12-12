@@ -27,7 +27,6 @@ window.onbeforeunload = (e) => {
 }
 
 ipcRenderer.on('save-file',(e)=>{
-    if (savePlayerConfig != undefined) savePlayerConfig();
     local.setObject('config', config);
     updateFile(currentFile).then(()=>{
         ipcRenderer.send('close',currentFile);
@@ -66,6 +65,7 @@ processFile = (name) => {
                         Name: currentDir
                     }
                 };
+                
                 if (compressFilter.includes(ex)) {
                     if (currentView == 3) playerCleanUp();
                     loadZip(f);
@@ -169,9 +169,14 @@ updateItemProgress = (file) => {
                     current++;
                 }
                 $itemf.find('.file-page').attr('data-pages', current+'/'+total);
-                $itemf.find('.file-page').addClass('bg-danger');
-                if (current + 1 >= total)
-                    $itemf.find('.file-page').toggleClass('bg-primary bg-danger');
+                
+                if (current + 1 >= total){
+                    $itemf.find('.file-page').removeClass('bg-danger').addClass('bg-primary');
+                }else{
+                    $itemf.find('.file-page').removeClass('bg-primary').addClass('bg-danger');
+                }
+               
+                   
             }
             index = $('.items').index($item[0]);
         }

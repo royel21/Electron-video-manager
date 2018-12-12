@@ -10,9 +10,9 @@ var totalTime;
 var videoIndex = 0;
 var videos = [];
 var hour = false;
-var vDuration = false;
+var vDuration;
 var Slider = null;
-
+var update = false;
 
 $('#v-next').click(() => {
     if (videoIndex < videos.length - 1) {
@@ -35,14 +35,13 @@ playerCleanUp = async () => {
         Slider.cleanUp();
         Slider = null;
     }
-    savePlayerConfig();
     videos = [];
     player.src = "";
 }
 returnToFb = () => {
-    toggleView(1);
     playerCleanUp();
-    updateItemProgress(currentFile);
+    toggleView(1);
+    selectItem(updateItemProgress(currentFile));
 }
 
 $('#v-exit-to-fb').click(returnToFb);
@@ -51,9 +50,7 @@ playVideo = async (v) => {
     updateItemProgress(currentFile);
     updateFile(currentFile);
     var videoDir = v.folder.Name;
-    var video = path.join(videoDir, v.Name.replace('#', '%23'))
-    player.src = video;
-    vpreview.src = video;
+    var video = path.join(videoDir, v.Name.replace('#', '%23'));
 
     currentFile = {
         Id: v.Id,
@@ -66,30 +63,33 @@ playVideo = async (v) => {
         var tempFile = WinDrive.ListFiles(video, [], true)[0];
         tempFile.DirName = videoDir;
         tempFile.Total = 0;
-        db.File.findOrCreateNew(tempFile).then(f => {
-            if (f) {
-                currentFile.Id = f.Id;
-                currentFile.Size = f.Size;
-            }
-        });
+        var f = await db.File.findOrCreateNew(tempFile)
+        if (f) {
+            currentFile.Id = f.Id;
+            currentFile.Size = f.Size;
+        }
         currentFile.Current = 0;
     }
-
-    player.currentTime = currentFile.Current;
-    player.play().catch(e => { });
-    if (config.paused) player.pause();
+    
+    player.src = video;
+    vpreview.src = video;
+    player.currentTime = currentFile.Current-0.1;
     $('.title').text(v.Name);
     updateRecents();
+    player.play().catch(e => {});
+    if (config.paused) player.pause(); 
 }
 
 player.onloadedmetadata = function (e) {
     Slider.min = 0;
     Slider.max = player.duration;
     hour = player.duration / 3600 < 0;
-
     vDuration = formatTime(player.duration);
     $vTotalTime.text(formatTime(0) + "/" + vDuration);
     currentFile.Total = player.duration;
+    toggleView(3);
+    Slider.value = Math.floor(currentFile.Current);
+    update = true;
 }
 
 $(player).dblclick((e) => {
@@ -97,7 +97,7 @@ $(player).dblclick((e) => {
 });
 
 player.ontimeupdate = (e) => {
-    if (vDuration) {
+    if (update && Slider) {
         Slider.value = Math.floor(player.currentTime);
         $vTotalTime.text(formatTime(player.currentTime) + "/" + vDuration)
         currentFile.Current = player.currentTime;
@@ -106,7 +106,12 @@ player.ontimeupdate = (e) => {
 
 player.onended = function () {
     if (videoIndex < videos.length - 1) {
-        playVideo(videos[++videoIndex]);
+        console.log("Test");
+        var waitEnd = setTimeout(()=>{
+            if(player.ended)
+            processFile(videos[++videoIndex]);
+            clearTimeout(waitEnd);
+        }, 3000)
     }
 }
 
@@ -120,7 +125,7 @@ playerKeyHandler = (e) => {
             }
         case 32:
             {
-                player.paused ? player.play().catch(e => { }) : player.pause();
+                player.paused ? player.play().catch(e => {}) : player.pause();
                 break;
             }
         case 37:
@@ -150,13 +155,13 @@ playerKeyHandler = (e) => {
 pauseOrPlay = () => {
     var playPause = "Play";
     if (btnPlay.checked) {
-        player.play().catch(e => { });
+        player.play().catch(e => {});
     } else {
         player.pause();
         playPause = "Pause";
     }
     $('.fa-play-circle').attr('data-title', playPause);
-    $popup.text(playPause);
+    config.paused = player.paused;
 }
 
 $(player).click((e) => {
@@ -176,13 +181,14 @@ btnPlay.onchange = pauseOrPlay;
 
 btnMuted.onchange = () => {
     player.muted = btnMuted.checked;
+    config.isMuted = btnMuted.checked;
     $('.fa-volume-up').attr('data-title', btnMuted.checked ? "Unmute" : "Mute");
 }
 
 var volTimer = null;
 
 player.onvolumechange = function (e) {
-
+    config.volume = player.volume;
     if ($('.footer').hasClass('hide-footer') && document.webkitIsFullScreen) {
         $('.v-vol').addClass('vol-show');
 
@@ -233,16 +239,6 @@ initPlayer = (v) => {
 
         player.muted = btnMuted.checked = config.isMuted;
         player.volume = volcontrol.value = config.volume;
-        toggleView(3);
     }
-    Slider.value = 0;
     playVideo(v);
-}
-
-savePlayerConfig = () => {
-    if (currentView === 3) {
-        config.volume = player.volume;
-        config.isMuted = player.muted;
-        config.paused = player.paused;
-    }
 }
