@@ -26,6 +26,7 @@ processRow = (event) => {
                 filter = videoFilter;
             filesList = listofFile.filter(f => filter.includes(f.Name.split('.').pop()));
         }
+        loadList('current-list', filesList, true);
         processFile(li.dataset.title);
 
     } else {
