@@ -5,6 +5,7 @@
 
 .modal-list-file {
     display: flex;
+    min-width: 350px;
     min-height: 350px;
     height: calc(80% - 90px);
     max-height: 800px;
@@ -150,6 +151,7 @@
     display: block;
     text-align: center;
     pointer-events: none;
+    padding: 0.5rem;
 }
 
 .list-group-item:focus {
@@ -287,4 +289,13 @@ label {
 
 #scan-list li {
     padding: 0.5rem .6rem;
+}
+
+.modal .fa-list-ol{
+    position: relative;
+    top: 3px;
+}
+
+#play-list .list-file-content{
+    height: 100%
 }

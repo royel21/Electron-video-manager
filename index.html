@@ -48,8 +48,14 @@
         <div class="modal modal-list-file card bg-dark resize">
             <div id="list-file-header" class="nav nav-tabs move pt-1 pl-1 dialog-header">
                 <span class="nav-item">
+                    <input id="tab-play-list" name="list-tab" type="radio" class="d-none">
+                    <label class="nav-link active" for="tab-play-list">
+                        <i class="fas fa-list-ol"></i>
+                    </label>
+                </span>
+                <span class="nav-item">
                     <input id="tab-recent" name="list-tab" type="radio" class="d-none">
-                    <label class="nav-link active" for="tab-recent">Recents</label>
+                    <label class="nav-link" for="tab-recent">Recents</label>
                 </span>
                 <span>
                     <input id="tab-files" name="list-tab" type="radio" class="d-none">
@@ -64,7 +70,14 @@
                 <span id="list-file-hide" class="btn-hide"><i class="far fa-times-circle"></i></span>
             </div>
             <div class="m-body cancel-footer">
-                <div id="recent" class="tab-content">
+                <div id="play-list" class="tab-content">
+                    <div class="list-file-content">
+                        <ul id="current-list" class="list-group-flush text-dark">
+                            <li class="list-item-empty list-group-item">Not Files Found</li>
+                        </ul>
+                    </div>
+                </div>
+                <div id="recent" class="tab-content d-none">
                     <div class="list-file-content">
                         <ul id="list-recent" class="list-group-flush text-dark">
                             <li class="list-item-empty list-group-item">Not Files Found</li>
@@ -161,7 +174,7 @@
                         <span id="v-play-pause">
                             <label for="v-play">
                                 <input id="v-play" type="checkbox">
-                                <i class="far fa-play-circle popup-msg" data-title=""></i>
+                                <i class="far fa-play-circle"></i>
                             </label>
                         </span>
                         <span id="v-next">
@@ -171,7 +184,8 @@
                             <i class="fas fa-expand-arrows-alt popup-msg" data-title="Full Screen"></i>
                         </span>
                         <span class="v-vol">
-                            <input id="v-vol-control" class="range popup-msg" data-title="Change Volume" type="range" min="0" step="0.01" value="0.5" max="1">
+                            <input id="v-vol-control" class="range popup-msg" data-title="Change Volume" type="range"
+                                min="0" step="0.01" value="0.5" max="1">
                             <label for="v-mute">
                                 <input type="checkbox" id="v-mute" class="vol-ctrl">
                                 <span id="mute-icon"></span>

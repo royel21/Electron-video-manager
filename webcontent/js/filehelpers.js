@@ -172,7 +172,7 @@ function CreateEl(file, diskIcon) {
         isFav = fav.isFav ? "in-fav fas" : "far";
         if (isFile && fav.Page > 0) {
             current = fav.Page, total = fav.Total;
-            pageCLass = (current+1) >= total ? "bg-primary" : "bg-danger";
+            pageCLass = (current + 1) >= total ? "bg-primary" : "bg-danger";
             if (isVideo) {
                 current = formatTime(current);
                 total = formatTime(total);
@@ -219,14 +219,16 @@ lazyLoad = () => {
             if (entry.isIntersecting) {
 
                 var ds = entry.target.dataset;
-                var isVideo = videoFilter.includes(ds.ex);
-                var icon = (isVideo ? './covers/videos/' + ds.name + '-0.png' : './covers/' + ds.name + '.jpg');
-
-                if (fs.existsSync(icon)) {
-                    lazyCover.src = icon.replace('#', '%23');
-                } else {
-                    lazyCover.src = lazyCover.dataset.src;
+                var icon;
+                if (lazyCover.dataset.src == videoIcon || lazyCover.dataset.src === zipIcon) {
+                    var isVideo = videoFilter.includes(ds.ex);
+                    icon = './covers/' + (isVideo ? 'videos/' + ds.name + '-0.png' : ds.name + '.jpg');
+                    if (fs.existsSync(icon)) {
+                        lazyCover.dataset.src = icon.replace('#', '%23');
+                    }
                 }
+
+                lazyCover.src = lazyCover.dataset.src;
             } else {
                 lazyCover.src = "";
             }

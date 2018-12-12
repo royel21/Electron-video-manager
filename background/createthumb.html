@@ -122,15 +122,18 @@
 
                 var coverP = path.resolve("./", 'covers', file.FileName + ".jpg");
                 var state;
+                var isVideo;
                 switch (file.extension.toLocaleLowerCase()) {
                     case "zip":
                         {
                             state = await ZipCover(file.FileName, coverP, currentDir);
+                            isVideo = false;
                             break;
                         }
                     case "rar":
                         {
                             state = await RarCover(file.FileName, coverP, currentDir);
+                            isVideo = false;
                             break;
                         }
                     case "mp4":
@@ -139,11 +142,12 @@
                     case "avi":
                         {
                             state = await VideoThumb(path.join(currentDir, file.FileName));
+                            isVideo = true;
                             break;
                         }
                 }
                 if (state) {
-                    fromWindow.webContents.send('thumb-create', file.FileName);
+                    fromWindow.webContents.send('thumb-create', file.FileName, isVideo);
                 }
             }
             fromWindow.webContents.send("error", 'Thumbnail Create:' + (new Date() - timer));

@@ -72,7 +72,7 @@ nextImg = () => {
 /***********************************************************/
 prevFile = () => {
     if (fileN > 0 && isImage === false) {
-        processFile(filesList[--fileN]);
+        processFile(filesList[--fileN].Name);
     } else {
         backToFileBrowser();
     }
@@ -80,7 +80,7 @@ prevFile = () => {
 /***********************************************************/
 nextFile = () => {
     if (fileN < filesList.length - 1 && isImage === false) {
-        processFile(filesList[++fileN]);
+        processFile(filesList[++fileN].Name);
     } else {
         backToFileBrowser();
     }
@@ -213,15 +213,16 @@ compressFile = async () => {
             $('#loadingDiv').addClass('d-none');
             $('.title').text(currentFile.Name);
 
-            if (!filesList.length) {
-                filesList = WinDrive.ListFiles(currentFile.dir, compressFilter)
-                    .map(f => f.FileName);
-            }
-            fileN = filesList.indexOf(currentFile.Name);
             setUpRange();
             viewImage(currentFile.Current);
             imgViewerInit();
+            currentDir = currentFile.dir;
             toggleView(2);
+            if (filesList.length == 0) {
+                filesList = WinDrive.ListFiles(currentDir, compressFilter)
+                    .map((vid) => { return { Name: vid.FileName } });
+            }
+            fileN = filesList.indexOf(currentFile.Name);
             LoadNextImage = true;
             return true;
         }
@@ -249,8 +250,8 @@ function showImage(pn) {
         tempImg.src = getImage(pn);
     } else {
         fileN = pn;
-        tempImg.src = path.join(currentDir, filesList[pn]) + '?x=' + getRandomNum();
-        $('.title').text(path.join(currentDir, filesList[pn]));
+        tempImg.src = path.join(currentDir, filesList[pn].Name) + '?x=' + getRandomNum();
+        $('.title').text(path.join(currentDir, filesList[pn].Name));
     }
 
     $filescount.text('Files: ' + (fileN + 1) + '/' + filesList.length);

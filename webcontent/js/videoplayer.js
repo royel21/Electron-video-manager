@@ -8,24 +8,23 @@ var $vTotalTime = $('#v-total-time');
 var isPlayer = () => currentView == 3;
 var totalTime;
 var videoIndex = 0;
-var videos = [];
 var hour = false;
 var vDuration;
 var Slider = null;
 var update = false;
 
 $('#v-next').click(() => {
-    if (videoIndex < videos.length - 1) {
-        processFile(videos[++videoIndex]);
-    }else{
+    if (videoIndex < filesList.length - 1) {
+        processFile(filesList[++videoIndex].Name);
+    } else {
         returnToFb();
     }
 });
 
 $('#v-prev').click(() => {
     if (videoIndex > 0) {
-        processFile(videos[--videoIndex]);
-    }else{
+        processFile(filesList[--videoIndex].Name);
+    } else {
         returnToFb();
     }
 });
@@ -39,7 +38,6 @@ playerCleanUp = async () => {
         Slider.cleanUp();
         Slider = null;
     }
-    videos = [];
     player.src = "";
 }
 returnToFb = () => {
@@ -74,14 +72,14 @@ playVideo = async (v) => {
         }
         currentFile.Current = 0;
     }
-    
+
     player.src = video;
     vpreview.src = video;
-    player.currentTime = currentFile.Current-0.1;
+    player.currentTime = currentFile.Current - 0.1;
     $('.title').text(v.Name);
     updateRecents();
-    player.play().catch(e => {});
-    if (config.paused) player.pause(); 
+    player.play().catch(e => { });
+    if (config.paused) player.pause();
 }
 
 player.onloadedmetadata = function (e) {
@@ -91,7 +89,6 @@ player.onloadedmetadata = function (e) {
     vDuration = formatTime(player.duration);
     $vTotalTime.text(formatTime(0) + "/" + vDuration);
     currentFile.Total = player.duration;
-    toggleView(3);
     Slider.value = Math.floor(currentFile.Current);
     update = true;
 }
@@ -109,14 +106,13 @@ player.ontimeupdate = (e) => {
 }
 
 player.onended = function () {
-    if (videoIndex < videos.length - 1) {
-        console.log("Test");
-        var waitEnd = setTimeout(()=>{
-            if(player.ended)
-            processFile(videos[++videoIndex]);
+    if (videoIndex < filesList.length - 1) {
+        var waitEnd = setTimeout(() => {
+            if (player.ended)
+                processFile(filesList[++videoIndex].Name);
             clearTimeout(waitEnd);
         }, 3000)
-    }else{
+    } else {
         returnToFb();
     }
 }
@@ -131,7 +127,7 @@ playerKeyHandler = (e) => {
             }
         case 32:
             {
-                player.paused ? player.play().catch(e => {}) : player.pause();
+                player.paused ? player.play().catch(e => { }) : player.pause();
                 break;
             }
         case 37:
@@ -161,7 +157,7 @@ playerKeyHandler = (e) => {
 pauseOrPlay = () => {
     var playPause = "Play";
     if (btnPlay.checked) {
-        player.play().catch(e => {});
+        player.play().catch(e => { });
     } else {
         player.pause();
         playPause = "Pause";
@@ -234,10 +230,6 @@ initPlayer = (v) => {
 
         Slider.setPreviewContent(vpreview);
 
-        videos = WinDrive.ListFiles(v.folder.Name, videoFilter).map((vid) => {
-            return vid.FileName;
-        });
-        videoIndex = videos.indexOf(v.Name);
         $(document).on('keydown', playerKeyHandler);
         $(window).on('wheel', wheelScroll);
         $('.fa-play-circle').attr('data-title', config.paused ? "Play" : "Pause");
@@ -245,6 +237,15 @@ initPlayer = (v) => {
 
         player.muted = btnMuted.checked = config.isMuted;
         player.volume = volcontrol.value = config.volume;
+        currentDir = v.folder.Name;
+        
+        toggleView(3);
+
+        if (filesList.length == 0) {
+            filesList = WinDrive.ListFiles(currentDir, videoFilter)
+                .map((vid) => { return { Name: vid.FileName } });
+        }
     }
+    videoIndex = filesList.findIndex(f => f.Name == v.Name);
     playVideo(v);
 }

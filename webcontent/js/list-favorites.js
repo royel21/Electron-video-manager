@@ -112,6 +112,7 @@ loadFavFiles = async () => {
             }
         });
         $deleteFav.removeClass("d-none");
+        filesList = files.map((f) => { return { Name: f.Name } });
     }
     $('#fav-found').text(files.length ? files.length : "");
     loadList('list-favs', files, isFile);

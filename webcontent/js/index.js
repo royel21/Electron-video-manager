@@ -11,23 +11,22 @@ var favs = [];
 var folderId = null;
 var backgroundImage = [];
 var compressingCount = 0;
-var $fviewer = $('#file-viewer');
+var $flist = $('#file-list');
 var filesList = [];
 var fileFound = [];
 var currentDir = "";
 var $loading = $('#folder-reloading');
 var setUp = true;
 var totalToConvert = 0;
-ipcRenderer.on('thumb-create', (event, name) => {
+ipcRenderer.on('thumb-create', (event, name, isVideo) => {
     totalToConvert--;
-    $('#conv-progress').text(totalToConvert+'/'+backgroundImage.length);
+    $('#conv-progress').text(totalToConvert + '/' + backgroundImage.length);
     var item = $('.items:textequalto(' + name + ')')[0];
-    if (item != undefined && item.offsetTop < $(window).height() + item.offsetHeight) {
-        var isVideo = videoFilter.includes(item.dataset.ex);
-        var icon = (isVideo ? './covers/videos/' + name + '-0.png' : './covers/' + name + '.jpg').replace('#', '%23');
+    if (item != undefined) {
+        var icon = './covers/' + (isVideo ? 'videos/' + name + '-0.png' : name + '.jpg').replace('#', '%23');
 
-        $(item).find('img')[0].dataset.src = icon;
-        $(item).find('img')[0].src = icon;
+        item.querySelector('img').dataset.src = icon;
+        item.querySelector('img').src = icon;
     }
 });
 
@@ -37,13 +36,13 @@ ipcRenderer.on('error', (event, msg) => {
     if (String(msg).includes("Scan")) {
         $loading.find('.fa-database').addClass('d-none');
     } else
-    if (String(msg).includes("Thumbnail Create")) {
-        --processRunning;
-        if (processRunning == 0) {
-            $loading.find('.fa-folder').addClass('d-none');
-            backgroundImage = [];
+        if (String(msg).includes("Thumbnail Create")) {
+            --processRunning;
+            if (processRunning == 0) {
+                $loading.find('.fa-folder').addClass('d-none');
+                backgroundImage = [];
+            }
         }
-    }
 });
 
 ipcRenderer.on('files-removed', (e, index) => {
@@ -136,7 +135,7 @@ loadDirectory = async (folder, id) => {
 
                 localStorage.setItem('currentDir', currentDir);
                 $filescount.text('Files: ' + totalitem);
-                filesList = allFiles = files.map(a => a.FileName);
+                filesList = allFiles = files.map(a => { return { Name: a.FileName } });
                 selectItem(selectedIndex);
             });
         }
@@ -445,7 +444,7 @@ startItemPreview = (e) => {
     if (videoFilter.includes($(e.target).closest('.items').data('ex'))) {
         var img = $(e.target).closest('.items').find('img')[0];
         if (img != undefined && !previewTimer && img.src.split('-0.png').length > 1) {
-            var iname = img.dataset.src = img.src;
+            var iname = img.src;
             iname = iname.split('-0.png')[0];
             previewTimer = setInterval(() => {
                 imgIndex = (imgIndex + 1) % 4;
@@ -465,6 +464,7 @@ stopItemPreview = () => {
         el = null;
     }
 }
+
 fileViewerCleanUp = () => {
     setUp = true;
     stopItemPreview();
@@ -472,9 +472,7 @@ fileViewerCleanUp = () => {
     $(document).off('keypress', jumpToFile);
     $('.openDir').off('click', openDir);
     $('.tool-folderUp').off('click', returnFolder);
-    $fviewer.find('#file-list').off('click', '.items', itemClick);
-    $fviewer.find('#file-list').off('dblclick', dbclick);
-    $(document.body).off('click', () => {
+    $(document.body).off('click scroll resize', () => {
         $cmenu.css({
             display: "none"
         });
@@ -485,14 +483,10 @@ fileViewerCleanUp = () => {
             display: "none"
         })
     });
-    $(window).off('resize', () => {
-        hidedetails();
-        $cmenu.css({
-            display: "none"
-        })
-    });
-    $fviewer.find('#file-list').off('mouseenter', '.items', startItemPreview);
-    $fviewer.find('#file-list').off('mouseleave', '.items', stopItemPreview);
+    $flist.off('click', '.items', itemClick);
+    $flist.off('dblclick', dbclick);
+    $flist.off('mouseenter', '.items', startItemPreview);
+    $flist.off('mouseleave', '.items', stopItemPreview);
 }
 
 fileViewerInit = () => {
@@ -501,10 +495,8 @@ fileViewerInit = () => {
         $(document).on('keypress', jumpToFile);
         $('.openDir').on('click', openDir);
         $('.tool-folderUp').on('click', returnFolder);
-        $fviewer.find('#file-list').on('click', '.items', itemClick);
-        $fviewer.find('#file-list').on('dblclick', dbclick);
         $(document).on('keydown', keyboardHandler);
-        $(document.body).on('click', () => {
+        $(document.body).on('click scroll resize', () => {
             $cmenu.css({
                 display: "none"
             });
@@ -515,13 +507,11 @@ fileViewerInit = () => {
                 display: "none"
             })
         });
-        $(window).on('resize', () => {
-            hidedetails();
-            $cmenu.css({
-                display: "none"
-            })
-        });
-        $fviewer.find('#file-list').on('mouseenter', '.items', startItemPreview);
-        $fviewer.find('#file-list').on('mouseleave', '.items', stopItemPreview);
+
+        $flist.on('click', '.items', itemClick);
+        $flist.on('dblclick', dbclick);
+        $flist.on('mouseenter', '.items', startItemPreview);
+        $flist.on('mouseleave', '.items', stopItemPreview);
+        loadList('current-list', [], true);
     }
 }
