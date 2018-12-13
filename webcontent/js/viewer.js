@@ -218,11 +218,8 @@ compressFile = async () => {
             imgViewerInit();
             currentDir = currentFile.dir;
             toggleView(2);
-            if (filesList.length == 0) {
-                filesList = WinDrive.ListFiles(currentDir, compressFilter)
-                    .map((vid) => { return { Name: vid.FileName } });
-            }
-            fileN = filesList.indexOf(currentFile.Name);
+            reloadList(compressFilter);
+            fileN = filesList.findIndex(f => f.Name === currentFile.Name);
             LoadNextImage = true;
             return true;
         }

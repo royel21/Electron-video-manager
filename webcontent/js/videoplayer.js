@@ -238,13 +238,10 @@ initPlayer = (v) => {
         player.muted = btnMuted.checked = config.isMuted;
         player.volume = volcontrol.value = config.volume;
         currentDir = v.folder.Name;
-        
-        toggleView(3);
 
-        if (filesList.length == 0) {
-            filesList = WinDrive.ListFiles(currentDir, videoFilter)
-                .map((vid) => { return { Name: vid.FileName } });
-        }
+        toggleView(3);
+        reloadList(videoFilter);
+        $(window).trigger('resize');
     }
     videoIndex = filesList.findIndex(f => f.Name == v.Name);
     playVideo(v);

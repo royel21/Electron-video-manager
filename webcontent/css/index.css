@@ -178,21 +178,24 @@ body,
 
 .item-file img {
     max-width: 180px;
-    max-height: 180px;
+    max-height: 170px;
 }
 
 .item-cover {
     display: flex;
     justify-content: center;
     align-items: center;
-    min-height: 150px;
+    height: 170px;
+    margin: 6px 0;
+}
+.item-cover img{
     pointer-events: none;
+    
 }
 .item-name{
     position: relative;
     text-align: center;
     pointer-events: none;
-    /* word-wrap: break-word; */
 }
 .item-name span {
     top: 0;

@@ -57,11 +57,11 @@
                     <input id="tab-recent" name="list-tab" type="radio" class="d-none">
                     <label class="nav-link" for="tab-recent">Recents</label>
                 </span>
-                <span>
+                <span class="nav-item">
                     <input id="tab-files" name="list-tab" type="radio" class="d-none">
                     <label class="nav-link" for="tab-files">Files</label>
                 </span>
-                <span>
+                <span class="nav-item">
                     <input id="tab-favorite" name="list-tab" type="radio" class="d-none">
                     <label class="nav-link" for="tab-favorite">
                         <i class="fa fa-star"></i>
@@ -76,6 +76,7 @@
                             <li class="list-item-empty list-group-item">Not Files Found</li>
                         </ul>
                     </div>
+                    <span id="file-count"></span>
                 </div>
                 <div id="recent" class="tab-content d-none">
                     <div class="list-file-content">
@@ -241,8 +242,12 @@
                         </div>
                     </div>
                     <div id="img-content">
-                        <img id="myimg">
-                        <img id="temp-img">
+                        <div>
+                            <img id="myimg">
+                        </div>
+                        <div>
+                            <img id="temp-img">
+                        </div>
                     </div>
                     <span id="page-n2">Page:
                         <span class="pages"></span>
@@ -347,12 +352,12 @@
     <script src="./webcontent/js/page-animation.js"></script>
     <script src="./webcontent/js/viewer.js"></script>
     <script src="./webcontent/js/modal-config.js"></script>
-    <script src="./webcontent/js/lists.js"></script>
     <script src="./webcontent/js/list-recents.js"></script>
     <script src="./webcontent/js/list-favorites.js"></script>
     <script src="./webcontent/js/list-files.js"></script>
     <script src="./webcontent/js/list-scan-folder.js"></script>
     <script src="./webcontent/js/modal-search.js"></script>
+    <script src="./webcontent/js/lists.js"></script>
     <script src="./webcontent/js/filehelpers.js"></script>
     <script src="./webcontent/js/index.js"></script>
     <script src="./webcontent/js/popup.js"></script>

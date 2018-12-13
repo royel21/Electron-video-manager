@@ -24,26 +24,26 @@ deleteFile = (file, showloading) => {
 }
 
 
-selectItem = (index) => {
+selectItem = async (index) => {
     selectedIndex = index;
     var nextEl = $('.items').get(index);
     var tout = setTimeout(() => {
         if (nextEl != undefined) {
-            if (nextEl.offsetTop < contentScroll.scrollTop) {
-                contentScroll.scroll({
-                    top: nextEl.offsetTop - 45,
-                    behavior: 'auto'
-                });
+            var scroll = contentScroll.scrollTop, elofft = nextEl.offsetTop;
+
+            if (elofft - scroll + 1 < -1) {
+                scroll = elofft;
             }
-            var top = nextEl.offsetTop + nextEl.offsetHeight;
-            var sctop = contentScroll.scrollTop + contentScroll.offsetHeight - 45;
-            var dif = top - sctop;
-            if (top > sctop + 2) {
-                contentScroll.scroll({
-                    top: contentScroll.scrollTop + dif,
-                    behavior: 'auto'
-                });
+
+            var top = elofft + nextEl.offsetHeight;
+            var sctop = scroll + contentScroll.offsetHeight;
+            if (top - sctop + 1 > 0) {
+                scroll = scroll + (top - sctop);
             }
+            contentScroll.scroll({
+                top: scroll,
+                behavior: 'auto'
+            });
             nextEl.focus();
         }
         clearTimeout(tout);

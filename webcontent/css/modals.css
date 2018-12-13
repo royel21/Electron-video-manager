@@ -26,6 +26,7 @@
 
 .tab-content {
     height: calc(100% - 2px);
+    position: relative;
 }
 
 .list-group-item {
@@ -114,7 +115,7 @@
 }
 
 .modal span i {
-    font-size: 25px;
+    font-size: 24px;
 }
 
 .btn-hide,
@@ -234,7 +235,9 @@ label {
 .modal label.active .fa-star {
     color: yellow;
 }
-
+.modal label{
+    padding-bottom: 6px;
+}
 #modal-search .input-group {
     pointer-events: none;
 }
@@ -298,4 +301,20 @@ label {
 
 #play-list .list-file-content{
     height: 100%
+}
+
+#file-count{
+    display: inline-block;
+    position: absolute;
+    right: 5px;
+    bottom: 5px;
+    border-radius: 50%;
+    background-color: grey;
+    height: 35px;
+    width: 40px;
+    text-align: center;
+    line-height: 2.5;
+    pointer-events: none;
+    z-index: 10;
+    opacity: .75;
 }

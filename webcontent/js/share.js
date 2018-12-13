@@ -22,14 +22,13 @@ var currentView = 1;
 var currentDir = "";
 var currentFile;
 window.onbeforeunload = (e) => {
-    // if (savePlayerConfig != undefined) savePlayerConfig();
-    // local.setObject('config', config);
+    local.setObject('config', config);
 }
 
-ipcRenderer.on('save-file',(e)=>{
+ipcRenderer.on('save-file', (e) => {
     local.setObject('config', config);
-    updateFile(currentFile).then(()=>{
-        ipcRenderer.send('close',currentFile);
+    updateFile(currentFile).then(() => {
+        ipcRenderer.send('close', currentFile);
     });
 });
 
@@ -46,7 +45,22 @@ if (local.hasObject('config')) {
 toggleView = (view) => {
     currentView = view;
     $('body').attr("viewer", view);
-    view === 1 ? fileViewerInit() : fileViewerCleanUp();
+    if (view === 1) {
+        fileViewerInit();
+        filesList = allFiles;
+        loadList('current-list', []);
+    } else {
+        fileViewerCleanUp();
+    }
+}
+
+reloadList = (filter) => {
+    if (filesList.length == 0) {
+        filesList = WinDrive.ListFiles(currentDir, filter)
+            .map((f) => { return { Name: f.FileName } });
+    }
+    if ($('#current-list li').length < 2)
+        loadList('current-list', filesList, true);
 }
 
 processFile = (name) => {
@@ -65,7 +79,7 @@ processFile = (name) => {
                         Name: currentDir
                     }
                 };
-                
+
                 if (compressFilter.includes(ex)) {
                     if (currentView == 3) playerCleanUp();
                     loadZip(f);
@@ -165,18 +179,18 @@ updateItemProgress = (file) => {
                 if (videoFilter.includes($item.data('ex'))) {
                     current = formatTime(current);
                     total = formatTime(total);
-                }else{
+                } else {
                     current++;
                 }
-                $itemf.find('.file-page').attr('data-pages', current+'/'+total);
-                
-                if (current + 1 >= total){
+                $itemf.find('.file-page').attr('data-pages', current + '/' + total);
+
+                if (current + 1 >= total) {
                     $itemf.find('.file-page').removeClass('bg-danger').addClass('bg-primary');
-                }else{
+                } else {
                     $itemf.find('.file-page').removeClass('bg-primary').addClass('bg-danger');
                 }
-               
-                   
+
+
             }
             index = $('.items').index($item[0]);
         }
@@ -208,6 +222,7 @@ consumeEvent = (e) => {
     e.stopPropagation();
     e.cancelBubble = true;
 }
+
 dropFile = function (e) {
     if (e.dataTransfer.files.length > 0) {
         var f = e.dataTransfer.files[0];

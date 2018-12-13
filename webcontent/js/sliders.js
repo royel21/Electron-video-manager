@@ -43,7 +43,7 @@ class SliderRange {
             if (this.onPreview) {
                 var newPos = Math.floor(ev.pageX - this.getOffset());
                 var current = Number(newPos.map(-10, this.offsetW(), this.min, this.max).toFixed(2));
-                this.$slider.find('.rc-preview').css({ display: "block", left: newPos - 37 });
+                this.$slider.find('.rc-preview').css({ display: "block", left: newPos - 65 });
                 this.onPreview(current < this.min ? this.min : current > this.max ? this.max : current);
             }
         });

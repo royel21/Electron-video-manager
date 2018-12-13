@@ -8,6 +8,8 @@ var offset = {
 var isPressed = false;
 var zindex = 100;
 
+getMoveDif = () => currentView === 3 ? 69 : 46;
+
 $('body').on('mousedown', '.move', (e) => {
     if ($(e.target).hasClass('move')) {
         modal = $(e.target).closest('.modal')[0];
@@ -28,16 +30,16 @@ function moveEl(el, left, top, w, h) {
         left = 1;
     }
 
-    if (left + w + 2 > $(window).width()) {
-        left = $(window).width() - w - 2;
+    if (left + w + 3 > $(window).width()) {
+        left = $(window).width() - w - 3;
     }
 
     if (top < 44) {
         top = 46;
     }
 
-    if ((top + h + 44) > $(window).height()) {
-        top = $(window).height() - h - 46;
+    if ((top + h + getMoveDif()) > $(window).height()) {
+        top = $(window).height() - h - getMoveDif();
     }
     el.style.left = left + 'px';
     el.style.top = top + 'px';

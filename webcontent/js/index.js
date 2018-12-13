@@ -18,6 +18,9 @@ var currentDir = "";
 var $loading = $('#folder-reloading');
 var setUp = true;
 var totalToConvert = 0;
+var colNum = 0;
+
+
 ipcRenderer.on('thumb-create', (event, name, isVideo) => {
     totalToConvert--;
     $('#conv-progress').text(totalToConvert + '/' + backgroundImage.length);
@@ -212,8 +215,8 @@ keyboardHandler = (e) => {
                 {
                     if (e.ctrlKey) {
                         returnFolder();
-                    } else if (selectedIndex - calCol() >= 0) {
-                        selectItem(selectedIndex - calCol());
+                    } else if (selectedIndex - colNum >= 0) {
+                        selectItem(selectedIndex - colNum);
                     }
                     wasProcesed = true;
                     break;
@@ -233,8 +236,8 @@ keyboardHandler = (e) => {
 
             case 40:
                 {
-                    if (selectedIndex + calCol() < totalitem) {
-                        selectItem(selectedIndex + calCol());
+                    if (selectedIndex + colNum < totalitem) {
+                        selectItem(selectedIndex + colNum);
                     }
                     wasProcesed = true;
                     break;
@@ -253,6 +256,7 @@ keyboardHandler = (e) => {
 
         if (wasProcesed) {
             consumeEvent(e);
+            e.preventDefault();
         }
     }
 }
@@ -340,7 +344,6 @@ goToRoots = async () => {
         }, ico));
     });
     $filescount.empty().append('Files: ' + totalitem);
-    calCol();
     var item = $('.items').toArray().filter((t) => {
         return $(t).attr('data-name') === dir
     });
@@ -352,15 +355,7 @@ goToRoots = async () => {
 
 $('#btn-home').click(goToRoots);
 
-calCol = () => {
-    if ($('#file-list').length !== 0) {
-        var winW = window.innerWidth;
-        var itemW = $('#file-list').children().get(0).offsetWidth + 10;
-        var row = parseInt(winW / (itemW));
-        return row;
-    }
-    return 0;
-}
+calCol = () => colNum = Math.floor((window.innerWidth - 25) / ($('.items').eq(0).width()));
 
 $(() => {
 
@@ -472,21 +467,15 @@ fileViewerCleanUp = () => {
     $(document).off('keypress', jumpToFile);
     $('.openDir').off('click', openDir);
     $('.tool-folderUp').off('click', returnFolder);
-    $(document.body).off('click scroll resize', () => {
-        $cmenu.css({
-            display: "none"
-        });
-    });
+    $(window).off('resize', calCol);
     $(contentScroll).off('scroll', () => {
         hidedetails();
-        $cmenu.css({
-            display: "none"
-        })
+        $cmenu.css({ display: "none" });
     });
     $flist.off('click', '.items', itemClick);
     $flist.off('dblclick', dbclick);
-    $flist.off('mouseenter', '.items', startItemPreview);
-    $flist.off('mouseleave', '.items', stopItemPreview);
+    $flist.off('mouseenter', '.item-cover span', startItemPreview);
+    $flist.off('mouseleave', '.item-cover span', stopItemPreview);
 }
 
 fileViewerInit = () => {
@@ -496,22 +485,16 @@ fileViewerInit = () => {
         $('.openDir').on('click', openDir);
         $('.tool-folderUp').on('click', returnFolder);
         $(document).on('keydown', keyboardHandler);
-        $(document.body).on('click scroll resize', () => {
-            $cmenu.css({
-                display: "none"
-            });
-        });
+        $(window).on('resize', calCol);
         $(contentScroll).on('scroll', () => {
             hidedetails();
-            $cmenu.css({
-                display: "none"
-            })
+            $cmenu.css({ display: "none" });
         });
-
         $flist.on('click', '.items', itemClick);
         $flist.on('dblclick', dbclick);
-        $flist.on('mouseenter', '.items', startItemPreview);
-        $flist.on('mouseleave', '.items', stopItemPreview);
+        $flist.on('mouseenter', '.item-cover span', startItemPreview);
+        $flist.on('mouseleave', '.item-cover span', stopItemPreview);
         loadList('current-list', [], true);
+        calCol();
     }
 }

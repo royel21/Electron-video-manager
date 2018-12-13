@@ -3,11 +3,13 @@ var $list_modal = $('.modal-list-file');
 
 $('.list-file-show').click((event) => {
     $list_modal.addClass('show-modal');
+    $(window).trigger('resize');
 });
 
-$('#list-file-hide').click(() => {
+$('#list-file-hide').click((e) => {
     $list_modal.removeClass('show-modal');
     hideCreateFav($fav_dialog);
+    consumeEvent(e);
 });
 
 $list_modal.on('dblclick', '#delete-list', consumeEvent);
@@ -35,16 +37,6 @@ processRow = (event) => {
     }
 }
 
-loadCurrentList = () => {
-    // var filter = compressFilter : videoFilter;
-    // if (filesList.length == 0) {
-    //     filesList = WinDrive.ListFiles(currentDir, currentView == 2 ? compressFilter : videoFilter)
-    //         .map((vid) => { return { Name: vid.FileName } });
-    // } else {
-    //     filesList = listofFile.filter(f => filter.includes(f.Name.split('.').pop()));
-    // }
-}
-
 $list_modal.on('dblclick', 'ul li', processRow);
 
 
@@ -61,6 +53,9 @@ function loadList(listName, list, isFile) {
     newList.append(documentFragment);
     if (!"list-recent".includes(listName) && isFile) {
         listofFile = list.map(a => { return { Name: a.Name } });
+    }
+    if(listName.includes('current')){
+        $('#file-count').text(listofFile.length);
     }
 }
 
@@ -87,6 +82,7 @@ $('#list-file-header input').change(event => {
     switch (listId) {
         case "recent":
             {
+
                 loadRecent();
                 break;
             }
@@ -103,13 +99,14 @@ $('#list-file-header input').change(event => {
                 break;
             }
         case "play-list": {
-            loadList('current-list', filesList, true);
+            if (currentView > 1 && $('#' + listId).find('li').length < 2) {
+                loadList('current-list', filesList, true);
+            }
         }
     }
 });
 
-
-$list_modal.on('keydown', 'ul li', (event) => {
+$('.list-file-content').on('keydown','li', (event) => {
     var $row = $(event.target);
     switch (event.keyCode) {
         case 13:
@@ -131,6 +128,7 @@ $list_modal.on('keydown', 'ul li', (event) => {
                 } else {
                     $row.prev().focus();
                 }
+                event.preventDefault();
                 break;
             }
 
@@ -147,7 +145,12 @@ $list_modal.on('keydown', 'ul li', (event) => {
                 } else {
                     $row.next().focus();
                 }
+                event.preventDefault();
                 break;
             }
     }
 });
+
+$('.tool-config .sub-tools').click((e)=>{
+   $('.tool-config input').prop( "checked", false );
+})
