@@ -92,8 +92,8 @@ File.findOrCreateNew = (file) => {
                 Size: file.Size
             }).then(f => {
                 resolve(f);
-            });
-        });
+            }).catch(err=>{console.log(err)});
+        }).catch(err=>{console.log(err)});
     });
 }
 

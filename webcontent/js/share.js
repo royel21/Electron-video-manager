@@ -128,7 +128,7 @@ var mouseTimer = null;
 showCursor = () => {
     $('.footer').removeClass('hide-footer');
     $('#file-name').removeClass('d-none');
-    $('.v-vol').removeClass('vol-show');
+    // $('.v-vol').removeClass('vol-show');
     $(document.body).css({
         cursor: "default"
     });
@@ -146,7 +146,7 @@ hideFooter = () => {
                     cursor: "default"
                 });
             } else {
-                $('.v-vol').addClass('vol-show');
+                // $('.v-vol').addClass('vol-show');
                 $('.footer').addClass("hide-footer");
                 $(document.body).css({
                     cursor: "none"
@@ -205,7 +205,7 @@ updateFile = async (file) => {
 }
 
 updateRecents = () => {
-    let tempM = config.recents.removeByName(currentFile);
+    let tempM = config.recents.removeById(currentFile);
     if (tempM != undefined) currentFile = tempM;
 
     config.recents.unshift(currentFile);

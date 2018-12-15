@@ -87,16 +87,6 @@ Array.prototype.removeById = function (obj) {
     }
 }
 
-
-Array.prototype.removeByName = function (obj) {
-    var i = this.length;
-    while (i--) {
-        if (this[i] instanceof Object && this[i].Name.toUpperCase().localeCompare(obj.Name.toUpperCase()) == 0) {
-            return this.splice(i, 1)[0];
-        }
-    }
-}
-
 Object.defineProperty(Array.prototype, "last", {
     get: function () {
         return this[this.length - 1];

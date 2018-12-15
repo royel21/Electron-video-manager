@@ -38,6 +38,10 @@ function imageViewerCleanUp() {
         $('#next-img').off('click', nextImg);
         $('#next-file').off('click', nextFile);
         $('#backtofilelist').off('click', backToFileBrowser);
+        $viewer.on('mousedown', event => {
+            event.which === 1 ? nextImg() : prevImg();
+            $viewer.focus();
+        })
     }
 }
 
@@ -163,12 +167,10 @@ function loadZip(file) {
     compressFile().then(result => {
         if (result) {
             if (file.Current == undefined) {
-                var tempFile = WinDrive.ListFiles(currentFile.dir, [], true)[0];
+                var tempFile = WinDrive.ListFiles(path.join(currentFile.dir, currentFile.Name), [], true)[0];
                 tempFile.Total = totalPage;
                 tempFile.DirName = currentDir;
-                db.File.findOrCreateNew(tempFile).then(f => {
-                    loadingNext = false;
-                });
+                db.File.findOrCreateNew(tempFile);
             }
             updateRecents();
             loadingNext = false;
@@ -213,13 +215,13 @@ compressFile = async () => {
             $('#loadingDiv').addClass('d-none');
             $('.title').text(currentFile.Name);
 
-            setUpRange();
-            viewImage(currentFile.Current);
             imgViewerInit();
             currentDir = currentFile.dir;
             toggleView(2);
             reloadList(compressFilter);
             fileN = filesList.findIndex(f => f.Name === currentFile.Name);
+            setUpRange();
+            viewImage(currentFile.Current);
             LoadNextImage = true;
             return true;
         }
@@ -231,28 +233,33 @@ compressFile = async () => {
 
 /*******************Compress File**************************************/
 /***********************************************************/
-function loadImage(fname) {
+function loadImage(file) {
+    currentFile = {
+        Name: file,
+        dir: currentDir
+    };
     isImage = true;
-    viewerImg.src = path.join(currentDir, fname) + '?x=' + getRandomNum();
-    $('.title').text(path.join(currentDir, fname));
-    currentFile.Current = fileN = filesList.indexOf(fname);
+    viewerImg.src = path.join(currentDir, file) + '?x=' + getRandomNum();
+    $('.title').text(currentDir);
+    currentFile.Current = fileN = filesList.findIndex(f => f.Name === currentFile.Name);
     totalPage = filesList.length;
+    imgViewerInit();
     toggleView(2);
+    setUpRange();
+    reloadList(compressFilter);
+    LoadNextImage = true;
 }
 
 /***********************************************************/
 function showImage(pn) {
     LoadNextImage = false;
-    if (isImage === false) {
+    if (!isImage) {
         tempImg.src = getImage(pn);
     } else {
         fileN = pn;
         tempImg.src = path.join(currentDir, filesList[pn].Name) + '?x=' + getRandomNum();
         $('.title').text(path.join(currentDir, filesList[pn].Name));
     }
-
-    $filescount.text('Files: ' + (fileN + 1) + '/' + filesList.length);
-    $('.pages').text(String(currentFile.Current + 1).padStart(totalPage > 99 ? 3 : 2, '0') + "/" + totalPage);
 }
 
 getImage = function (pn) {
@@ -264,14 +271,6 @@ getImage = function (pn) {
             rar.ExtractFile(entry)).toString('base64');
     return img
 }
-
-/******************************************************/
-$viewer.mousedown(event => {
-    event.which === 1 ? nextImg() : prevImg();
-    $viewer.focus();
-});
-
-/******************************************************/
 
 async function backToFileBrowser() {
     imageViewerCleanUp();
@@ -341,5 +340,10 @@ imgViewerInit = () => {
         $('#next-file').on('click', nextFile);
         $('#backtofilelist').on('click', backToFileBrowser);
         $(document).on('keydown', ViewerKeyUp);
+        /******************************************************/
+        $viewer.on('mousedown', event => {
+            event.which === 1 ? nextImg() : prevImg();
+            $viewer.focus();
+        })
     }
 }

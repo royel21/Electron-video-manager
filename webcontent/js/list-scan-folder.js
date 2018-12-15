@@ -29,10 +29,12 @@ $('#scan-list-show').click((e) => {
                             dir: dir[0]
                         }]
                     });
+
                     $('#scan-list').append(template('./template/folder-row.html', {
                         id,
                         dir: dir[0]
                     }));
+                    $('#folder-reloading .fa-database').removeClass('d-none');
                 }
             }
         });

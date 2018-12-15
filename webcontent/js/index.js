@@ -326,6 +326,10 @@ $('#tool-folderNext').click(() => {
 });
 
 goToRoots = async () => {
+    if(currentView > 1){
+        imageViewerCleanUp();
+        playerCleanUp();
+    }
     $('.title').text("Home");
     var diskIcon = './webcontent/image/hard-disk-256.png'
     $('#file-list').empty();
@@ -351,6 +355,8 @@ goToRoots = async () => {
     localStorage.setItem('currentDir', '');
     lazyLoad();
     toggleView(1);
+    filesList = [];
+    currentDir = "";
 }
 
 $('#btn-home').click(goToRoots);

@@ -3,6 +3,9 @@ updatePageNum = () => {
     if(currentFile !== undefined)
     imageSlider.value = currentFile.Current;
     LoadNextImage = true;
+    $filescount.text('Files: ' + (fileN + 1) + '/' + filesList.length);
+    $('.pages').text(String(currentFile.Current + 1).padStart(totalPage > 99 ? 3 : 2, '0') + "/" + totalPage);
+
 }
 
 noneAnimation = () => {

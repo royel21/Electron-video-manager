@@ -1,4 +1,4 @@
-var modalconfig;
+
 isViewer = () => currentView === 1;
 
 sortFileBy = (a, b) => {
@@ -64,18 +64,16 @@ sortElements = () => {
 
 showConfigModal = (e) => {
 
-    if (modalconfig == undefined) {
-        modalconfig = $(template('./template/modal-config.html', { isViewer: isViewer() ? "d-none" : "", isfilebrowser: isViewer() ? "" : "d-none" }));
+    let $modalconfig = $(template('./template/modal-config.html', { isViewer: isViewer() ? "d-none" : "", isfilebrowser: isViewer() ? "" : "d-none" }));
 
-        $('.content').prepend(modalconfig);
-        modalconfig.find('#modal-close').click(() => {
-            hideModal(modalconfig);
-            modalconfig = undefined;
-        });
-    };
+    $('.content').prepend($modalconfig);
+    $modalconfig.find('#modal-close').click(() => {
+        hideModal($modalconfig);
+        $modalconfig = undefined;
+    });
     if (!isViewer()) {
         //Animation Selection
-        var $animSelect = modalconfig.find('#anim-select');
+        var $animSelect = $modalconfig.find('#anim-select');
         for (var key in pgAnimation) {
             $animSelect.append($(`<option value="${key}" ${key == config.pageAnimation ? "Selected" : ""}>${key}</option>"`));
         }
@@ -83,31 +81,32 @@ showConfigModal = (e) => {
             config.pageAnimation = $animSelect.val();
         });
         /*************Animation Duration in ms***********************/
-        var $animDuration = modalconfig.find('#anim-duration');
+        var $animDuration = $modalconfig.find('#anim-duration');
         $animDuration.val(config.animDuration);
         $animDuration.change((e) => {
             config.animDuration = e.target.value;
         });
-        
-        
-        const imgScaleW = document.getElementById('scale-img-w');
-        imgScaleW.onchane = function () {
+
+
+        const imgScaleW = $modalconfig.find('#scale-img-w')[0];
+        imgScaleW.oninput = function () {
             config.imgScale = this.value;
             $('#img-content img').css("transform", "scaleX(" + config.imgScale + ")");
         }
-
+        
         imgScaleW.value = config.imgScale;
+        console.log("test",imgScaleW);
 
     } else {
 
-        var $sortSelect = modalconfig.find('#sort-select');
-        
+        var $sortSelect = $modalconfig.find('#sort-select');
+
         $sortSelect.change(e => {
             config.sortBy = $sortSelect.val();
             sortElements();
         });
     }
-    positionModal(e, modalconfig);
+    positionModal(e, $modalconfig);
 }
 
 hideModal = function ($modal) {

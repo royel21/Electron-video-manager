@@ -30,7 +30,7 @@ $('#v-prev').click(() => {
 });
 
 playerCleanUp = async () => {
-    updateFile(currentFile);
+    updateItemProgress(currentFile);
     $(window).off('wheel', wheelScroll);
     $(document).off('keydown', playerKeyHandler);
 
@@ -50,7 +50,6 @@ $('#v-exit-to-fb').click(returnToFb);
 
 playVideo = async (v) => {
     updateItemProgress(currentFile);
-    updateFile(currentFile);
     var videoDir = v.folder.Name;
     var video = path.join(videoDir, v.Name.replace('#', '%23'));
 
