@@ -8,16 +8,17 @@ class SliderRange {
         this.$element = $(el);
         this.isSliderThumbPressed = false;
         this.$slider = $(`<div id="-${new Date().getTime()}" class="rc-slider">
-                <div class="rc-track">
-                    <div class="rc-progress"></div>
-                </div>
-                <span class="rc-thumb"></span>
-                <span class="rc-preview" data-title="00:00">
-                    <span class="rc-preview-content"></span>
-                    <div><span class="rc-preview-title"></div>
-                    <span class="rc-preview-arrow">
-                    </span>
-                </span></div>`);
+                    <div class="rc-track">
+                        <div class="rc-progress"></div>
+                        <span class="rc-thumb"></span>
+                        <span class="rc-preview" data-title="00:00">
+                        <span class="rc-preview-content">
+                        </span>
+                            <div><span class="rc-preview-title"></div>
+                            <span class="rc-preview-arrow"></span>
+                        </span>
+                    </div>
+                </div>`);
 
         this.$element.empty().append(this.$slider);
 
@@ -41,24 +42,27 @@ class SliderRange {
 
         this.$slider.find('.rc-track').on('mousemove', (ev) => {
             if (this.onPreview) {
-                var newPos = Math.floor(ev.pageX - this.getOffset());
-                var current = Number(newPos.map(-10, this.offsetW(), this.min, this.max).toFixed(2));
-                this.$slider.find('.rc-preview').css({ display: "block", left: newPos - 65 });
-                this.onPreview(current < this.min ? this.min : current > this.max ? this.max : current);
+                var newPos = Math.floor(ev.pageX - this.getOffset())+13;
+                
+                var current = Number(newPos.map(0, this.$slider.width(), this.min, this.max).toFixed(2));
+                var pos = newPos.map(0, this.$slider.width(), 0, 100).toFixed(0);
+                
+                this.$slider.find('.rc-preview').css({
+                    left: `calc(${pos < 0 ? 0 : pos > 100 ? 100 : pos}% - 80px)`
+                });
+               
+                this.onPreview(this.validateValue(current));
             }
         });
 
-        this.$slider.mouseleave(() => this.$slider.find('.rc-preview').css({ display: "none" }));
-        this.$slider.find('.rc-thumb').mouseenter(() => this.$slider.find('.rc-preview').css({ display: "none" }));
-        $(document).mouseup(() => this.isSliderThumbPressed = false);
-
-        $(window).on('resize', () => {
-            this.updatePos();
+        $(document).mouseup((e) => {
+            this.isSliderThumbPressed = false;
+            e.stopPropagation();
         });
     }
 
     getOffset() {
-        return this.$slider[0].offsetLeft + 12.5;
+        return this.$slider[0].offsetLeft + 13;
     }
 
     offsetW() {
@@ -88,8 +92,12 @@ class SliderRange {
     }
 
     set value(val) {
-        this._value = val < this.min ? this.min : val > this.max ? this.max : val;
+        this._value = this.validateValue(val);
         this.updatePos();
+    }
+
+    validateValue(val){
+        return val < this.min ? this.min : val > this.max ? this.max : val;
     }
 
     setPreviewContent(el) {
@@ -112,8 +120,9 @@ class SliderRange {
     updatePos() {
         if (typeof this._value === "number") {
             setTimeout(() => {
-                this.$slider.find('.rc-thumb').css({ left: this._value.map(this._min, this._max, -10, this.offsetW()) });
-                this.$slider.find('.rc-progress').css({ width: this._value.map(this._min, this._max, 0, 100) + "%" });
+                var pos = this._value.map(this._min, this._max, 0, 100).toFixed(2) + "%";
+                this.$slider.find('.rc-thumb')[0].style.left = `calc(${pos} - 13px)`;
+                this.$slider.find('.rc-progress')[0].style.width = pos;
             });
         }
     }

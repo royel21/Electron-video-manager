@@ -42,8 +42,9 @@ playerCleanUp = async () => {
 }
 returnToFb = () => {
     playerCleanUp();
-    toggleView(1);
-    selectItem(updateItemProgress(currentFile));
+    loadDirectory('').then(()=>{
+        selectItem(updateItemProgress(currentFile));
+    });
 }
 
 $('#v-exit-to-fb').click(returnToFb);
@@ -77,7 +78,7 @@ playVideo = async (v) => {
     player.currentTime = currentFile.Current - 0.1;
     $('.title').text(v.Name);
     updateRecents();
-    player.play().catch(e => { });
+    player.play().catch(e => {});
     if (config.paused) player.pause();
 }
 
@@ -117,57 +118,97 @@ player.onended = function () {
 }
 
 playerKeyHandler = (e) => {
-
+    var keys = config.playerkey;
     switch (e.keyCode) {
-        case 13:
+        case keys.fullscreen.keycode:
             {
-                setfullscreen();
+                if (e.ctrlKey == keys.fullscreen.isctrl)
+                    setfullscreen();
                 break;
             }
-        case 32:
+        case keys.playpause.keycode:
             {
-                player.paused ? player.play().catch(e => { }) : player.pause();
+                if (e.ctrlKey == keys.playpause.isctrl)
+                    pauseOrPlay();
                 break;
             }
-        case 37:
+        case keys.rewind.keycode:
             {
-                player.currentTime -= event.ctrlKey ? 12 : 6;
+                if (e.ctrlKey == keys.rewind.isctrl)
+                    player.currentTime -= 6;
                 break;
             }
-        case 38:
+        case keys.volumeup.keycode:
             {
-                volcontrol.value = player.volume + (event.ctrlKey ? 0.05 : 0.01);
-                player.volume = volcontrol.value;
+                if (e.ctrlKey == keys.volumeup.isctrl) {
+                    volcontrol.value = player.volume + 0.05;
+                    player.volume = volcontrol.value;
+                }
                 break;
             }
-        case 39:
+        case keys.forward.keycode:
             {
-                player.currentTime += event.ctrlKey ? 12 : 6;
+                if (e.ctrlKey == keys.forward.isctrl)
+                    player.currentTime += 6;
                 break;
             }
-        case 40:
+        case keys.volumedown.keycode:
             {
-                volcontrol.value -= Number(event.ctrlKey ? 0.05 : 0.01);
-                player.volume = volcontrol.value;
+                if (e.ctrlKey == keys.volumedown.isctrl) {
+                    volcontrol.value -= Number(0.05);
+                    player.volume = volcontrol.value;
+                }
+                break;
+            }
+        case keys.volumemute.keycode:
+            {
+                if (e.ctrlKey == keys.volumemute.isctrl) {
+                    player.muted = btnMuted.checked;
+                    config.isMuted = btnMuted.checked;
+                    $('.fa-volume-up').attr('data-title', btnMuted.checked ? "Unmute" : "Mute");
+                }
+                break;
+            }
+        case keys.nextfile.keycode:
+            {
+                if (e.ctrlKey == keys.nextfile.isctrl) {
+                    if (videoIndex < filesList.length - 1) {
+                        processFile(filesList[++videoIndex].Name);
+                    } else {
+                        returnToFb();
+                    }
+                }
+                break;
+            }
+        case keys.previousfile.keycode:
+            {
+                if (e.ctrlKey == keys.previousfile.isctrl) {
+                    if (videoIndex > 0) {
+                        processFile(filesList[--videoIndex].Name);
+                    } else {
+                        returnToFb();
+                    }
+                }
                 break;
             }
     }
 }
+
 pauseOrPlay = () => {
     var playPause = "Play";
-    if (btnPlay.checked) {
-        player.play().catch(e => { });
+    if (player.paused) {
+        player.play().catch(e => {});
     } else {
         player.pause();
         playPause = "Pause";
     }
     $('.fa-play-circle').attr('data-title', playPause);
-    config.paused = player.paused;
+    btnPlay.checked = config.paused = player.paused;
+
 }
 
 $(player).click((e) => {
     if (e.which == 1) {
-        btnPlay.checked = player.paused;
         pauseOrPlay();
     }
 });
@@ -175,6 +216,7 @@ $(player).click((e) => {
 volcontrol.oninput = (e) => {
     player.volume = volcontrol.value;
 }
+
 player.onplay = player.onpause = hideFooter;
 
 
@@ -245,3 +287,47 @@ initPlayer = (v) => {
     videoIndex = filesList.findIndex(f => f.Name == v.Name);
     playVideo(v);
 }
+
+showPlayerConfig = (e) => {
+
+    let $modalconfig = $(template('./template/modal-config.html', mconfig[currentView]));
+
+    $('.content').prepend($modalconfig);
+
+    $modalconfig.find('#v-config').on('keydown keyup keypress click', consumeEvent);
+
+    $modalconfig.find('#modal-close').click(() => {
+        hideModal($modalconfig);
+        $modalconfig = undefined;
+    });
+
+    var keyselect = $modalconfig.find('#key-select')[0];
+    var isctrl = $modalconfig.find('#isctrl')[0];
+    var keyinput = $modalconfig.find('#keyinput')[0];
+    var currentMap = keyselect.value;
+
+    keyselect.oninput = (e) => {
+        currentMap = keyselect.value;
+        keyinput.value = config.playerkey[currentMap].name;
+        isctrl.checked = config.playerkey[currentMap].isctrl;
+    }
+    keyinput.value = config.playerkey[currentMap].name;
+    keyinput.onkeyup = (e) => {
+        keyinput.value = e.keyCode == 32 ? "Space" : e.key;
+        config.playerkey[currentMap] = {
+            name: keyinput.value,
+            keycode: e.keyCode,
+            isctrl: isctrl.checked
+        }
+        consumeEvent(e);
+        e.preventDefault();
+    }
+
+    isctrl.onchange = (e)=>{
+        config.playerkey[currentMap].isctrl = isctrl.checked;
+    }
+    consumeEvent(e);
+    positionModal(e, $modalconfig);
+}
+
+$('#v-player-config').click(showPlayerConfig);

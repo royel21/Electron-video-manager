@@ -1,6 +1,3 @@
-
-isViewer = () => currentView === 1;
-
 sortFileBy = (a, b) => {
     var n1 = a.FileName.toLocaleUpperCase().replace(/[\{|\[]/g, "0");
     var n2 = b.FileName.toLocaleUpperCase().replace(/[\{|\[]/g, "0");
@@ -37,8 +34,15 @@ sortBy = (a, b) => {
     if (a.dataset != undefined || b.dataset != undefined) {
         var dataA = a.dataset;
         var dataB = b.dataset;
-        return sortFileBy({ FileName: dataA.name, Size: Number(dataA.size), LastModified: dataA.mdate },
-            { FileName: dataB.name, Size: Number(dataB.size), LastModified: dataB.mdate });
+        return sortFileBy({
+            FileName: dataA.name,
+            Size: Number(dataA.size),
+            LastModified: dataA.mdate
+        }, {
+            FileName: dataB.name,
+            Size: Number(dataB.size),
+            LastModified: dataB.mdate
+        });
     } else {
         return sortFileBy(a, b);
     }
@@ -55,56 +59,82 @@ sortElements = () => {
     items.filter((el) => !$(el).data('isfile'))
         .concat(items.filter((el) => $(el)
             .data('isfile'))).forEach(function (p, i) {
-                flist.appendChild(p);
-                fileL[i] = p.dataset.name;
-            });
+            flist.appendChild(p);
+            fileL[i] = p.dataset.name;
+        });
     filesList = fileL;
     lazyLoad();
 }
 
+var mconfig = {
+    1: {
+        isViewer: "d-none",
+        isfilebrowser: "",
+        isvideoplayer: "d-none"
+    },
+    2: {
+        isViewer: "",
+        isfilebrowser: "d-none",
+        isvideoplayer: "d-none"
+    },
+    3: {
+        isViewer: "d-none",
+        isfilebrowser: "d-none",
+        isvideoplayer: ""
+    }
+}
+
 showConfigModal = (e) => {
 
-    let $modalconfig = $(template('./template/modal-config.html', { isViewer: isViewer() ? "d-none" : "", isfilebrowser: isViewer() ? "" : "d-none" }));
+    let $modalconfig = $(template('./template/modal-config.html', mconfig[currentView]));
 
     $('.content').prepend($modalconfig);
     $modalconfig.find('#modal-close').click(() => {
         hideModal($modalconfig);
         $modalconfig = undefined;
     });
-    if (!isViewer()) {
-        //Animation Selection
-        var $animSelect = $modalconfig.find('#anim-select');
-        for (var key in pgAnimation) {
-            $animSelect.append($(`<option value="${key}" ${key == config.pageAnimation ? "Selected" : ""}>${key}</option>"`));
-        }
-        $animSelect.change(e => {
-            config.pageAnimation = $animSelect.val();
-        });
-        /*************Animation Duration in ms***********************/
-        var $animDuration = $modalconfig.find('#anim-duration');
-        $animDuration.val(config.animDuration);
-        $animDuration.change((e) => {
-            config.animDuration = e.target.value;
-        });
+    switch (currentView) {
+        case 1:
+            {
+                var $sortSelect = $modalconfig.find('#sort-select');
+
+                $sortSelect.change(e => {
+                    config.sortBy = $sortSelect.val();
+                    sortElements();
+                });
+                break;
+            }
+        case 2:
+            {
+                var $animSelect = $modalconfig.find('#anim-select');
+                for (var key in pgAnimation) {
+                    $animSelect.append($(`<option value="${key}" ${key == config.pageAnimation ? "Selected" : ""}>${key}</option>"`));
+                }
+                $animSelect.change(e => {
+                    config.pageAnimation = $animSelect.val();
+                });
+                /*************Animation Duration in ms***********************/
+                var $animDuration = $modalconfig.find('#anim-duration');
+                $animDuration.val(config.animDuration);
+                $animDuration.change((e) => {
+                    config.animDuration = e.target.value;
+                });
 
 
-        const imgScaleW = $modalconfig.find('#scale-img-w')[0];
-        imgScaleW.oninput = function () {
-            config.imgScale = this.value;
-            $('#img-content img').css("transform", "scaleX(" + config.imgScale + ")");
-        }
-        
-        imgScaleW.value = config.imgScale;
-        console.log("test",imgScaleW);
+                const imgScaleW = $modalconfig.find('#scale-img-w')[0];
+                imgScaleW.oninput = function () {
+                    config.imgScale = this.value;
+                    $('#img-content img').css("transform", "scaleX(" + config.imgScale + ")");
+                }
 
-    } else {
+                imgScaleW.value = config.imgScale;
+                break;
+            }
+        case 3:
+            {
 
-        var $sortSelect = $modalconfig.find('#sort-select');
-
-        $sortSelect.change(e => {
-            config.sortBy = $sortSelect.val();
-            sortElements();
-        });
+                break;
+            }
     }
     positionModal(e, $modalconfig);
 }
@@ -118,7 +148,7 @@ hideModal = function ($modal) {
 positionModal = (e, $modal) => {
     var pos = $(e.target).offset();
     var m = $modal[0];
-    moveEl(m, pos.left, (pos.top - m.offsetHeight - 10), $modal.width(), $modal.height());
+    moveEl(m, pos.left-($modal.width()/2), (pos.top - m.offsetHeight - 10), $modal.width(), $modal.height());
     $modal.fadeIn('slow');
 };
 

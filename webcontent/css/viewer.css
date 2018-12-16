@@ -40,6 +40,7 @@
 
 #image-seek{
     flex-grow: 1;
+    margin: 0 10px;
 }
 
 body[viewer="2"]:-webkit-full-screen #img-content{

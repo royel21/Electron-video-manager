@@ -16,7 +16,54 @@ var config = {
     isMuted: false,
     paused: true,
     hidecontrolduration: 1,
-};
+    playerkey: {
+        nextfile: {
+            name: "PageDown",
+            keycode: 34,
+            isctrl: false
+        },
+        previousfile: {
+            name: "PageDown",
+            keycode: 33,
+            isctrl: false
+        },
+        forward: {
+            name: "ArrowRight",
+            keycode: 39,
+            isctrl: false
+        },
+        rewind: {
+            name: "ArrowLeft",
+            keycode: 37,
+            isctrl: false
+        },
+        playpause: {
+            name: "Space",
+            keycode: 32,
+            isctrl: false
+        },
+        fullscreen: {
+            name: "Enter",
+            keycode: 13,
+            isctrl: false
+        },
+        volumeup: {
+            name: "ArrowUp",
+            keycode: 38,
+            isctrl: false
+        },
+        volumedown: {
+            name: "ArrowDown",
+            keycode: 40,
+            isctrl: false
+        },
+        volumemute: {
+            name: "m",
+            keycode: 77,
+            isctrl: false
+        }
+    }
+}
 
 var currentView = 1;
 var currentDir = "";
@@ -57,7 +104,11 @@ toggleView = (view) => {
 reloadList = (filter) => {
     if (filesList.length == 0) {
         filesList = WinDrive.ListFiles(currentDir, filter)
-            .map((f) => { return { Name: f.FileName } });
+            .map((f) => {
+                return {
+                    Name: f.FileName
+                }
+            });
     }
     if ($('#current-list li').length < 2)
         loadList('current-list', filesList, true);
@@ -70,8 +121,8 @@ processFile = (name) => {
         loadImage(name);
     } else {
         db.File.findByName({
-            Name: name
-        })
+                Name: name
+            })
             .then((f) => {
                 if (f == null) f = {
                     Name: name,
@@ -99,21 +150,21 @@ $('.openFile').on('click', function () {
     dialog.showOpenDialog(mainWindow, {
         title: "Select the file to open",
         filters: [{
-            name: 'All Files',
-            extensions: ['*']
-        },
-        {
-            name: 'Images',
-            extensions: ['jpg', 'png', 'gif', 'bmp']
-        },
-        {
-            name: 'Movies',
-            extensions: ['mkv', 'avi', 'mp4', 'ogg']
-        },
-        {
-            name: 'Mangas',
-            extensions: ['zip', 'rar']
-        }
+                name: 'All Files',
+                extensions: ['*']
+            },
+            {
+                name: 'Images',
+                extensions: ['jpg', 'png', 'gif', 'bmp']
+            },
+            {
+                name: 'Movies',
+                extensions: ['mkv', 'avi', 'mp4', 'ogg']
+            },
+            {
+                name: 'Mangas',
+                extensions: ['zip', 'rar']
+            }
         ],
         properties: ['openFile']
     }, function (openedFile) {
@@ -175,7 +226,8 @@ updateItemProgress = (file) => {
             $item = $('.items:textequalto(' + file.Name + ')');
             if (file.Current > 0 && !imagesFilter.includes($item.data('ex'))) {
                 let $itemf = $item.find('.item-file');
-                let current = file.Current, total = file.Total;
+                let current = file.Current,
+                    total = file.Total;
                 if (videoFilter.includes($item.data('ex'))) {
                     current = formatTime(current);
                     total = formatTime(total);
@@ -247,7 +299,7 @@ $(document).on('dragover', (e) => {
 
 $('.cancel-footer').on('mousedown click keyup keydown keypress wheel', consumeEvent);
 
-$(document).on('webkitfullscreenchange', () => {
+$(document).on('webkitfullscreenchange', (e) => {
     if (document.webkitIsFullScreen) {
         $(document).on('mousemove', hideFooter);
         hideFooter();

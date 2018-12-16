@@ -1,9 +1,10 @@
 var listofFile = []
 var $list_modal = $('.modal-list-file');
 
-$('.list-file-show').click((event) => {
+$('.list-file-show').click((e) => {
     $list_modal.addClass('show-modal');
-    $(window).trigger('resize');
+    selectList($('#' + (currentView == 1 ? 'tab-recent' : "tab-play-list"))[0]);
+    positionModal(e, $list_modal);
 });
 
 $('#list-file-hide').click((e) => {
@@ -12,11 +13,16 @@ $('#list-file-hide').click((e) => {
     consumeEvent(e);
 });
 
-$list_modal.on('dblclick', '#delete-list', consumeEvent);
+selectListRow = (el, isCtrl) =>{ 
+    if (!isCtrl) {
+        $(el.closest('ul')).find("li").removeClass('el-selected');
+    }
+    $(el).addClass('el-selected');
+    el.focus();
+}
 
-$list_modal.on('click', 'ul li', (event) => {
-    $(event.target).focus();
-});
+$('.list-file-content').on('dblclick', '#delete-list', consumeEvent);
+$('.list-file-content').on('click', 'ul li', (e)=>{ selectListRow(e.target, e.ctrlKey)});
 
 processRow = (event) => {
     var li = event.target.closest('li');
@@ -52,9 +58,13 @@ function loadList(listName, list, isFile) {
     });
     newList.append(documentFragment);
     if (!"list-recent".includes(listName) && isFile) {
-        listofFile = list.map(a => { return { Name: a.Name } });
+        listofFile = list.map(a => {
+            return {
+                Name: a.Name
+            }
+        });
     }
-    if(listName.includes('current')){
+    if (listName.includes('current')) {
         $('#file-count').text(listofFile.length);
     }
 }
@@ -63,7 +73,7 @@ createEntry = (value, isFile) => {
     var listIcon = "&#xf07b";
     if (isFile) {
 
-        var listIcon = videoFilter.includes(value.Name.toLowerCase().split('.').pop()) ? "&#xf1c8;" : "&#xf1c6;";
+        var listIcon = videoFilter.includes(value.Name.toLowerCase().split('.').pop()) ? "&#xf03d;" : "&#xf1c6;";
     }
     var div = document.createElement('div');
     div.innerHTML = `<li id="file-${value.Id}" class="list-group-item popup-msg" data-isFile="${isFile}" data-title="${value.Name}" tabindex="0">` +
@@ -74,15 +84,20 @@ createEntry = (value, isFile) => {
 }
 
 $('#list-file-header input').change(event => {
+    selectList(event.target);
+});
+
+
+selectList = (target) => {
     $('#list-file-header label').removeClass('active');
-    $(event.target).next().addClass('active');
     $(".tab-content").addClass('d-none');
-    var listId = event.target.id.replace('tab-', '');
-    $('#' + listId).removeClass('d-none');
+    $(target).next().addClass('active');
+    var listId = target.id.replace('tab-', '');
+    var $list = $('#' + listId);
+    $list.removeClass('d-none');
     switch (listId) {
         case "recent":
             {
-
                 loadRecent();
                 break;
             }
@@ -98,16 +113,23 @@ $('#list-file-header input').change(event => {
                 loadFav();
                 break;
             }
-        case "play-list": {
-            if (currentView > 1 && $('#' + listId).find('li').length < 2) {
-                loadList('current-list', filesList, true);
+        case "play-list":
+            {
+                if (currentView > 1 && $('#' + listId).find('li').length < 2) {
+                    loadList('current-list', filesList, true);
+                }
             }
-        }
     }
-});
+    if (currentFile && listId.includes('play')) {
+        var el = $list.find('li[data-title*="' + currentFile.Name.split(" ").pop() + '"]')[0];
+        el.scrollIntoView();
+        selectListRow(el, false);
+    }
+}
 
-$('.list-file-content').on('keydown','li', (event) => {
+$('.list-file-content').on('keydown', 'li', (event) => {
     var $row = $(event.target);
+    var $list = $row.closest('ul');
     switch (event.keyCode) {
         case 13:
             {
@@ -118,15 +140,14 @@ $('.list-file-content').on('keydown','li', (event) => {
         case 38:
             {
                 if ($row.prev()[0].id == "") {
-                    var $list = $row.closest('ul');
                     if ($list[0].id == "list-files" && currentPage > 1) {
                         loadNewPage(--currentPage).then(() => {
-                            $('#list-files').find('li').get(1).focus();
+                            selectListRow($('#list-files').find('li').get(1), event.ctrlKey);
                         });
                     }
-                    $row.closest('ul').find('li').last().focus();
+                    selectListRow($row.closest('ul').find('li').last()[0], event.ctrlKey);
                 } else {
-                    $row.prev().focus();
+                    selectListRow($row.prev()[0], event.ctrlKey);
                 }
                 event.preventDefault();
                 break;
@@ -135,15 +156,14 @@ $('.list-file-content').on('keydown','li', (event) => {
         case 40:
             {
                 if ($row.next()[0] == undefined) {
-                    var $list = $row.closest('ul');
                     if ($list[0].id == "list-files" && currentPage < numberOfPages) {
                         loadNewPage(++currentPage).then(() => {
-                            $('#list-files').find('li').get(1).focus();
+                            selectListRow($('#list-files').find('li').get(1), event.ctrlKey);
                         });
                     }
-                    $list.find('li').get(1).focus();
+                    selectListRow($list.find('li').get(1), event.ctrlKey);
                 } else {
-                    $row.next().focus();
+                    selectListRow($row.next()[0], event.ctrlKey);
                 }
                 event.preventDefault();
                 break;
@@ -151,6 +171,6 @@ $('.list-file-content').on('keydown','li', (event) => {
     }
 });
 
-$('.tool-config .sub-tools').click((e)=>{
-   $('.tool-config input').prop( "checked", false );
+$('.tool-config .sub-tools').click((e) => {
+    $('.tool-config input').prop("checked", false);
 })

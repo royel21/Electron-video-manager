@@ -41,7 +41,7 @@ function imageViewerCleanUp() {
         $viewer.on('mousedown', event => {
             event.which === 1 ? nextImg() : prevImg();
             $viewer.focus();
-        })
+        });
     }
 }
 
@@ -344,6 +344,6 @@ imgViewerInit = () => {
         $viewer.on('mousedown', event => {
             event.which === 1 ? nextImg() : prevImg();
             $viewer.focus();
-        })
+        });
     }
 }

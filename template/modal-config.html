@@ -1,6 +1,6 @@
 <div id="modal-config" class="modal bg-dark card">
     <div class="dialog-header text-center move">
-        <span class="title">Configuration</span>
+        <span class="m-title">Configuration</span>
         <span id="modal-close" class="btn-hide"><i class="far fa-times-circle"></i></span>
     </div>
     <div id="modal-body">
@@ -30,7 +30,7 @@
                 <div class="input-group-prepend">
                     <div class="select-style">Sort By:</div>
                 </div>
-                <select id="sort-select" class="form-control select-list">
+                <select id="sort-select" class="form-control select-list ">
                     <option value="Name-D">&#xf15d; Name</option>
                     <option value="Name-U">&#xf15e; Name</option>
                     <option value="Date-D">&#xf162; Date</option>
@@ -38,6 +38,34 @@
                     <option value="Size-D">&#xf160; Size</option>
                     <option value="Size-U">&#xf161; Size</option>
                 </select>
+            </div>
+        </div>
+        <div id="v-config" class="card-body {isvideoplayer}">
+            <div class="input-group mt-2">
+                <div class="input-group-prepend">
+                    <div class="select-style">Function:</div>
+                </div>
+                <select id="key-select" class="form-control select-list">
+                    <option value="nextfile">&#xf061; &#xf1c8;</option>
+                    <option value="previousfile">&#xf060; &#xf1c8;</option>
+                    <option value="fullscreen">&#xf31e; Screen</option>
+                    <option value="playpause" selected>&#xf04b; &#xf337; &#xf04c;</option>
+                    <option value="volumeup">&#xf062; Volume</option>
+                    <option value="volumedown">&#xf063; Volume</option>
+                    <option value="volumemute">&#xf6a9; Volume</option>
+                    <option value="rewind">&#xf049;</option>
+                    <option value="forward">&#xf050;</option>
+                </select>
+            </div>
+            <div class="input-group mt-2">
+                <div class="input-group-prepend">
+                    <input type="checkbox" name="" id="isctrl">
+                    <label id="ctrl-check" for="isctrl" class="select-style">CTRL </label>
+                </div>
+                <div class="input-group-prepend">
+                    <label for="isctrl" class="select-style">Enter key</label>
+                </div>
+                <input type="text" name="" id="keyinput" class="form-control">
             </div>
         </div>
     </div>

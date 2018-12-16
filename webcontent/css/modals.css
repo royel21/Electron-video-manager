@@ -7,7 +7,7 @@
     display: flex;
     min-width: 350px;
     min-height: 350px;
-    height: calc(80% - 90px);
+    height: calc(480 - 90px);
     max-height: 800px;
     bottom: 46px;
     font-size: 14px;
@@ -34,6 +34,7 @@
     padding: 0.2rem 0.5rem;
     overflow: hidden;
     text-overflow: ellipsis;
+    outline: none;
 }
 
 .list-file-content {
@@ -155,8 +156,7 @@
     padding: 0.5rem;
 }
 
-.list-group-item:focus {
-    outline: none;
+.el-selected {
     opacity: 0.70;
 }
 
@@ -175,9 +175,10 @@ label {
     height: 35px !important;
 }
 
-.modal .title {
+.modal .m-title {
     pointer-events: none;
     line-height: 2.5;
+    margin-bottom: 0;
 }
 
 #folder-reloading {
@@ -235,9 +236,11 @@ label {
 .modal label.active .fa-star {
     color: yellow;
 }
-.modal label{
+
+.modal label {
     padding-bottom: 6px;
 }
+
 #modal-search .input-group {
     pointer-events: none;
 }
@@ -249,7 +252,8 @@ label {
 #modal-search #search-found {
     pointer-events: none;
 }
-
+#key-select,
+#key-select option,
 #sort-select,
 #sort-select option {
     font-weight: bold;
@@ -257,6 +261,7 @@ label {
     color: black;
 }
 
+#key-select,
 #sort-select {
     color: brown;
 }
@@ -294,16 +299,16 @@ label {
     padding: 0.5rem .6rem;
 }
 
-.modal .fa-list-ol{
+.modal .fa-list-ol {
     position: relative;
     top: 3px;
 }
 
-#play-list .list-file-content{
+#play-list .list-file-content {
     height: 100%
 }
 
-#file-count{
+#file-count {
     display: inline-block;
     position: absolute;
     right: 5px;
@@ -317,4 +322,43 @@ label {
     pointer-events: none;
     z-index: 10;
     opacity: .75;
+}
+
+
+#v-config #ctrl-check {
+    position: relative;
+    font-weight: bold;
+    font-family: Arial, Font Awesome\ 5 Free;
+    margin: 0 4px 0 0;
+    padding: 0 25px 0 5px;
+    border-radius: 3px;
+    cursor: pointer;
+}
+
+#v-config #ctrl-check:after,
+#v-config #ctrl-check:before{
+    position: absolute;
+    right: 4px;
+}
+
+#v-config #ctrl-check:before{
+    content: "\f146";
+    display: inline-block;
+}
+
+#v-config #ctrl-check:after{
+    content: "\f14a";
+    display: none;
+}
+
+#v-config input[type=checkbox]{
+    display: none;
+}
+
+#v-config #isctrl:checked + #ctrl-check:after{
+    display: inline-block;
+}
+
+#v-config #isctrl:checked + #ctrl-check:before{
+    display: none;
 }
