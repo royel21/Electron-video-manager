@@ -44,7 +44,7 @@ selectItem = async (index) => {
                 top: scroll,
                 behavior: 'auto'
             });
-            nextEl.focus();
+            $(nextEl).focus();
         }
         clearTimeout(tout);
     });

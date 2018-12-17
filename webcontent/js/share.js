@@ -94,7 +94,7 @@ toggleView = (view) => {
     $('body').attr("viewer", view);
     if (view === 1) {
         fileViewerInit();
-        filesList = allFiles;
+        filesList = [];
         loadList('current-list', []);
     } else {
         fileViewerCleanUp();
@@ -109,9 +109,8 @@ reloadList = (filter) => {
                     Name: f.FileName
                 }
             });
-    }
-    if ($('#current-list li').length < 2)
         loadList('current-list', filesList, true);
+    }
 }
 
 processFile = (name) => {
@@ -121,8 +120,8 @@ processFile = (name) => {
         loadImage(name);
     } else {
         db.File.findByName({
-                Name: name
-            })
+            Name: name
+        })
             .then((f) => {
                 if (f == null) f = {
                     Name: name,
@@ -150,21 +149,21 @@ $('.openFile').on('click', function () {
     dialog.showOpenDialog(mainWindow, {
         title: "Select the file to open",
         filters: [{
-                name: 'All Files',
-                extensions: ['*']
-            },
-            {
-                name: 'Images',
-                extensions: ['jpg', 'png', 'gif', 'bmp']
-            },
-            {
-                name: 'Movies',
-                extensions: ['mkv', 'avi', 'mp4', 'ogg']
-            },
-            {
-                name: 'Mangas',
-                extensions: ['zip', 'rar']
-            }
+            name: 'All Files',
+            extensions: ['*']
+        },
+        {
+            name: 'Images',
+            extensions: ['jpg', 'png', 'gif', 'bmp']
+        },
+        {
+            name: 'Movies',
+            extensions: ['mkv', 'avi', 'mp4', 'ogg']
+        },
+        {
+            name: 'Mangas',
+            extensions: ['zip', 'rar']
+        }
         ],
         properties: ['openFile']
     }, function (openedFile) {
@@ -257,7 +256,7 @@ updateFile = async (file) => {
 }
 
 updateRecents = () => {
-    let tempM = config.recents.removeById(currentFile);
+    let tempM = config.recents.removeBy(currentFile, "Name");
     if (tempM != undefined) currentFile = tempM;
 
     config.recents.unshift(currentFile);

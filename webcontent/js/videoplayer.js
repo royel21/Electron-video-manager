@@ -42,7 +42,7 @@ playerCleanUp = async () => {
 }
 returnToFb = () => {
     playerCleanUp();
-    loadDirectory('').then(()=>{
+    loadDirectory('').then(() => {
         selectItem(updateItemProgress(currentFile));
     });
 }
@@ -78,7 +78,7 @@ playVideo = async (v) => {
     player.currentTime = currentFile.Current - 0.1;
     $('.title').text(v.Name);
     updateRecents();
-    player.play().catch(e => {});
+    player.play().catch(e => { });
     if (config.paused) player.pause();
 }
 
@@ -197,7 +197,7 @@ playerKeyHandler = (e) => {
 pauseOrPlay = () => {
     var playPause = "Play";
     if (player.paused) {
-        player.play().catch(e => {});
+        player.play().catch(e => { });
     } else {
         player.pause();
         playPause = "Pause";
@@ -278,12 +278,12 @@ initPlayer = (v) => {
 
         player.muted = btnMuted.checked = config.isMuted;
         player.volume = volcontrol.value = config.volume;
-        currentDir = v.folder.Name;
-
         toggleView(3);
-        reloadList(videoFilter);
         $(window).trigger('resize');
     }
+    currentDir = v.folder.Name;
+    reloadList(videoFilter);
+
     videoIndex = filesList.findIndex(f => f.Name == v.Name);
     playVideo(v);
 }
@@ -323,7 +323,7 @@ showPlayerConfig = (e) => {
         e.preventDefault();
     }
 
-    isctrl.onchange = (e)=>{
+    isctrl.onchange = (e) => {
         config.playerkey[currentMap].isctrl = isctrl.checked;
     }
     consumeEvent(e);

@@ -87,6 +87,15 @@ Array.prototype.removeById = function (obj) {
     }
 }
 
+Array.prototype.removeBy = function (obj, by) {
+    var i = this.length;
+    while (i--) {
+        if (this[i] instanceof Object && this[i][by] == obj[by]) {
+            return this.splice(i, 1)[0];
+        }
+    }
+}
+
 Object.defineProperty(Array.prototype, "last", {
     get: function () {
         return this[this.length - 1];

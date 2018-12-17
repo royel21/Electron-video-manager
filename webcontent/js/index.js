@@ -1,6 +1,5 @@
 var selectedIndex = 0;
 var totalitem = 0;
-var allFiles;
 var contentScroll = $('.content').get(0);
 var processRunning = 0;
 var folderIcon = path.join('./webcontent/image/Folder.png');
@@ -34,8 +33,6 @@ ipcRenderer.on('thumb-create', (event, name, isVideo) => {
 });
 
 ipcRenderer.on('error', (event, msg) => {
-    console.log(msg);
-
     if (String(msg).includes("Scan")) {
         $loading.find('.fa-database').addClass('d-none');
     } else
@@ -138,7 +135,6 @@ loadDirectory = async (folder, id) => {
 
                 localStorage.setItem('currentDir', currentDir);
                 $filescount.text('Files: ' + totalitem);
-                filesList = allFiles = files.map(a => { return { Name: a.FileName } });
                 selectItem(selectedIndex);
             });
         }
@@ -190,7 +186,7 @@ keyboardHandler = (e) => {
 
                         if ($el.data('isfile')) {
                             processFile(name);
-                        } else {
+                         } else {
                             loadDirectory(name);
                         }
                     }
@@ -271,12 +267,10 @@ openDir = () => {
         loadDirectory('');
     }
 };
-
-dbclick = (e) => {
+dblclick = (e) => {
     if (['item-del', 'item-fav'].includes(e.target.classList[0])) return;
 
     var $item = $(e.target).closest('.items');
-
     var name = $item.data('name');
     if (name) {
         if ($item.data('isfile')) {
@@ -479,7 +473,7 @@ fileViewerCleanUp = () => {
         $cmenu.css({ display: "none" });
     });
     $flist.off('click', '.items', itemClick);
-    $flist.off('dblclick', dbclick);
+    $flist.off('dblclick', dblclick);
     $flist.off('mouseenter', '.item-cover span', startItemPreview);
     $flist.off('mouseleave', '.item-cover span', stopItemPreview);
 }
@@ -497,7 +491,7 @@ fileViewerInit = () => {
             $cmenu.css({ display: "none" });
         });
         $flist.on('click', '.items', itemClick);
-        $flist.on('dblclick', dbclick);
+        $flist.on('dblclick', dblclick);
         $flist.on('mouseenter', '.item-cover span', startItemPreview);
         $flist.on('mouseleave', '.item-cover span', stopItemPreview);
         loadList('current-list', [], true);

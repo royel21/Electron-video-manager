@@ -13,7 +13,7 @@ $('#list-file-hide').click((e) => {
     consumeEvent(e);
 });
 
-selectListRow = (el, isCtrl) =>{ 
+selectListRow = (el, isCtrl) => {
     if (!isCtrl) {
         $(el.closest('ul')).find("li").removeClass('el-selected');
     }
@@ -22,7 +22,7 @@ selectListRow = (el, isCtrl) =>{
 }
 
 $('.list-file-content').on('dblclick', '#delete-list', consumeEvent);
-$('.list-file-content').on('click', 'ul li', (e)=>{ selectListRow(e.target, e.ctrlKey)});
+$('.list-file-content').on('click', 'ul li', (e) => { selectListRow(e.target, e.ctrlKey) });
 
 processRow = (event) => {
     var li = event.target.closest('li');
@@ -33,10 +33,10 @@ processRow = (event) => {
             if (videoFilter.includes(li.dataset.title.split('.').pop()))
                 filter = videoFilter;
             filesList = listofFile.filter(f => filter.includes(f.Name.split('.').pop()));
+            loadList('current-list', filesList, true);
         }
-        loadList('current-list', filesList, true);
         processFile(li.dataset.title);
-
+        console.log(currentFile);
     } else {
         loadDirectory('', id);
         toggleView(1);
@@ -63,7 +63,10 @@ function loadList(listName, list, isFile) {
                 Name: a.Name
             }
         });
+    } else {
+       filesList = listofFile = [];
     }
+
     if (listName.includes('current')) {
         $('#file-count').text(listofFile.length);
     }
@@ -123,10 +126,9 @@ selectList = (target) => {
 
     if (currentFile && listId.includes('play')) {
         var el = $list.find('li[data-title*="' + currentFile.Name + '"]')[0];
-        if(el){
+        if (el) {
             el.scrollIntoView();
             selectListRow(el, false);
-
         }
     }
 }

@@ -24,7 +24,7 @@ function createWin() {
         transparent: true,
         frame: false,
     });
-    //win.setMenu(null);
+    win.setMenu(null);
     win.loadURL('file://' + __dirname + '/index.html');
     win.on('ready-to-show', () => {
         win.show();
@@ -55,7 +55,6 @@ function createWin() {
         }
     });
     win.openDevTools();
-    // win.setAlwaysOnTop(true);
 }
 
 ipcMain.on('console-log', (event, msg) => {

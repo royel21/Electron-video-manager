@@ -163,7 +163,7 @@ function loadZip(file) {
         Current: file.Current == undefined ? 0 : file.Current,
         Total: 0
     };
-
+    
     compressFile().then(result => {
         if (result) {
             if (file.Current == undefined) {
@@ -275,7 +275,6 @@ getImage = function (pn) {
 async function backToFileBrowser() {
     imageViewerCleanUp();
     if (WinDrive.ListFiles(currentDir).length === totalitem) {
-        filesList = allFiles;
         $filescount.text('Files: ' + totalitem);
         $('.title').text(currentDir);
     } else {
