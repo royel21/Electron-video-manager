@@ -36,7 +36,6 @@ processRow = (event) => {
             loadList('current-list', filesList, true);
         }
         processFile(li.dataset.title);
-        console.log(currentFile);
     } else {
         loadDirectory('', id);
         toggleView(1);
