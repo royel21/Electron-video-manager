@@ -120,10 +120,14 @@ selectList = (target) => {
                 }
             }
     }
+
     if (currentFile && listId.includes('play')) {
-        var el = $list.find('li[data-title*="' + currentFile.Name.split(" ").pop() + '"]')[0];
-        el.scrollIntoView();
-        selectListRow(el, false);
+        var el = $list.find('li[data-title*="' + currentFile.Name + '"]')[0];
+        if(el){
+            el.scrollIntoView();
+            selectListRow(el, false);
+
+        }
     }
 }
 
