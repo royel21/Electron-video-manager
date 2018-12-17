@@ -110,7 +110,7 @@ class SliderRange {
 
     updateValue(val) {
         var val = Number(val.map(-10, this.offsetW(), this.min, this.max).toFixed(2));
-        this._value = val < this.min ? this.min : val > this.max ? this.max : val;
+        this._value = this.validateValue(val);
         if (this.oninput) {
             this.oninput(this._value);
         }
