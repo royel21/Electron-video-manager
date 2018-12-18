@@ -1,6 +1,7 @@
 const db = require('./webcontent/models/models');
 
 var supportedFiles = ['png', 'gif', 'jpg', 'jpeg', 'webp', 'bmp', 'rar', 'zip', 'mp4', 'mkv', 'avi', 'webm', 'ogg'];
+var fileN = 0;
 
 var config = {
     recents: [],
@@ -111,6 +112,7 @@ reloadList = (filter) => {
             });
         loadList('current-list', filesList, true);
     }
+    fileN = filesList.findIndex(f => f.Name === currentFile.Name);
 }
 
 processFile = (name) => {

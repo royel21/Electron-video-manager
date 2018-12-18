@@ -7,23 +7,23 @@ var $vTotalTime = $('#v-total-time');
 
 var isPlayer = () => currentView == 3;
 var totalTime;
-var videoIndex = 0;
+var fileN = 0;
 var hour = false;
 var vDuration;
 var Slider = null;
 var update = false;
 
 $('#v-next').click(() => {
-    if (videoIndex < filesList.length - 1) {
-        processFile(filesList[++videoIndex].Name);
+    if (fileN < filesList.length - 1) {
+        processFile(filesList[++fileN].Name);
     } else {
         returnToFb();
     }
 });
 
 $('#v-prev').click(() => {
-    if (videoIndex > 0) {
-        processFile(filesList[--videoIndex].Name);
+    if (fileN > 0) {
+        processFile(filesList[--fileN].Name);
     } else {
         returnToFb();
     }
@@ -80,6 +80,8 @@ playVideo = async (v) => {
     updateRecents();
     player.play().catch(e => { });
     if (config.paused) player.pause();
+
+    reloadList(videoFilter);
 }
 
 player.onloadedmetadata = function (e) {
@@ -106,10 +108,10 @@ player.ontimeupdate = (e) => {
 }
 
 player.onended = function () {
-    if (videoIndex < filesList.length - 1) {
+    if (fileN < filesList.length - 1) {
         var waitEnd = setTimeout(() => {
             if (player.ended)
-                processFile(filesList[++videoIndex].Name);
+                processFile(filesList[++fileN].Name);
             clearTimeout(waitEnd);
         }, 3000)
     } else {
@@ -172,8 +174,8 @@ playerKeyHandler = (e) => {
         case keys.nextfile.keycode:
             {
                 if (e.ctrlKey == keys.nextfile.isctrl) {
-                    if (videoIndex < filesList.length - 1) {
-                        processFile(filesList[++videoIndex].Name);
+                    if (fileN < filesList.length - 1) {
+                        processFile(filesList[++fileN].Name);
                     } else {
                         returnToFb();
                     }
@@ -183,8 +185,8 @@ playerKeyHandler = (e) => {
         case keys.previousfile.keycode:
             {
                 if (e.ctrlKey == keys.previousfile.isctrl) {
-                    if (videoIndex > 0) {
-                        processFile(filesList[--videoIndex].Name);
+                    if (fileN > 0) {
+                        processFile(filesList[--fileN].Name);
                     } else {
                         returnToFb();
                     }
@@ -282,9 +284,6 @@ initPlayer = (v) => {
         $(window).trigger('resize');
     }
     currentDir = v.folder.Name;
-    reloadList(videoFilter);
-
-    videoIndex = filesList.findIndex(f => f.Name == v.Name);
     playVideo(v);
 }
 

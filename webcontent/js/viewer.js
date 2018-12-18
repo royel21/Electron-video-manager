@@ -12,11 +12,9 @@ const $filescount = $('.total-files');
 const $imgRange = $('#img-seek');
 /***********************************************************/
 var totalimg = [];
-var fileN = 0;
 var LoadNextImage = true;
 var loadingNext = false;
 var $viewer = $('#image-viewer');
-var $input;
 var imageSlider = null;
 var imgPrev = $('<img>')[0];
 var currentFile;
@@ -92,9 +90,9 @@ nextFile = () => {
 /***********************************************************/
 $('#page-n').on('click', function () {
 
-    if (totalPage !== 0 && $input == undefined) {
+    if (totalPage !== 0) {
         this.textContent = "";
-        $input = $(`<input type="number" value=${(currentFile.Current + 1)}
+        let $input = $(`<input type="number" value=${(currentFile.Current + 1)}
                          style="width:70px; padding:0" min=1 
                          max=${totalPage}>`).appendTo($(this)).focus();
 
@@ -223,7 +221,6 @@ compressFile = async () => {
             currentDir = currentFile.dir;
             toggleView(2);
             reloadList(compressFilter);
-            fileN = filesList.findIndex(f => f.Name === currentFile.Name);
             setUpRange();
             viewImage(currentFile.Current);
             LoadNextImage = true;
