@@ -176,6 +176,8 @@ function CreateEl(file, diskIcon) {
             if (isVideo) {
                 current = formatTime(current);
                 total = formatTime(total);
+            }else{
+                current = fav.Page+1;
             }
             page = `${current}/${total}`
         }

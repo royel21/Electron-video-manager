@@ -163,7 +163,7 @@ function loadZip(file) {
         Current: file.Current == undefined ? 0 : file.Current,
         Total: 0
     };
-    
+
     compressFile().then(result => {
         if (result) {
             if (file.Current == undefined) {
@@ -200,11 +200,15 @@ compressFile = async () => {
                 file: filePath,
                 storeEntries: true
             });
+            
             await new Promise((resolve, reject) => {
                 zip.on('ready', () => {
-                    totalimg = Object.values(zip.entries()).sort((a, b) => {
-                        return String(a.name).localeCompare(String(b.name));
-                    }).filter(imgFilter);
+                    try {
+                        totalimg = Object.values(zip.entries()).sort((a, b) => {
+                            return String(a.name).localeCompare(String(b.name));
+                        }).filter(imgFilter);
+                    } catch (err) {
+                    }
                     resolve();
                 });
             });
@@ -224,9 +228,11 @@ compressFile = async () => {
             viewImage(currentFile.Current);
             LoadNextImage = true;
             return true;
+        } else {
+            $('#loadingDiv').addClass('d-none');
+            return false;
         }
     }
-    $('#loadingDiv').addClass('d-none');
     backToFileBrowser();
     return false;
 }

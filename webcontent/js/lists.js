@@ -56,7 +56,7 @@ function loadList(listName, list, isFile) {
         documentFragment.append(createEntry(value, isFile));
     });
     newList.append(documentFragment);
-    if (!"list-recent".includes(listName) && isFile) {
+    if (!listName.includes("recent") && isFile) {
         listofFile = list.map(a => {
             return {
                 Name: a.Name
