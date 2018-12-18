@@ -13,7 +13,7 @@ $(document).mousemove((e) => {
             resizeEl.style.width = x + "px";
         }
         
-        if (y < $(window).height() - resizeEl.offsetTop - 44) {
+        if (y < $(window).height() - resizeEl.offsetTop - getMoveDif()) {
             resizeEl.style.height = y + "px";
         }
     }

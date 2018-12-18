@@ -113,6 +113,7 @@ reloadList = (filter) => {
         loadList('current-list', filesList, true);
     }
     fileN = filesList.findIndex(f => f.Name === currentFile.Name);
+    if(fileN < 0 && fileN == undefined) fileN = 0;
 }
 
 processFile = (name) => {
