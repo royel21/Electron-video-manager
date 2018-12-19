@@ -86,7 +86,7 @@
                                 folderId: f1[0].Id
                             });
                         } else {
-                            if (f.Size != file.Size) {
+                            if (f.Size === 0) {
                                 console.log(f.FileName, f.Size);
                                 console.log(file.Name,file.Size);
                                 file.updateAttributes({
@@ -94,7 +94,7 @@
                                 });
                             }
 
-                            if (file.folderId != f1[0].Id) {
+                            if (!file.folderId) {
                                 console.log(file.folderId, f1[0].Id);
                                 foundFiles.push(file);
                             }
