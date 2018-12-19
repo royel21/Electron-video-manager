@@ -1,28 +1,46 @@
 
 deleteFile = (file, showloading) => {
-    return new Promise((resolve, rejected) => {
-        dialog.showMessageBox(mainWindow, {
-            type: 'warning',
-            buttons: ['Yes', 'No'],
-            message: 'Are you sure you want to delete ' + file + ' ?',
-            checkboxLabel: 'Never ask me again',
-            checkboxChecked: false,
+    if (!config.showDeleteDialog) {
+        return new Promise((resolve, rejected) => {
+            dialog.showMessageBox(mainWindow, {
+                type: 'warning',
+                buttons: ['Yes', 'No'],
+                message: 'Are you sure you want to delete ' + file + ' ?',
+                checkboxLabel: 'Never ask me again',
+                checkboxChecked: false,
 
-        }, (resp, checkboxChecked) => {
-            if (resp === 0) {
-                if (fs.existsSync(file)) {
-                    if (showloading) $('#loadingDiv').removeClass('d-none');
-                    fs.removeSync(file);
-                    var cover = path.join("./covers", path.basename(file) + ".jpg");
-                    if (fs.existsSync(cover)) fs.removeSync(cover);
-                    if (showloading) $('#loadingDiv').addClass('d-none');
-                }
-            }
-            resolve(resp);
+            }, (resp, checkboxChecked) => {
+                config.showDeleteDialog = checkboxChecked;
+                processDelete(file, showloading);
+                resolve(resp);
+            });
         });
-    });
+    } else {
+        return new Promise((resolve, rejected) => {
+            processDelete(file, showloading);
+            resolve(0);
+        });
+    }
 }
-
+processDelete = (file, showloading) => {
+    if (fs.existsSync(file)) {
+        if (showloading) $('#loadingDiv').removeClass('d-none');
+        fs.removeSync(file);
+        if (videoFilter.includes(file.split('.').pop())) {
+            var i = 0;
+            while (i < 4) {
+                var cover = path.join("./covers/videos", path.basename(file) + i + ".png");
+                if (fs.existsSync(cover)) fs.removeSync(cover);
+                i++;
+                console.log(cover);
+            }
+        } else {
+            var cover = path.join("./covers", path.basename(file) + ".jpg");
+            if (fs.existsSync(cover)) fs.removeSync(cover);
+        }
+        if (showloading) $('#loadingDiv').addClass('d-none');
+    }
+}
 
 selectItem = async (index) => {
     selectedIndex = index;
@@ -176,8 +194,8 @@ function CreateEl(file, diskIcon) {
             if (isVideo) {
                 current = formatTime(current);
                 total = formatTime(total);
-            }else{
-                current = fav.Page+1;
+            } else {
+                current = fav.Page + 1;
             }
             page = `${current}/${total}`
         }

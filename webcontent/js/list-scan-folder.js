@@ -19,10 +19,12 @@ $('#scan-list-show').click((e) => {
                 }) == undefined) {
                     var id = 0;
                     if (config.scanFolder.length > 0) id = config.scanFolder.last.Id + 1;
+
                     config.scanFolder.push({
                         Id: id,
                         dir: dir[0]
                     });
+
                     createBackgroundWin('reload-Db', {
                         folders: [{
                             Id: id,
@@ -43,7 +45,8 @@ $('#scan-list-show').click((e) => {
             $('#folder-reloading .fa-database').removeClass('d-none');
             console.log('reload')
             createBackgroundWin('reload-Db', {
-                folders: config.scanFolder
+                folders: config.scanFolder,
+                resetDb: true
             });
         });
 

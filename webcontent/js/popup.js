@@ -7,10 +7,22 @@ popupHide = (event) => {
     $popup.removeClass('popup-top');
 }
 
-popupShow = (event) => {
+popupShow = async (event) => {
     if ($(event.target).hasClass('popup-msg')) {
         var rect = event.target.getBoundingClientRect();
         var msg = event.target.dataset.title;
+        var li = $(event.target).closest('li')[0];
+        if (li != undefined) {
+            var file = await db.File.findOne({
+                where: {
+                    Id: li.id.replace('file-', '')
+                },
+                include: { model: db.Folder }
+            });
+            if (file) {
+                msg = path.join(file.folder.Name, file.Name);
+            }
+        }
         $popup.css({
             display: "block",
             top: -3000,

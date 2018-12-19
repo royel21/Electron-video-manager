@@ -49,8 +49,7 @@ const File = db.define('files', {
         autoIncrement: true
     },
     Name: {
-        type: Sequelize.STRING,
-        unique: true
+        type: Sequelize.STRING
     },
     Current: {
         type: Sequelize.INTEGER(5).UNSIGNED,

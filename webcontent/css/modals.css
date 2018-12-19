@@ -362,3 +362,8 @@ label {
 #v-config #isctrl:checked + #ctrl-check:before{
     display: none;
 }
+
+.modal label.active .fa-database{
+    color: lightgray;
+    text-shadow: 0 0 5px rgba(0, 0, 0, 0.6)
+}

@@ -44,11 +44,14 @@
 
         scanDirs = async () => {
             timer = new Date();
+            if(data.resetDb){
+                await db.db.sync({force: true});
+            }
             for (var f of data.folders) {
                 await scanOneDir(f);
             }
             fromWindow.webContents.send('error', "Scan Done: " + (new Date() - timer));
-            //window.close();
+            window.close();
         }
 
         PopulateDB = async (folder, files, id) => {
@@ -56,17 +59,17 @@
                 return f.isDirectory || fileFilter.includes(f.extension.toLocaleLowerCase()) &&
                     !f.isHidden
             });
-            var f1;
-
-
-            f1 = await db.Folder.findOrCreate({
+            var f1 = await db.Folder.findOrCreate({
                 where: {
                     Name: folder
                 }
             });
-            f1[0].updateAttributes({
-                folderId: id
-            });
+
+            if (id) {
+                f1[0].updateAttributes({
+                    folderId: id
+                });
+            }
 
             var files = [];
             var foundFiles = [];
@@ -76,7 +79,7 @@
                     if (!f.isDirectory) {
                         file = await db.File.findOne({
                             where: {
-                                Name: f.FileName
+                                Name: f.FileName, folderId: f1[0].Id
                             }
                         });
                         if (file == null) {
@@ -87,15 +90,12 @@
                             });
                         } else {
                             if (f.Size === 0) {
-                                console.log(f.FileName, f.Size);
-                                console.log(file.Name,file.Size);
                                 file.updateAttributes({
                                     Size: f.Size
                                 });
                             }
 
                             if (!file.folderId) {
-                                console.log(file.folderId, f1[0].Id);
                                 foundFiles.push(file);
                             }
                         }
@@ -108,14 +108,8 @@
                     console.log(error)
                 }
             }
-
-            console.log("test1");
-
-            console.log(files, foundFiles);
             if (files.length > 0) await db.File.bulkCreate(files);
             if (foundFiles.length > 0) await f1[0].addFiles(foundFiles);
-            console.log("test2");
-
         }
 
         scanDirs();

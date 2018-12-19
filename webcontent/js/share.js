@@ -17,6 +17,7 @@ var config = {
     isMuted: false,
     paused: true,
     hidecontrolduration: 1,
+    showDeleteDialog: true,
     playerkey: {
         nextfile: {
             name: "PageDown",
