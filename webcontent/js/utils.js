@@ -21,9 +21,9 @@ createBackgroundWin = (event, data) => {
         var e = event;
         var d = data;
         var win = new BrowserWindow({
-            width: 1,
-            height: 1,
-            show: false
+            width: 1000,
+            height: 1000,
+            show: true
         });
         win.loadURL(invisPath);
         win.webContents.on('did-finish-load', () => {

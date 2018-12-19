@@ -48,15 +48,18 @@
                 await scanOneDir(f);
             }
             fromWindow.webContents.send('error', "Scan Done: " + (new Date() - timer));
-            window.close();
+            //window.close();
         }
 
         PopulateDB = async (folder, files, id) => {
             var fis = files.filter((f) => {
-                return f.isDirectory || fileFilter.includes(f.extension.toLocaleLowerCase())
+                return f.isDirectory || fileFilter.includes(f.extension.toLocaleLowerCase()) &&
+                    !f.isHidden
             });
+            var f1;
 
-            var f1 = await db.Folder.findOrCreate({
+
+            f1 = await db.Folder.findOrCreate({
                 where: {
                     Name: folder
                 }
@@ -79,18 +82,20 @@
                         if (file == null) {
                             files.push({
                                 Name: f.FileName,
-                                CurrentPage: 0,
                                 Size: f.Size,
                                 folderId: f1[0].Id
                             });
                         } else {
                             if (f.Size != file.Size) {
+                                console.log(f.FileName, f.Size);
+                                console.log(file.Name,file.Size);
                                 file.updateAttributes({
                                     Size: f.Size
                                 });
                             }
 
                             if (file.folderId != f1[0].Id) {
+                                console.log(file.folderId, f1[0].Id);
                                 foundFiles.push(file);
                             }
                         }
@@ -103,8 +108,14 @@
                     console.log(error)
                 }
             }
+
+            console.log("test1");
+
+            console.log(files, foundFiles);
             if (files.length > 0) await db.File.bulkCreate(files);
             if (foundFiles.length > 0) await f1[0].addFiles(foundFiles);
+            console.log("test2");
+
         }
 
         scanDirs();
