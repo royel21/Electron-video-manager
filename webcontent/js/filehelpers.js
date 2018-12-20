@@ -1,6 +1,6 @@
 
 deleteFile = (file, showloading) => {
-    if (!config.showDeleteDialog) {
+    if (config.showDeleteDialog) {
         return new Promise((resolve, rejected) => {
             dialog.showMessageBox(mainWindow, {
                 type: 'warning',

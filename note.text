@@ -1,0 +1,5 @@
+select f.Name, fc.dupeCount, f.id
+    from files f
+    inner join ( SELECT Name, COUNT(*) AS dupeCount FROM files
+    GROUP BY Name
+HAVING COUNT(*) > 1) fc on f.Name = fc.Name;
