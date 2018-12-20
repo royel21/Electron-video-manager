@@ -45,7 +45,7 @@
         scanDirs = async () => {
             timer = new Date();
             if(data.resetDb){
-                await db.db.sync({force: true});
+                await db.init(true);
             }
             for (var f of data.folders) {
                 await scanOneDir(f);

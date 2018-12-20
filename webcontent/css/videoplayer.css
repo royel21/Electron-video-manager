@@ -248,3 +248,11 @@ body:not(:-webkit-full-screen) .v-controls {
 .footer span:hover .popup-caction:after{
     display: inline-block;
 }
+
+
+@media all and (min-width: 700){
+    .v-controls .v-vol{
+
+        display: none;
+    }
+}

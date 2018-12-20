@@ -1,6 +1,6 @@
 var $popup = $('#popup')
 
-popupHide = (event) => {
+popupHide = (e) => {
     $popup.css({
         display: "none"
     }).text("");
@@ -8,10 +8,14 @@ popupHide = (event) => {
 }
 
 popupShow = async (event) => {
-    if ($(event.target).hasClass('popup-msg')) {
-        var rect = event.target.getBoundingClientRect();
-        var msg = event.target.dataset.title;
-        var li = $(event.target).closest('li')[0];
+    var element = $(event.target).hasClass('popup-msg') ?
+        event.target : $(event.target).closest(".popup-msg")[0];
+
+    if (element != undefined) {
+
+        var rect = element.getBoundingClientRect();
+        var msg = element.dataset.title;
+        var li = $(element).closest('li')[0];
         if (li != undefined) {
             var file = await db.File.findOne({
                 where: {
@@ -26,7 +30,7 @@ popupShow = async (event) => {
         $popup.css({
             display: "block",
             top: -3000,
-        }).text(msg == undefined ? event.target.textContent : msg);
+        }).text(msg == undefined ? element.textContent : msg);
 
         var top = rect.top + 8 + rect.height;
         if (top + $popup.height() + 10 > window.innerHeight) {
@@ -41,7 +45,6 @@ popupShow = async (event) => {
     }
 }
 
-$('body').on('mousemove', '.popup-msg', popupShow);
-$('.footer .popup-msg').on('mousemove', popupShow);
-$('.footer .popup-msg').on('click', popupHide);
-$('body').on('mouseleave wheel', '.popup-msg', popupHide);
+$('body, .footer .popup-msg').on('mouseenter', '.popup-msg', popupShow);
+$('body, .footer .popup-msg').on('mouseleave wheel', '.popup-msg', popupHide);
+$('body, .footer .popup-msg').on('click', popupHide);

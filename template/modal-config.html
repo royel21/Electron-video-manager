@@ -4,7 +4,7 @@
         <span id="modal-close" class="btn-hide"><i class="far fa-times-circle"></i></span>
     </div>
     <div id="modal-body">
-        <div id="viewer-config" class="card-body {isviewer} cancel-footer">
+        <div id="image-viewer-config" class="card-body {isviewer} cancel-footer">
             <div class="input-group mt-2">
                 <div class="input-group-prepend">
                     <div class="select-style">Page Animation:</div>
@@ -25,7 +25,7 @@
                 <input id="scale-img-w" type="number" class="form-control mr-1" min="0" max="1" step="0.05"></span>
             </div>
         </div>
-        <div id="viewer-config" class="card-body {isfilebrowser}">
+        <div id="file-viewer-config" class="card-body {isfilebrowser}">
             <div class="input-group mt-2">
                 <div class="input-group-prepend">
                     <div class="select-style">Sort By:</div>
@@ -38,6 +38,12 @@
                     <option value="Size-D">&#xf160; Size</option>
                     <option value="Size-U">&#xf161; Size</option>
                 </select>
+            </div>
+            <div class="input-group mt-2">
+                <div class="input-group-prepend">
+                    <input type="checkbox" name="" id="showDeleteDialog">
+                    <label id="showDeleteDialog-check" for="showDeleteDialog" class="select-style">Show Delete Dialog </label>
+                </div>
             </div>
         </div>
         <div id="v-config" class="card-body {isvideoplayer}">
@@ -58,14 +64,15 @@
                 </select>
             </div>
             <div class="input-group mt-2">
+                
+                <div class="input-group-prepend">
+                    <label class="select-style">Enter key</label>
+                </div>
+                <input type="text" name="" id="keyinput" class="form-control">
                 <div class="input-group-prepend">
                     <input type="checkbox" name="" id="isctrl">
                     <label id="ctrl-check" for="isctrl" class="select-style">CTRL </label>
                 </div>
-                <div class="input-group-prepend">
-                    <label for="isctrl" class="select-style">Enter key</label>
-                </div>
-                <input type="text" name="" id="keyinput" class="form-control">
             </div>
         </div>
     </div>

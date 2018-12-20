@@ -374,7 +374,7 @@ $(() => {
         }
     });
 
-    db.init().then(() => {
+    db.init(false).then(() => {
         db.File.count().then(c => {
             if (c == 0) {
                 $loading.find('.fa-database').removeClass('d-none');

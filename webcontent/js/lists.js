@@ -1,24 +1,14 @@
 var listofFile = []
 var $list_modal = $('.modal-list-file');
 
-$('.list-file-show').click((e) => {
-    $list_modal.addClass('show-modal');
-    selectList($('#' + (currentView == 1 ? 'tab-recent' : "tab-play-list"))[0]);
-    positionModal(e, $list_modal);
-});
-
-$('#list-file-hide').click((e) => {
-    $list_modal.removeClass('show-modal');
-    hideCreateFav($fav_dialog);
-    consumeEvent(e);
-});
-
 selectListRow = (el, isCtrl) => {
-    if (!isCtrl) {
-        $(el.closest('ul')).find("li").removeClass('el-selected');
+    if ($(el).is("li")) {
+        if (!isCtrl) {
+            $(el.closest('ul')).find("li").removeClass('el-selected');
+        }
+        $(el).addClass('el-selected');
+        el.focus();
     }
-    $(el).addClass('el-selected');
-    el.focus();
 }
 
 $('.list-file-content').on('dblclick', '#delete-list', consumeEvent);
@@ -63,7 +53,7 @@ function loadList(listName, list, isFile) {
             }
         });
     } else {
-       filesList = listofFile = [];
+        filesList = listofFile = [];
     }
 
     if (listName.includes('current')) {
@@ -85,15 +75,15 @@ createEntry = (value, isFile) => {
     return div.firstElementChild;
 }
 
-$('#list-file-header input').change(event => {
+$('#list-file-header input[type="radio"]').change(event => {
     selectList(event.target);
 });
 
 
 selectList = (target) => {
-    $('#list-file-header label').removeClass('active');
+    // $('#list-file-header label').removeClass('active');
     $(".tab-content").addClass('d-none');
-    $(target).next().addClass('active');
+    // $(target).next().addClass('active');
     var listId = target.id.replace('tab-', '');
     var $list = $('#' + listId);
     $list.removeClass('d-none');
@@ -174,6 +164,20 @@ $('.list-file-content').on('keydown', 'li', (event) => {
                 break;
             }
     }
+});
+
+$('.list-file-show').click((e) => {
+    $list_modal.addClass('show-modal');
+    var $target = $('#' + (currentView == 1 ? 'tab-recent' : "tab-play-list"));
+    $target[0].checked = true;
+    selectList($target[0]);
+    positionModal(e, $list_modal);
+});
+
+$('#list-file-hide').click((e) => {
+    $list_modal.removeClass('show-modal');
+    hideCreateFav($fav_dialog);
+    consumeEvent(e);
 });
 
 $('.tool-config .sub-tools').click((e) => {

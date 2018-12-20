@@ -116,10 +116,11 @@ Folder.hasMany(Folder);
 FavoriteFile.hasMany(File);
 FavoriteFile.hasMany(Folder);
 
-init = async () => {
-    if (!fs.existsSync(dbPath)) {
+init = async (isforce) => {
+    if (!fs.existsSync(dbPath) || isforce) {
         await db.sync({
-            logging: true
+            logging: console.log,
+            force: isforce
         });
         await FavoriteFile.findOrCreate({
             where: {

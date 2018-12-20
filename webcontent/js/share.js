@@ -264,7 +264,10 @@ updateRecents = () => {
     if (tempM != undefined) currentFile = tempM;
 
     config.recents.unshift(currentFile);
-    if (config.recents.length > config.recentMax) config.recents.pop();
+    if (config.recents.length > config.recentMax){
+       config.recents.pop();
+       if($('#recent').is(':visible')) $('#list-recent li').last().remove();
+    }
 
     if ($('#recent').is(':visible')) {
         var $li = $('#list-recent #file-' + currentFile.Id);

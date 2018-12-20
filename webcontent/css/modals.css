@@ -291,7 +291,7 @@ label {
     height: 70%;
 }
 
-#viewer-config .select-style {
+.card-body .select-style {
     width: 175px;
 }
 
@@ -325,14 +325,24 @@ label {
 }
 
 
+#v-config .select-style {
+    width: initial;
+
+}
+
 #v-config #ctrl-check {
     position: relative;
     font-weight: bold;
     font-family: Arial, Font Awesome\ 5 Free;
     margin: 0 4px 0 0;
     padding: 0 25px 0 5px;
-    border-radius: 3px;
+    border-radius: 0 3px 3px 0;
     cursor: pointer;
+}
+
+#v-config #keyinput{
+    margin:0;
+    border-radius: 0;
 }
 
 #v-config #ctrl-check:after,
@@ -363,7 +373,49 @@ label {
     display: none;
 }
 
-.modal label.active .fa-database{
+.modal input[type="radio"]:checked + label .fa-database{
     color: lightgray;
     text-shadow: 0 0 5px rgba(0, 0, 0, 0.6)
+}
+
+.modal input[type="radio"]:checked + label{
+        color: #495057;
+    background-color: #fff;
+    border-color: #dee2e6 #dee2e6 #fff;
+    cursor: default !important;
+}
+
+#file-viewer-config input{
+     display: none;
+}
+
+#file-viewer-config #showDeleteDialog-check{
+    cursor: pointer;
+    color: black;
+    font-weight: bold;
+    font-family: Arial, Font Awesome\ 5 Free;
+    transition: all .2s;
+}
+
+#file-viewer-config #showDeleteDialog-check:before{
+    content: " ";
+    position: absolute;
+    display:inline-block;
+    left: 56.5%;
+    width: 128px;
+    height: 100%;
+    background-color: white;
+    border-radius: 0 5px 5px 0;
+    font-size: 25px;
+}
+
+#file-viewer-config #showDeleteDialog-check:after{
+    content: "\f00c";
+    position: absolute;
+    left: 74%;
+    font-size: 25px;
+}
+
+#file-viewer-config #showDeleteDialog:checked + #showDeleteDialog-check:after{
+    content: "\f00d";
 }

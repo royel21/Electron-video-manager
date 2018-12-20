@@ -10,7 +10,7 @@ deleteFile = (file, showloading) => {
                 checkboxChecked: false,
 
             }, (resp, checkboxChecked) => {
-                config.showDeleteDialog = checkboxChecked;
+                config.showDeleteDialog = !checkboxChecked;
                 processDelete(file, showloading);
                 resolve(resp);
             });
