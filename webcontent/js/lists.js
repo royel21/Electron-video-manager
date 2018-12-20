@@ -12,7 +12,9 @@ selectListRow = (el, isCtrl) => {
 }
 
 $('.list-file-content').on('dblclick', '#delete-list', consumeEvent);
-$('.list-file-content').on('click', 'ul li', (e) => { selectListRow(e.target, e.ctrlKey) });
+$('.list-file-content').on('click', 'ul li', (e) => {
+    selectListRow(e.target, e.ctrlKey)
+});
 
 processRow = (event) => {
     var li = event.target.closest('li');

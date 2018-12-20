@@ -124,13 +124,15 @@ loadDirectory = async (folder, id) => {
                 });
 
                 if (tFiles.length > 0) {
-                    $loading.find('.fa-folder').removeClass('d-none');
                     createBackgroundWin('create-cover', {
                         files: tFiles
                     });
                     backgroundImage = backgroundImage.concat(tFiles);
                     processRunning++;
                     totalToConvert = backgroundImage.length;
+                    
+                    $('#conv-progress').text(totalToConvert + '/' + backgroundImage.length);
+                    $loading.find('.fa-folder').removeClass('d-none');
                 }
 
                 localStorage.setItem('currentDir', currentDir);
