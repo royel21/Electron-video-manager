@@ -1,6 +1,5 @@
-
 deleteFile = (file, showloading) => {
-    if (config.showDeleteDialog) {
+    if (!config.showDeleteDialog) {
         return new Promise((resolve, rejected) => {
             dialog.showMessageBox(mainWindow, {
                 type: 'warning',
@@ -10,9 +9,12 @@ deleteFile = (file, showloading) => {
                 checkboxChecked: false,
 
             }, (resp, checkboxChecked) => {
-                config.showDeleteDialog = checkboxChecked;
-                processDelete(file, showloading);
-                resolve(resp);
+                if (resp == 0) {
+                    config.showDeleteDialog = checkboxChecked;
+                    processDelete(file, showloading);
+                    resolve(resp);
+                }
+                resolve(1);
             });
         });
     } else {
@@ -32,7 +34,6 @@ processDelete = (file, showloading) => {
                 var cover = path.join("./covers/videos", path.basename(file) + i + ".png");
                 if (fs.existsSync(cover)) fs.removeSync(cover);
                 i++;
-                console.log(cover);
             }
         } else {
             var cover = path.join("./covers", path.basename(file) + ".jpg");
@@ -47,7 +48,8 @@ selectItem = async (index) => {
     var nextEl = $('.items').get(index);
     var tout = setTimeout(() => {
         if (nextEl != undefined) {
-            var scroll = contentScroll.scrollTop, elofft = nextEl.offsetTop;
+            var scroll = contentScroll.scrollTop,
+                elofft = nextEl.offsetTop;
 
             if (elofft - scroll + 1 < -1) {
                 scroll = elofft;
@@ -81,13 +83,13 @@ itemClick = (event) => {
             case 'item-del':
                 {
                     deleteFile(path.join(currentDir, $item.data('name')), true)
-                        .then(resp => {
-                            if (resp == 0) {
-                                $item.fadeOut('slow', () => {
-                                    $item.remove();
-                                });
-                            }
-                        });
+                    .then(resp => {
+                        if (resp == 0) {
+                            $item.fadeOut('slow', () => {
+                                $item.remove();
+                            });
+                        }
+                    });
                     break;
                 }
             case 'item-fav':
@@ -122,7 +124,9 @@ addToFav = async ($item, event) => {
         if (isFile) {
             // files can't be without parent folder;
             if (folderId == null)
-                folderId = (await db.Folder.Create({ Name: currentDir })).Id;
+                folderId = (await db.Folder.Create({
+                    Name: currentDir
+                })).Id;
 
             f = await db.File.findOrCreate({
                 where: {
@@ -222,12 +226,25 @@ function CreateEl(file, diskIcon) {
 }
 
 loadFavs = async () => {
-    var fos = await db.Folder.findAll({ where: { folderId: folderId } });
-    var fis = await db.File.findAll({ where: { folderId: folderId } });
+    var fos = await db.Folder.findAll({
+        where: {
+            folderId: folderId
+        }
+    });
+    var fis = await db.File.findAll({
+        where: {
+            folderId: folderId
+        }
+    });
     favs = fos.concat(fis).map(f => {
         var isFav = f.favoritefileId !== null;
         var Name = f.Name.length < 4 ? f.Name : path.basename(f.Name);
-        return { Name, Page: f.Current, isFav, Total: f.Total }
+        return {
+            Name,
+            Page: f.Current,
+            isFav,
+            Total: f.Total
+        }
     });
 }
 
@@ -254,8 +271,8 @@ lazyLoad = () => {
             }
         });
     }, {
-            rootMargin: "384px 0px 384px 0px"
-        });
+        rootMargin: "384px 0px 384px 0px"
+    });
 
     lazyCovers.forEach((lazyImg) => {
         lazyImageObserver.observe(lazyImg);

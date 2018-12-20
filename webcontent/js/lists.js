@@ -17,12 +17,16 @@ selectListRow = (el, isCtrl) => {
     if (!isCtrl) {
         $(el.closest('ul')).find("li").removeClass('el-selected');
     }
-    $(el).addClass('el-selected');
-    el.focus();
+    if ($(el).is("li")) {
+        $(el).addClass('el-selected');
+        el.focus();
+    }
 }
 
 $('.list-file-content').on('dblclick', '#delete-list', consumeEvent);
-$('.list-file-content').on('click', 'ul li', (e) => { selectListRow(e.target, e.ctrlKey) });
+$('.list-file-content').on('click', 'ul li', (e) => {
+    selectListRow(e.target, e.ctrlKey)
+});
 
 processRow = (event) => {
     var li = event.target.closest('li');
@@ -63,7 +67,7 @@ function loadList(listName, list, isFile) {
             }
         });
     } else {
-       filesList = listofFile = [];
+        filesList = listofFile = [];
     }
 
     if (listName.includes('current')) {
