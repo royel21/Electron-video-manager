@@ -114,7 +114,7 @@ reloadList = (filter) => {
         loadList('current-list', filesList, true);
     }
     fileN = filesList.findIndex(f => f.Name === currentFile.Name);
-    if(fileN < 0 && fileN == undefined) fileN = 0;
+    if (fileN < 0 && fileN == undefined) fileN = 0;
 }
 
 processFile = (name) => {
@@ -264,9 +264,9 @@ updateRecents = () => {
     if (tempM != undefined) currentFile = tempM;
 
     config.recents.unshift(currentFile);
-    if (config.recents.length > config.recentMax){
-       config.recents.pop();
-       if($('#recent').is(':visible')) $('#list-recent li').last().remove();
+    if (config.recents.length > config.recentMax) {
+        config.recents.pop();
+        if ($('#recent').is(':visible')) $('#list-recent li').last().remove();
     }
 
     if ($('#recent').is(':visible')) {

@@ -3,7 +3,7 @@ const shell = require('electron').shell;
 
 var cpyFile;
 var $dialogDetails;
-
+var isItem;
 keepIn = (e, $el) => {
     if (e.clientY + $el.height() > window.innerHeight) {
         $el.css({
@@ -17,94 +17,113 @@ keepIn = (e, $el) => {
         });
     }
 }
+showCtxMenu = (name, isfile, e) => {
+    $cmenu.css({
+        top: e.clientY + 4,
+        left: e.clientX + 4
+    });
+    keepIn(e, $cmenu);
+
+    $('#cm-zip-file').css({ display: isfile ? "none" : "block" });
+    $('#cm-file-rename').css({ display: isfile ? "block" : "none" });
+    $('#cm-open-with-default').css({ display: isfile ? "block" : "none" });
+    db.File.findByName({ Name: name }).then(f => {
+        cpyFile = { Name: name, Current: 0, fullPath: path.join(currentDir, name), Total: 0, Size: 0 };
+        if (f) {
+            cpyFile.Current = f.Current;
+            cpyFile.fullPath = path.join(f.folder.Name, name);
+            cpyFile.Total = f.Total;
+        }
+    });
+
+    $cmenu.css({
+        display: "block"
+    });
+}
 
 $('#file-list').on('mousedown', '.items', (e) => {
     if ($(e.target).closest('.item-btns')[0] != undefined) return;
     if (e.which === 3) {
-        $cmenu.css({
-            top: e.clientY + 4,
-            left: e.clientX + 4
-        });
-
-        keepIn(e, $cmenu);
-
-        $cmenu.css({
-            display: "block"
-        });
+        isItem = true;
         var $item = $(e.target.closest(".items"));
-       
-        $('#cm-zip-file').css({ display: $item.data('isfile') ? "none" : "block" });
-        $('#cm-file-rename').css({ display: $item.data('isfile') ? "block" : "none" });
-        $('#cm-open-with-default').css({ display: $item.data('isfile') ? "block" : "none" });
-
-        cpyFile = $item.data('name');
+        showCtxMenu($item.data('name'), $item.data('isfile'), e);
+    } else {
+        $cmenu.css({
+            display: "none"
+        });
     }
+    cpyFile = undefined;
 });
 
 $('#cm-open-with-default').click((e) => {
-    shell.openItem(path.join(currentDir, cpyFile));
+    shell.openItem(cpyFile.fullPath);
     $cmenu.css({
         display: "none"
     });
+    cpyFile = undefined;
 });
 $('#cm-cp-name').click((e) => {
-    clipboard.writeText(formatName(cpyFile, 0).split('.')[0]);
+    clipboard.writeText(nameFormat(cpyFile.Name, 0).split('.')[0]);
     $cmenu.css({
         display: "none"
     });
+    cpyFile = undefined;
 });
 
 $('#cm-cp-path').click((e) => {
-    clipboard.writeText(path.join(currentDir, cpyFile));
+    clipboard.writeText(cpyFile.fullPath);
     $cmenu.css({
         display: "none"
     });
+    cpyFile = undefined;
 });
 $('#cm-zip-file').click((e) => {
     $('.fa-file-archive').removeClass('d-none');
-    createBackgroundWin('zip-file', { dir: path.join(currentDir, cpyFile) });
+    createBackgroundWin('zip-file', { dir: cpyFile.fullPath });
     compressingCount++;
     $cmenu.css({
         display: "none"
     });
+    cpyFile = undefined;
 });
 
 $('#cm-sh-details').click((e) => {
-    db.File.findOne({ where: { Name: cpyFile } }).
-        then(file => {
-            hidedetails();
-            var tempf = WinDrive.ListFiles(path.join(currentDir, cpyFile), [], true)[0];
-            if (videoFilter.includes(tempf.extension)) {
-                tempf.Page = file != null ? formatTime(file.Current) : 0;
-                tempf.Total = file != null ? formatTime(file.Total) : 0;
-            } else {
-                tempf.Page = file != null ? file.Current + 1 : 0;
-                tempf.Total = file != null ? file.Total : 0;
-            }
 
-            var date = new Date(tempf.LastModified);
-            tempf.Date = date.toLocaleDateString("en-US") + " " + date.toLocaleTimeString("en-US");
-            tempf.Size = FormattBytes(tempf.Size);
-            $dialogDetails = $(template('./template/modal-details.html', tempf));
-            $('#file-viewer').prepend($dialogDetails);
+    hidedetails();
+    var tempf = WinDrive.ListFiles(cpyFile.fullPath, [], true)[0];
+    if (videoFilter.includes(tempf.extension)) {
+        tempf.Page = formatTime(cpyFile.Current);
+        tempf.Total = formatTime(cpyFile.Total);
+    } else {
+        tempf.Page = cpyFile.Current;
+        tempf.Total = cpyFile.Total;
+    }
 
-            $dialogDetails.find('#modal-close').click(() => {
-                hidedetails();
-            });
+    var date = new Date(tempf.LastModified);
+    tempf.Date = date.toLocaleDateString("en-US") + " " + date.toLocaleTimeString("en-US");
+    tempf.Size = FormattBytes(tempf.Size);
+    $dialogDetails = $(template('./template/modal-details.html', tempf));
 
-            $dialogDetails.css({
-                left: e.clientX,
-                top: e.clientY
-            });
-            keepIn(e, $dialogDetails);
-            $dialogDetails.fadeIn('fast', () => {
-                $dialogDetails.css({ height: $dialogDetails.find('#details-body').height() + 50 });
-            });
-        })
+    $('.content').prepend($dialogDetails);
+    $dialogDetails.find('#modal-close').click(() => {
+        hidedetails();
+    });
+
+    $dialogDetails.css({
+        left: e.clientX,
+        top: e.clientY
+    });
+    keepIn(e, $dialogDetails);
+    $dialogDetails.fadeIn('fast', () => {
+        $dialogDetails.css({ height: $dialogDetails.find('#details-body').height() + 50 });
+    });
+
     $cmenu.css({
         display: "none"
     });
+    cpyFile = undefined;
 });
+
 hidedetails = () => {
     if ($dialogDetails != undefined) {
         hideModal($dialogDetails);
@@ -113,28 +132,72 @@ hidedetails = () => {
 }
 
 $('#cm-file-rename').click((e) => {
-    dialogBox({ title: "New Name:", x: e.clientX, y: e.clientY, data: cpyFile, btn1: "Rename" }).then(result => {
-        if (result.length > 0) {
-            var oldFile = path.join(currentDir, cpyFile);
-            var newFile = path.join(currentDir, result);
-            fs.renameSync(oldFile, newFile);
-            var oldCover = path.join('./covers', cpyFile + ".jpg");
-            if (fs.existsSync(oldCover)) {
-                var newCover = path.join('./covers', result + ".jpg");
-                fs.renameSync(oldCover, newCover);
-                var $item = $('.items:textequalto(' + cpyFile + ')');
-                $item.attr('data-name', result).data('name', result);
-                $item.find('.item-name').text(result);
-                var img = $item.find('img').get(0);
-                img.dataset.src = img.src = newCover;
+    dialogBox({ title: "New Name:", x: e.clientX, y: e.clientY, data: cpyFile.Name, btn1: "Rename" })
+        .then(result => {
+            if (result.length > 0) {
+                $('#loadingDiv').removeClass('d-none');
+                console.time('A');
+                var waitingTime = setTimeout(() => {
+                    var oldFile = cpyFile.fullPath;
+                    var newFile = path.join(path.dirname(cpyFile.fullPath), result);
+                    fs.renameSync(oldFile, newFile); 
+                    db.File.update({ Name: result }, { where: { Name: cpyFile.Name } }).catch(err => { });
+                    var newCover;
+                    var oldCover;
+                    var icon = "&#xf1c6; ";
+                    if (videoFilter.includes(cpyFile.Name.split('.').pop())) {
+                        var imgs = WinDrive.ListFiles('./covers/videos/', ['png']).filter(f => {
+                            return f.FileName.includes(cpyFile.Name);
+                        });
+                        for (var f of imgs) {
+                            oldCover = path.join('./covers/videos/', f.FileName);
+                            if (fs.existsSync(oldCover)) {
+                                newCover = oldCover.replace(f.FileName.split('-')[0], result);
+                                fs.renameSync(oldCover, newCover);
+                            }
+                        }
+                    } else {
+                        oldCover = path.join('./covers', cpyFile.Name + ".jpg");
+                        if (fs.existsSync(oldCover)) {
+                            newCover = path.join('./covers', result + ".jpg");
+                            fs.renameSync(oldCover, newCover);
+                        }
+                        icon = "&#xf03d; ";
+                    }
+
+                    var item = document.querySelector('.items[data-name="' + cpyFile.Name + '"]');
+                    console.log(item);
+                    // if ($item[0]) {
+                    //     if ($item[0] != undefined) {
+                    //         $item.attr('data-name', result).data('name', result);
+                    //         $item.find('.item-name').text(result);
+                    //         var img = $item.find('img').get(0);
+                    //         img.dataset.src = img.src = newCover;
+                    //     }
+                    // }
+                    var li = document.querySelector('li[data-title="' + cpyFile.Name + '"]');
+                    console.log(li);
+                    if (li) {
+                        li.setAttribute('data-title', result);
+                        li.querySelector('.list-text').textContent = icon + result;
+                        console.log(li.querySelector('.list-text'));
+                    }
+                   $('#loadingDiv').addClass('d-none');
+                    isItem = false;
+                    console.log(result);
+                    console.timeEnd('A');
+                    clearTimeout(waitingTime);
+                });
             }
-            db.File.update({ Name: result }, { where: { Name: cpyFile } });
-        }
-    });
+        });
     $cmenu.css({
         display: "none"
     });
 });
+
+renameCover = (cover) => {
+
+}
 
 dialogBox = (data, cb) => {
     return new Promise((resolve, reject) => {
@@ -158,6 +221,7 @@ dialogBox = (data, cb) => {
                 $dialog.remove();
                 $dialog = undefined;
             });
+            resolve("");
         });
 
         $dialog.css({

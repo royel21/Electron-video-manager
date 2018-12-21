@@ -12,8 +12,20 @@ selectListRow = (el, isCtrl) => {
 }
 
 $('.list-file-content').on('dblclick', '#delete-list', consumeEvent);
-$('.list-file-content').on('click', 'ul li', (e) => {
-    selectListRow(e.target, e.ctrlKey)
+
+$('.list-file-content').on('mousedown', 'ul li', (e) => {
+    if (e.which === 3) {
+        if ($(e.target).closest('#recent')[0] == undefined && $(e.target).closest('#current-list')[0] == undefined &&
+         $(e.target).is("li")) {
+            var $li = $(e.target.closest('li'));
+            showCtxMenu($li.data('title'), $li.data('isfile'), e);
+        }
+    } else {
+        selectListRow(e.target, e.ctrlKey);
+        $cmenu.css({
+            display: "none"
+        });
+    }
 });
 
 processRow = (event) => {
@@ -72,7 +84,7 @@ createEntry = (value, isFile) => {
     var div = document.createElement('div');
     div.innerHTML = `<li id="file-${value.Id}" class="list-group-item popup-msg" data-isFile="${isFile}" data-title="${value.Name}" tabindex="0">` +
         `<span id="delete-list"><i class="fas fa-trash-alt fa-1x"></i></span>` +
-        `<span class="list-text"><span class="list-icon">${listIcon}</span> ${value.Name} ${FormattBytes(value.Size)}</li>`;
+        `<span class="list-text">${listIcon} ${value.Name} ${FormattBytes(value.Size)}</li>`;
 
     return div.firstElementChild;
 }

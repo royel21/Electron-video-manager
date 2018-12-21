@@ -355,28 +355,6 @@ input[type=number]:focus {
     background-color: rgba(0, 0, 0, 0.2);
 }
 
-.loadding .fa-spinner {
-    font-size: 12.0em;
-}
-
-@media all and (min-width: 700px) {
-    .loadding .fa-spinner {
-        font-size: 15em;
-    }
-}
-
-@media all and (min-width: 900px) {
-    .loadding .fa-spinner {
-        font-size: 20em;
-    }
-}
-
-@media all and (min-width: 1200px) {
-    .loadding .fa-spinner {
-        font-size: 25em;
-    }
-}
-
  #temp-img{
      display: none;
      position: absolute;
@@ -503,7 +481,7 @@ input[type=number]:focus {
     color: white;
     position: fixed;
     top: 100px;
-    z-index: 999;
+    z-index: 9999;
     border-radius: 5px;
 }
 
@@ -526,4 +504,26 @@ input[type=number]:focus {
 }
 #context-menu li:last-child:hover{
     border-radius: 0 0 5px 5px;
+}
+
+.loadding .fa-spinner {
+    font-size: 12.0em;
+}
+
+@media all and (min-width: 700px) {
+    .loadding .fa-spinner {
+        font-size: 15em;
+    }
+}
+
+@media all and (min-width: 900px) {
+    .loadding .fa-spinner {
+        font-size: 20em;
+    }
+}
+
+@media all and (min-width: 1200px) {
+    .loadding .fa-spinner {
+        font-size: 25em;
+    }
 }

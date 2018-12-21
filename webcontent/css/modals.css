@@ -266,9 +266,8 @@ label {
     color: brown;
 }
 
-.m-body .list-icon {
-    font-size: 20px;
-    margin-right: 3px;
+.m-body .list-text {
+    font-size: 14px;
     font-weight: bold;
     font-family: Arial, Font Awesome\ 5 Free;
 }

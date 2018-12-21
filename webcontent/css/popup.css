@@ -13,6 +13,7 @@
     pointer-events: none;
     word-wrap: break-word;
     text-align: center;
+    pointer-events: none;
 }
 
 #popup:after {
