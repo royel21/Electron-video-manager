@@ -138,19 +138,18 @@ function FormattBytes(b) {
     } else
         return "";
 }
-
-function formatName(name, padding = 3) {
-    var str = name.replace(/[\\|?|<|>|*|:|"]/ig, '');
-    var res1 = str.split(/\d+/g);
-    var res2 = str.match(/\d+/g);
-    var temp = "";
-    if (res1 == null || res2 == null) return str;
-
-    for (let [i, s] of res2.entries()) {
-        temp += res1[i] + String(Number(s)).padStart(padding, 0);
+function nameFormat(name, padding = 3) {
+    var res1 = name.split(/\d+/g);
+    var res2 = name.match(/\d+/g);
+    var temp = name;
+    if (res1 == null && res2 == null){
+        for (let [i, s] of res2.entries()) {
+            temp += res1[i] + String(Number(s)).padStart(padding, 0);
+        }
+        temp = temp + res1[res1.length - 1];
     }
-
+    
     var elem = document.createElement('textarea');
-    elem.innerHTML = temp + res1[res1.length - 1];
+    elem.innerHTML = temp.replace(/[\\|?|<|>|*|:|"]/ig, '').replace("  ", " ");
     return elem.value;
 }

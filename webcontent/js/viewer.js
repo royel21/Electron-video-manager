@@ -231,6 +231,7 @@ compressFile = async () => {
         }
     }
     backToFileBrowser();
+    $('#loadingDiv').addClass('d-none');
     return false;
 }
 
