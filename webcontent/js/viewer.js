@@ -27,22 +27,6 @@ function imgFilter(entry) {
 function getRandomNum() {
     return Math.random() * (1 - 99999) + 1;
 }
-/**********************************************************/
-function imageViewerCleanUp() {
-    if (currentView === 2) {
-        $(document).off('keydown', ViewerKeyUp);
-        $('#prev-file').off('click', prevFile);
-        $('#prev-img').off('click', prevImg);
-        $('#next-img').off('click', nextImg);
-        $('#next-file').off('click', nextFile);
-        $('#backtofilelist').off('click', backToFileBrowser);
-        $viewer.on('mousedown', event => {
-            event.which === 1 ? nextImg() : prevImg();
-            $viewer.focus();
-        });
-    }
-}
-
 /***********************************************************/
 prevImg = () => {
     if (!loadingNext) {
@@ -334,6 +318,22 @@ tempImg.onload = function () {
 }
 
 $('#img-content img').css("transform", "scaleX(" + config.imgScale + ")");
+
+/**********************************************************/
+function imageViewerCleanUp() {
+    if (currentView === 2) {
+        $(document).off('keydown', ViewerKeyUp);
+        $('#prev-file').off('click', prevFile);
+        $('#prev-img').off('click', prevImg);
+        $('#next-img').off('click', nextImg);
+        $('#next-file').off('click', nextFile);
+        $('#backtofilelist').off('click', backToFileBrowser);
+        $viewer.on('mousedown', event => {
+            event.which === 1 ? nextImg() : prevImg();
+            $viewer.focus();
+        });
+    }
+}
 
 imgViewerInit = () => {
     if (currentView !== 2) {

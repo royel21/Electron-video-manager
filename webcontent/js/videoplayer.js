@@ -244,6 +244,7 @@ player.onvolumechange = function (e) {
             volTimer = null;
         }, 1000);
     }
+    volcontrol.setAttribute("value", player.volume);
 }
 
 wheelScroll = (event) => {

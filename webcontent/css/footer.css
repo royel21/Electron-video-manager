@@ -145,23 +145,6 @@
     margin-top: 5px;
 }
 
-@media all and (max-width: 780px) {
-    #image-seek {
-        display: none;
-    }
-    .img-toolbar{
-        margin: 0;
-        margin-left: 50px;
-        display: inline-block;
-    }
-}
-
-@media all and (max-width: 700px) {
-    #prev-img, #next-img {
-        display: none;
-    }
-}
-
 .modal span:hover > i,
 .footer label:hover > i,
 .footer span:hover > i{
@@ -213,4 +196,22 @@ nav span:active > i,
 }
 .footer .top input[type=checkbox]:checked + #on-top-cicle {
     background-color: honeydew;
+}
+
+
+@media all and (max-width: 780px) {
+    #image-seek {
+        display: none;
+    }
+    .img-toolbar{
+        margin: 0;
+        margin-left: 140px;
+        display: inline-block;
+    }
+}
+
+@media all and (max-width: 700px) {
+    #prev-img, #next-img {
+        display: none;
+    }
 }

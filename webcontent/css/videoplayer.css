@@ -191,7 +191,7 @@ body[viewer="3"]:-webkit-full-screen .v-controls .vol-show{
     background: #fff;
     -webkit-app-region: no-drag;
 }
-
+ 
 #mute-icon {
     display: inline-block;
     position: absolute;
@@ -207,6 +207,7 @@ body[viewer="3"]:-webkit-full-screen .v-controls .vol-show{
     z-index: 5;
 }
 
+.v-controls .v-vol #v-vol-control[value="0"] + label #mute-icon,
 .vol-ctrl:checked+#mute-icon {
     transform: rotateZ(45deg) scaleX(1);
 }
@@ -250,9 +251,8 @@ body:not(:-webkit-full-screen) .v-controls {
 }
 
 
-@media all and (min-width: 700){
-    .v-controls .v-vol{
-
-        display: none;
+@media all and (max-width: 760px) {
+    body[viewer="3"] #v-control-2{
+        padding-right: 70px;
     }
 }

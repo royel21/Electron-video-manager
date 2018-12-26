@@ -1,90 +1,90 @@
-const { clipboard } = require('electron');
+const {
+    clipboard
+} = require('electron');
 const shell = require('electron').shell;
 
+var cmenu = document.getElementById('context-menu');
 var cpyFile;
-var $dialogDetails;
-var isItem;
-keepIn = (e, $el) => {
-    if (e.clientY + $el.height() > window.innerHeight) {
-        $el.css({
-            top: e.clientY - $el.height()
-        });
+var dialogDetails;
+
+hideCMenu = () => {
+    cmenu.style.display = "none"
+    cpyFile = undefined;
+}
+
+keepIn = (e, el) => {
+    if (e.clientY + el.offsetHeight > window.innerHeight) {
+        el.style.top = (e.clientY - el.offsetHeight) + "px";
     }
 
-    if (e.clientX + $el.width() > window.innerWidth) {
-        $el.css({
-            left: e.clientX - $el.width()
-        });
+    if (e.clientX + el.offsetWidth > window.innerWidth) {
+
+        el.style.left = (e.clientX - el.offsetWidth) + "px";
     }
 }
 showCtxMenu = (name, isfile, e) => {
-    $cmenu.css({
-        top: e.clientY + 4,
-        left: e.clientX + 4
-    });
-    keepIn(e, $cmenu);
+    cmenu.style.top = e.clientY + 4 + "px";
+    cmenu.style.left = e.clientX + 4 + "px";
+    keepIn(e, cmenu);
 
-    $('#cm-zip-file').css({ display: isfile ? "none" : "block" });
-    $('#cm-file-rename').css({ display: isfile ? "block" : "none" });
-    $('#cm-open-with-default').css({ display: isfile ? "block" : "none" });
-    db.File.findByName({ Name: name }).then(f => {
-        cpyFile = { Name: name, Current: 0, fullPath: path.join(currentDir, name), Total: 0, Size: 0 };
+    $('#cm-zip-file').css({
+        display: isfile ? "none" : "block"
+    });
+    $('#cm-file-rename').css({
+        display: isfile ? "block" : "none"
+    });
+    $('#cm-open-with-default').css({
+        display: isfile ? "block" : "none"
+    });
+    db.File.findByName({
+        Name: name
+    }).then(f => {
+        cpyFile = {
+            Name: name,
+            Current: 0,
+            fullPath: path.join(currentDir, name),
+            Total: 0,
+            Size: 0
+        };
         if (f) {
             cpyFile.Current = f.Current;
             cpyFile.fullPath = path.join(f.folder.Name, name);
             cpyFile.Total = f.Total;
         }
     });
-
-    $cmenu.css({
-        display: "block"
-    });
+    cmenu.style.display = "block";
 }
 
 $('#file-list').on('mousedown', '.items', (e) => {
-    if ($(e.target).closest('.item-btns')[0] != undefined) return;
+    if (e.target.closest('.item-btns') != undefined) return;
     if (e.which === 3) {
-        isItem = true;
-        var $item = $(e.target.closest(".items"));
-        showCtxMenu($item.data('name'), $item.data('isfile'), e);
+        var item = e.target.closest(".items");
+        showCtxMenu(item.dataset.name, item.dataset.isfile == "true", e);
     } else {
-        $cmenu.css({
-            display: "none"
-        });
+        hideCMenu();
     }
-    cpyFile = undefined;
 });
 
 $('#cm-open-with-default').click((e) => {
     shell.openItem(cpyFile.fullPath);
-    $cmenu.css({
-        display: "none"
-    });
-    cpyFile = undefined;
+    hideCMenu();
 });
 $('#cm-cp-name').click((e) => {
     clipboard.writeText(nameFormat(cpyFile.Name, 0).split('.')[0]);
-    $cmenu.css({
-        display: "none"
-    });
-    cpyFile = undefined;
+    hideCMenu();
 });
 
 $('#cm-cp-path').click((e) => {
     clipboard.writeText(cpyFile.fullPath);
-    $cmenu.css({
-        display: "none"
-    });
-    cpyFile = undefined;
+    hideCMenu();
 });
 $('#cm-zip-file').click((e) => {
     $('.fa-file-archive').removeClass('d-none');
-    createBackgroundWin('zip-file', { dir: cpyFile.fullPath });
-    compressingCount++;
-    $cmenu.css({
-        display: "none"
+    createBackgroundWin('zip-file', {
+        dir: cpyFile.fullPath
     });
-    cpyFile = undefined;
+    compressingCount++;
+    hideCMenu();
 });
 
 $('#cm-sh-details').click((e) => {
@@ -101,38 +101,48 @@ $('#cm-sh-details').click((e) => {
 
     var date = new Date(tempf.LastModified);
     tempf.Date = date.toLocaleDateString("en-US") + " " + date.toLocaleTimeString("en-US");
-    tempf.Size = FormattBytes(tempf.Size);
-    $dialogDetails = $(template('./template/modal-details.html', tempf));
+    let div = document.createElement('div');
+    div.innerHTML = `<div id="modal-details" class="modal bg-dark card">
+                            <div class="dialog-header text-center move">
+                                <span class="m-title">Details</span>
+                                <span id="modal-close" class="btn-hide"><i class="far fa-times-circle"></i></span>
+                            </div>
+                            <div id="details-body">
+                                <div><span>Name: </span>${tempf.FileName}</div>
+                                <div><span>Current: </span>${tempf.Page}</div>
+                                <div><span>Total: </span>${tempf.Total}</div>
+                                <div><span>Extension: </span>${tempf.extension}</div>
+                                <div><span>Size: </span>${FormattBytes(tempf.Size)}</div>
+                                <div><span>Last Modified: </span>${tempf.Date}</div>
+                            </div>
+                    </div>`
+    dialogDetails = div.firstElementChild;
+    console.log(dialogDetails);
+    dialogDetails.querySelector('#modal-close').onclick = hidedetails;
 
-    $('.content').prepend($dialogDetails);
-    $dialogDetails.find('#modal-close').click(() => {
-        hidedetails();
-    });
-
-    $dialogDetails.css({
-        left: e.clientX,
-        top: e.clientY
-    });
-    keepIn(e, $dialogDetails);
-    $dialogDetails.fadeIn('fast', () => {
-        $dialogDetails.css({ height: $dialogDetails.find('#details-body').height() + 50 });
-    });
-
-    $cmenu.css({
-        display: "none"
-    });
-    cpyFile = undefined;
+    dialogDetails.style.top = e.clientY + "px";
+    dialogDetails.style.left = e.clientX + "px";
+    dialogDetails.offsetHeight = dialogDetails.querySelector('#details-body').offsetHeight + 50;
+    dialogDetails.style.display = "block";
+    $('.content').prepend(dialogDetails);
+    hideCMenu();
 });
 
 hidedetails = () => {
-    if ($dialogDetails != undefined) {
-        hideModal($dialogDetails);
-        $dialogDetails = undefined;
+    if (dialogDetails != undefined) {
+        dialogDetails.remove();
+        dialogDetails = undefined;
     }
 }
 
 $('#cm-file-rename').click((e) => {
-    dialogBox({ title: "New Name:", x: e.clientX, y: e.clientY, data: cpyFile.Name, btn1: "Rename" })
+    dialogBox({
+            title: "New Name:",
+            x: e.clientX,
+            y: e.clientY,
+            data: cpyFile.Name,
+            btn1: "Rename"
+        })
         .then(result => {
             if (result.length > 0) {
                 $('#loadingDiv').removeClass('d-none');
@@ -140,11 +150,17 @@ $('#cm-file-rename').click((e) => {
                 var waitingTime = setTimeout(() => {
                     var oldFile = cpyFile.fullPath;
                     var newFile = path.join(path.dirname(cpyFile.fullPath), result);
-                    fs.renameSync(oldFile, newFile); 
-                    db.File.update({ Name: result }, { where: { Name: cpyFile.Name } }).catch(err => { });
+                    fs.renameSync(oldFile, newFile);
+                    db.File.update({
+                        Name: result
+                    }, {
+                        where: {
+                            Name: cpyFile.Name
+                        }
+                    }).catch(err => {});
                     var newCover;
                     var oldCover;
-                    var icon = "&#xf1c6; ";
+                    var icon = "&#xf03d; ";
                     if (videoFilter.includes(cpyFile.Name.split('.').pop())) {
                         var imgs = WinDrive.ListFiles('./covers/videos/', ['png']).filter(f => {
                             return f.FileName.includes(cpyFile.Name);
@@ -162,42 +178,33 @@ $('#cm-file-rename').click((e) => {
                             newCover = path.join('./covers', result + ".jpg");
                             fs.renameSync(oldCover, newCover);
                         }
-                        icon = "&#xf03d; ";
+                        icon = "&#xf1c6; ";
                     }
 
                     var item = document.querySelector('.items[data-name="' + cpyFile.Name + '"]');
-                    console.log(item);
-                    // if ($item[0]) {
-                    //     if ($item[0] != undefined) {
-                    //         $item.attr('data-name', result).data('name', result);
-                    //         $item.find('.item-name').text(result);
-                    //         var img = $item.find('img').get(0);
-                    //         img.dataset.src = img.src = newCover;
-                    //     }
-                    // }
+                    if (item) {
+                        item.setAttribute('data-name', result);
+                        item.dataset.name = result;
+                        item.querySelector('.item-name').textContent = result;
+                        var img = item.querySelector('img');
+                        img.dataset.src = img.src = newCover.replace('-3', '-0');
+                    }
+
                     var li = document.querySelector('li[data-title="' + cpyFile.Name + '"]');
-                    console.log(li);
                     if (li) {
                         li.setAttribute('data-title', result);
-                        li.querySelector('.list-text').textContent = icon + result;
-                        console.log(li.querySelector('.list-text'));
+                        li.querySelector('.list-text').innerHTML = `${icon}${result}`;
                     }
-                   $('#loadingDiv').addClass('d-none');
-                    isItem = false;
-                    console.log(result);
+                    $('#loadingDiv').addClass('d-none');
+
                     console.timeEnd('A');
                     clearTimeout(waitingTime);
                 });
             }
         });
-    $cmenu.css({
-        display: "none"
-    });
+    cmenu.style.display = "none";
 });
 
-renameCover = (cover) => {
-
-}
 
 dialogBox = (data, cb) => {
     return new Promise((resolve, reject) => {
@@ -207,6 +214,17 @@ dialogBox = (data, cb) => {
         }));
         var $nameBox = $dialog.find('#name');
         $nameBox.val(data.data);
+
+        $nameBox.keydown(e => {
+            if (e.keyCode === 13) {
+                resolve($nameBox.val());
+                $dialog.fadeOut('fast', () => {
+                    $dialog.remove();
+                    $dialog = undefined;
+                });
+            }
+        });
+
         $('.content').prepend($dialog);
         $dialog.find('#create').click(() => {
             resolve($nameBox.val());
@@ -234,7 +252,11 @@ dialogBox = (data, cb) => {
         });
 
         $dialog.fadeIn('slow');
-        $nameBox.keydown((e) => { e.stopPropagation() });
-        $nameBox.keypress((e) => { e.stopPropagation() });
+        $nameBox.keydown((e) => {
+            e.stopPropagation()
+        });
+        $nameBox.keypress((e) => {
+            e.stopPropagation()
+        });
     });
 }

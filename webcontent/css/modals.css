@@ -291,7 +291,7 @@ label {
 }
 
 .card-body .select-style {
-    width: 175px;
+    width: 128px;
 }
 
 #scan-list li {
@@ -400,8 +400,8 @@ label {
     content: " ";
     position: absolute;
     display:inline-block;
-    left: 56.5%;
-    width: 128px;
+    left: 49.5%;
+    width: 125px;
     height: 100%;
     background-color: white;
     border-radius: 0 5px 5px 0;
@@ -411,10 +411,36 @@ label {
 #file-viewer-config #showDeleteDialog-check:after{
     content: "\f00c";
     position: absolute;
-    left: 74%;
+    left: 68%;
     font-size: 25px;
 }
 
 #file-viewer-config #showDeleteDialog:checked + #showDeleteDialog-check:after{
     content: "\f00d";
+}
+
+.select-style{
+    display: flex;
+    align-items: center;
+    padding: .375rem .50rem;
+    margin-bottom: 0;
+    font-size: 1rem;
+    line-height: 1.5;
+    color: #495057;
+    text-align: center;
+    white-space: nowrap;
+    background-color: #e9ecef;
+    border: 1px solid #ced4da;
+    border-top-left-radius: .25rem;
+    border-bottom-left-radius: .25rem;
+    font-weight: bold;
+}
+
+.select-style span{
+    margin: 0 5px;
+}
+
+#modal-config{
+ min-width: 300px;
+ width: 200px;
 }

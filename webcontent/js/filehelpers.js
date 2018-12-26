@@ -70,9 +70,7 @@ selectItem = async (index) => {
 
 
 itemClick = (event) => {
-    $cmenu.css({
-        display: "none"
-    });
+    hideCMenu();
     var $item = $(event.target).closest('.items');
     if ($item.get(0) != undefined) {
         var index = $('.items').index($item);

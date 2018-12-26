@@ -45,6 +45,6 @@ popupShow = async (event) => {
     }
 }
 
-$('body, .footer .popup-msg').on('mouseenter', '.popup-msg', popupShow);
-$('body, .footer .popup-msg').on('mouseleave wheel', '.popup-msg', popupHide);
-$('body, .footer .popup-msg').on('click', popupHide);
+$('body, .footer').on('mouseenter', '.popup-msg', popupShow);
+$('body, .footer').on('mouseleave wheel', '.popup-msg', popupHide);
+$('body, .footer').on('click', popupHide);

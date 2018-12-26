@@ -138,7 +138,7 @@ processFile = (name) => {
                     if (currentView == 3) playerCleanUp();
                     loadZip(f);
                 } else if (videoFilter.includes(ex)) {
-                    if (currentView == 2) imageViewerCleanUp();
+                    imageViewerCleanUp();
                     initPlayer(f);
                 }
             });

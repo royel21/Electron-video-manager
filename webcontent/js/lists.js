@@ -22,9 +22,7 @@ $('.list-file-content').on('mousedown', 'ul li', (e) => {
         }
     } else {
         selectListRow(e.target, e.ctrlKey);
-        $cmenu.css({
-            display: "none"
-        });
+        hideCMenu();
     }
 });
 
@@ -84,7 +82,7 @@ createEntry = (value, isFile) => {
     var div = document.createElement('div');
     div.innerHTML = `<li id="file-${value.Id}" class="list-group-item popup-msg" data-isFile="${isFile}" data-title="${value.Name}" tabindex="0">` +
         `<span id="delete-list"><i class="fas fa-trash-alt fa-1x"></i></span>` +
-        `<span class="list-text">${listIcon} ${value.Name} ${FormattBytes(value.Size)}</li>`;
+        `<span class="list-text">${listIcon} ${value.Name}</li>`;
 
     return div.firstElementChild;
 }

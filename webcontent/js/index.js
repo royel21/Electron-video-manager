@@ -5,7 +5,6 @@ var processRunning = 0;
 var folderIcon = path.join('./webcontent/image/Folder.png');
 var zipIcon = path.join('./webcontent/image/zip.png');
 var videoIcon = path.join('./webcontent/image/video.png');
-var $cmenu = $('#context-menu');
 var favs = [];
 var folderId = null;
 var backgroundImage = [];
@@ -472,7 +471,6 @@ fileViewerCleanUp = () => {
     $(window).off('resize', calCol);
     $(contentScroll).off('scroll', () => {
         hidedetails();
-        $cmenu.css({ display: "none" });
     });
     $flist.off('click', '.items', itemClick);
     $flist.off('dblclick', dblclick);
@@ -490,7 +488,6 @@ fileViewerInit = () => {
         $(window).on('resize', calCol);
         $(contentScroll).on('scroll', () => {
             hidedetails();
-            $cmenu.css({ display: "none" });
         });
         $flist.on('click', '.items', itemClick);
         $flist.on('dblclick', dblclick);

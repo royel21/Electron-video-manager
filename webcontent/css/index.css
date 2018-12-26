@@ -229,6 +229,11 @@ body,
     font-family: "Verdana", Times, serif;
 }
 
+body:-webkit-full-screen .total-files{
+    left: 0px;
+    bottom: 5px
+}
+
 .in-fav {
     color: yellow;
 }
@@ -248,7 +253,7 @@ body,
 }
 
 input[type=number] {
-    font-size: 20px;
+    font-size: 15px;
     background-color: transparent;
     color: white;
     text-align: center;
@@ -446,27 +451,6 @@ input[type=number]:focus {
 
 #file-browser .toolbar-control{
     display: none;
-}
-
-.select-style{
-    display: flex;
-    align-items: center;
-    padding: .375rem .75rem;
-    margin-bottom: 0;
-    font-size: 1rem;
-    line-height: 1.5;
-    color: #495057;
-    text-align: center;
-    white-space: nowrap;
-    background-color: #e9ecef;
-    border: 1px solid #ced4da;
-    border-top-left-radius: .25rem;
-    border-bottom-left-radius: .25rem;
-    font-weight: bold;
-}
-
-.select-style span{
-    margin: 0 5px;
 }
 
 #recent-clear,
