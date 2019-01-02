@@ -7,10 +7,7 @@ var cmenu = document.getElementById('context-menu');
 var cpyFile;
 var dialogDetails;
 
-hideCMenu = () => {
-    cmenu.style.display = "none"
-    cpyFile = undefined;
-}
+hideCMenu = () => cmenu.style.display = "none";
 
 keepIn = (e, el) => {
     if (e.clientY + el.offsetHeight > window.innerHeight) {
@@ -22,6 +19,7 @@ keepIn = (e, el) => {
         el.style.left = (e.clientX - el.offsetWidth) + "px";
     }
 }
+
 showCtxMenu = (name, isfile, e) => {
     cmenu.style.top = e.clientY + 4 + "px";
     cmenu.style.left = e.clientX + 4 + "px";
@@ -260,3 +258,5 @@ dialogBox = (data, cb) => {
         });
     });
 }
+
+$(document).on("click",(e)=>{ hideCMenu(); })

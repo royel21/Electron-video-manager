@@ -119,6 +119,11 @@
     font-size: 24px;
 }
 
+.modal li span i {
+    font-size: 18px;
+    margin: 0 2px;
+}
+
 .btn-hide,
 #list-add-folder,
 #list-sync-folder {

@@ -48,3 +48,4 @@ popupShow = async (event) => {
 $('body, .footer').on('mouseenter', '.popup-msg', popupShow);
 $('body, .footer').on('mouseleave wheel', '.popup-msg', popupHide);
 $('body, .footer').on('click', popupHide);
+$('.cancel-footer').on('mouseenter',popupHide);

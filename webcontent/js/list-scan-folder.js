@@ -1,12 +1,24 @@
 var $modalScnList;
 
+createFRow = (id, dir) =>{
+    return `<li id="f-${id}" data-dir="{dir}" class="list-group-item">
+    <span class="f-delete">
+        <i class="fas fa-trash-alt"></i>
+    </span>
+    <span class="f-reload">
+        <i class="fa fa-sync"></i>
+    </span>
+    <span>${dir}</span>
+</li>`
+}
+
 $('#scan-list-show').click((e) => {
     if ($modalScnList == undefined) {
         $modalScnList = $(template('./template/modal-scan.html', {}));
 
         $('.content').prepend($modalScnList);
         for (var fd of config.scanFolder) {
-            $('#scan-list').append(template('./template/folder-row.html', fd));
+            $('#scan-list').append(createFRow(fd.Id, fd.dir));
         }
         $modalScnList.find('#list-add-folder').click(() => {
             var dir = dialog.showOpenDialog(mainWindow, {
@@ -18,7 +30,8 @@ $('#scan-list-show').click((e) => {
                     return f.dir == dir[0];
                 }) == undefined) {
                     var id = 0;
-                    if (config.scanFolder.length > 0) id = config.scanFolder.last.Id + 1;
+                    var lastId = config.scanFolder.last.Id
+                    if (config.scanFolder.length > 0) id =  lastId ? lastId + 1 : 0;
 
                     config.scanFolder.push({
                         Id: id,
@@ -31,11 +44,16 @@ $('#scan-list-show').click((e) => {
                             dir: dir[0]
                         }]
                     });
-
-                    $('#scan-list').append(template('./template/folder-row.html', {
-                        id,
-                        dir: dir[0]
-                    }));
+                    var fRow = `<li id="f-${id}" data-dir="{dir}" class="list-group-item">
+                                    <span class="f-delete">
+                                        <i class="fas fa-trash-alt"></i>
+                                    </span>
+                                    <span class="f-reload">
+                                        <i class="fas fa-fa-sync"></i>
+                                    </span>
+                                    <span>${dir}</span>
+                                </li>`
+                    $('#scan-list').append(fRow);
                     $('#folder-reloading .fa-database').removeClass('d-none');
                 }
             }
@@ -43,13 +61,20 @@ $('#scan-list-show').click((e) => {
 
         $modalScnList.find('#list-sync-folder').click(() => {
             $('#folder-reloading .fa-database').removeClass('d-none');
-            console.log('reload')
             createBackgroundWin('reload-Db', {
                 folders: config.scanFolder,
                 resetDb: true
             });
         });
-
+        $modalScnList.find('.f-reload').click((e) => {
+            var id = e.target.closest('li').id.replace("f-","")
+            $('#folder-reloading .fa-database').removeClass('d-none');
+            console.log(config.scanFolder[id], id)
+            createBackgroundWin('reload-Db', {
+                folders: [config.scanFolder[id]],
+                resetDb: false
+            });
+        });
         $modalScnList.find('#close-modal').click(() => {
             hideModal($modalScnList);
             $modalScnList = undefined;
