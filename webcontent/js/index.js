@@ -90,6 +90,7 @@ loadDirectory = async (folder, id) => {
             currentDir = dir;
             var files = [];
             var folders = [];
+
             WinDrive.ListFiles(dir).forEach((f) => {
                 var name = f.FileName.toLocaleLowerCase();
                 if (!f.isHidden) {
@@ -102,6 +103,7 @@ loadDirectory = async (folder, id) => {
                     }
                 }
             });
+
             totalitem = folders.length + files.length;
             var documentFragment = document.createDocumentFragment();
             folders.concat(files).forEach((f) => {
@@ -110,6 +112,7 @@ loadDirectory = async (folder, id) => {
             var flist = document.getElementById('file-list');
             flist.innerHTML = "";
             flist.append(documentFragment);
+            sortElements();
             $('.title').text(dir);
             selectedIndex = 0;
             lazyLoad();

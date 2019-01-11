@@ -102,8 +102,10 @@ showConfigModal = (e) => {
                     config.sortBy = $sortSelect.val();
                     sortElements();
                 });
+                $sortSelect.find('option[value="'+config.sortBy+'"]')[0].selected = true;
                 var showDelDialog = $modalconfig.find('#showDeleteDialog')[0];
                 showDelDialog.checked = !config.showDeleteDialog;
+
                 showDelDialog.onchange = (e) => {
                     config.showDeleteDialog = !showDelDialog.checked;
                 }

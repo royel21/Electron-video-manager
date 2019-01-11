@@ -1,16 +1,12 @@
-const extractFrames = require('ffmpeg-extract-frames')
+var Client = require('node-ssdp').Client
+      , client = new Client();
+ 
+    client.on('response', function (headers, statusCode, rinfo) {
+      console.log('Got a response to an m-search.');
+    });
 
-test = async () =>{
-    await extractFrames({
-        input: 'media/1.mp4',
-        output: './screenshot-%i.jpg',
-        offsets: [
-          1000,
-          2000,
-          3500
-        ]
-      })
-}
-
-test();
-// extract 3 frames at 1s, 2s, and 3.5s respectively
+ 
+    // Or get a list of all services on the network
+ 
+    client.search('ssdp:all');
+    console.log("start ssdp");

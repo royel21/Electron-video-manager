@@ -15,6 +15,7 @@
     "ffprobe-static": "^3.0.0",
     "fluent-ffmpeg": "^2.1.2",
     "fs-extra": "^7.0.0",
+    "node-ssdp": "^4.0.0",
     "node-stream-zip": "^1.7.0",
     "rcunrar": "file:../local_modules/rcunrar",
     "sequelize": "^4.39.1",

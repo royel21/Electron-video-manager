@@ -77,7 +77,7 @@ itemClick = (event) => {
         switch (event.target.classList[0]) {
             case 'item-del':
                 {
-                    deleteFile(path.join(currentDir, $item.data('name')), true)
+                    deleteFile(path.join(currentDir, $item.data('name')+""), true)
                     .then(resp => {
                         if (resp == 0) {
                             $item.fadeOut('slow', () => {
