@@ -182,15 +182,14 @@ compressFile = async () => {
                 file: filePath,
                 storeEntries: true
             });
-            
+
             await new Promise((resolve, reject) => {
                 zip.on('ready', () => {
                     try {
                         totalimg = Object.values(zip.entries()).sort((a, b) => {
                             return String(a.name).localeCompare(String(b.name));
                         }).filter(imgFilter);
-                    } catch (err) {
-                    }
+                    } catch (err) {}
                     resolve();
                 });
             });
@@ -329,8 +328,10 @@ function imageViewerCleanUp() {
         $('#next-file').off('click', nextFile);
         $('#backtofilelist').off('click', backToFileBrowser);
         $viewer.on('mousedown', event => {
-            event.which === 1 ? nextImg() : prevImg();
-            $viewer.focus();
+            if (event.target.id.includes("myimg") || event.target.id.includes("img-content")) {
+                event.which === 1 ? nextImg() : prevImg();
+                $viewer.focus();
+            }
         });
     }
 }
@@ -345,8 +346,49 @@ imgViewerInit = () => {
         $(document).on('keydown', ViewerKeyUp);
         /******************************************************/
         $viewer.on('mousedown', event => {
-            event.which === 1 ? nextImg() : prevImg();
-            $viewer.focus();
+            if (event.target.id.includes("myimg") || event.target.id.includes("img-content")) {
+                event.which === 1 ? nextImg() : prevImg();
+                $viewer.focus();
+            }
         });
     }
+}
+
+
+const webtoon = $('#webtoon')[0];
+webtoon.oninput = function (e) {
+    console.log("test");
+    if (webtoon.checked) {
+        $('#img-viewer').css({
+            "overflow": "auto"
+        });
+        $('#img-content').css({
+            "height": "initial"
+        });
+        $('#img-content img').css({
+            "transform": "scaleX(1)",
+            width: "initial"
+        });
+        config.animDuration = lastAnimation;
+    } else {
+        $('#img-viewer').css({
+            "overflow": "hidden"
+        });
+        $('#img-content').css({
+            "height": "100%"
+        });
+        lastAnimation = config.animDuration;
+        config.animDuration = "None";
+        $('#img-content img').css({
+            "transform": "scaleX(" + config.imgScale + ")",
+            width: "100%"
+        });
+    }
+ 
+    e.stopPropagation();
+    e.cancelBubble = true;
+    e.preventDefault();
+}
+
+webtoon.onclick = (e) =>{
 }

@@ -389,11 +389,11 @@ label {
     cursor: default !important;
 }
 
-#file-viewer-config input{
+.checked-box{
      display: none;
 }
 
-#file-viewer-config #showDeleteDialog-check{
+.checked-mark{
     cursor: pointer;
     color: black;
     font-weight: bold;
@@ -401,7 +401,7 @@ label {
     transition: all .2s;
 }
 
-#file-viewer-config #showDeleteDialog-check:before{
+.checked-mark:before{
     content: " ";
     position: absolute;
     display:inline-block;
@@ -413,14 +413,14 @@ label {
     font-size: 25px;
 }
 
-#file-viewer-config #showDeleteDialog-check:after{
+.checked-mark:after{
     content: "\f00c";
     position: absolute;
     left: 68%;
     font-size: 25px;
 }
 
-#file-viewer-config #showDeleteDialog:checked + #showDeleteDialog-check:after{
+.checked-box:checked + .checked-mark:after{
     content: "\f00d";
 }
 

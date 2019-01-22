@@ -139,10 +139,8 @@ addToFav = async ($item, event) => {
                     favoritefileId: 1
                 });
             } else {
-                var file = WinDrive.ListFiles(path.join(currentDir, name), true)[0];
                 f[0].updateAttributes({
                     Current: 0,
-                    Size: file.Size,
                     folderId: folderId,
                     favoritefileId: config.favId
                 });

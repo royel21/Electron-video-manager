@@ -5,6 +5,7 @@ updatePageNum = () => {
     LoadNextImage = true;
     $filescount.text('Files: ' + (fileN + 1) + '/' + filesList.length);
     $('.pages').text(String(currentFile.Current + 1).padStart(totalPage > 99 ? 3 : 2, '0') + "/" + totalPage);
+    $("#img-viewer")[0].scrollTo(0, 0);
 
 }
 

@@ -1,3 +1,4 @@
+var lastAnimation;
 sortFileBy = (a, b) => {
     var n1 = a.FileName.toLocaleUpperCase().replace(/[\{|\[]/g, "0");
     var n2 = b.FileName.toLocaleUpperCase().replace(/[\{|\[]/g, "0");
@@ -102,7 +103,7 @@ showConfigModal = (e) => {
                     config.sortBy = $sortSelect.val();
                     sortElements();
                 });
-                $sortSelect.find('option[value="'+config.sortBy+'"]')[0].selected = true;
+                $sortSelect.find('option[value="' + config.sortBy + '"]')[0].selected = true;
                 var showDelDialog = $modalconfig.find('#showDeleteDialog')[0];
                 showDelDialog.checked = !config.showDeleteDialog;
 
@@ -133,7 +134,6 @@ showConfigModal = (e) => {
                     config.imgScale = this.value;
                     $('#img-content img').css("transform", "scaleX(" + config.imgScale + ")");
                 }
-
                 imgScaleW.value = config.imgScale;
                 break;
             }
@@ -155,7 +155,7 @@ hideModal = function ($modal) {
 positionModal = (e, $modal) => {
     var pos = $(e.target).offset();
     var m = $modal[0];
-    moveEl(m, pos.left-($modal.width()/2), (pos.top - m.offsetHeight - 10), $modal.width(), $modal.height());
+    moveEl(m, pos.left - ($modal.width() / 2), (pos.top - m.offsetHeight - 10), $modal.width(), $modal.height());
     $modal.fadeIn('slow');
 };
 
