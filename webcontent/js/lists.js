@@ -24,7 +24,6 @@ $('.list-file-content').on('mousedown', 'ul li', (e) => {
         selectListRow(e.target, e.ctrlKey);
         hideCMenu();
     }
-    console.log(e.which)
 });
 
 processRow = (event) => {

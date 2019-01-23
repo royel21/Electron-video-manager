@@ -1,3 +1,5 @@
+var animateDiv1 = document.getElementById("animate-image-1");
+var animateDiv2 = document.getElementById("animate-image-2");
 updatePageNum = () => {
     tempImg.src = "";
     if(currentFile !== undefined)
@@ -15,12 +17,18 @@ noneAnimation = () => {
 }
 
 slideAnimation = () => {
-    tempImg.style.left = direction ? window.innerWidth + "px" : -window.innerWidth + "px";
-    tempImg.style.display = "block";
-    $(tempImg).animate({ left: 0 }, {
+    $(animateDiv1).animate({ left: direction ? -window.innerWidth + "px" : +window.innerWidth + "px" }, {
         duration: Number(config.animDuration),
         always: function () {
-            tempImg.style.display = "none";
+            animateDiv1.style.left = 0;
+        }
+    });
+    animateDiv2.style.left = direction ? window.innerWidth + "px" : -window.innerWidth + "px";
+    animateDiv2.style.display = "flex";
+    $(animateDiv2).animate({ left: 0 }, {
+        duration: Number(config.animDuration),
+        always: function () {
+            animateDiv2.style.display = "none";
             viewerImg.src = tempImg.src;
             updatePageNum();
         }
