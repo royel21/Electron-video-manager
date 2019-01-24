@@ -372,6 +372,8 @@ imgViewerInit = () => {
 }
 
 var lastAnimation = config.pageAnimation;
+
+
 webtoon.oninput = function (e) {
     if (webtoon.checked) {
         $('#img-viewer').css({
@@ -392,7 +394,7 @@ webtoon.oninput = function (e) {
 
         let pn = currentFile.Current;
 
-        for (var i = pn - 7; i < pn + 8; i++) {
+        for (var i = pn - 3; i < pn + 4; i++) {
             console.log("I:", i);
             if (i > -1 && i < totalPage) {
                 console.log(i)
@@ -400,6 +402,7 @@ webtoon.oninput = function (e) {
                 webDiv.childNodes[i].style.display = "block";
             }
         }
+
         webDiv.childNodes[pn].onload = () => {
             webDiv.childNodes[pn].scrollIntoView(true);
             lazyLoadWebToon();
@@ -419,7 +422,9 @@ webtoon.oninput = function (e) {
         // config.pageAnimation = lastAnimation;
         $("#webtoon-content").css("display", "none");
         $("#img-content").css("display", "flex");
-        $("#webtoon-content img").css({ "display": "none" }).attr("src", "");
+        $("#webtoon-content img").css({
+            "display": "none"
+        }).attr("src", "");
     }
 
     e.stopPropagation();
@@ -427,33 +432,37 @@ webtoon.oninput = function (e) {
     e.preventDefault();
 }
 
+const low = 3, high = 4;
+
 loadToon = async (index) => {
-    if (index > currentFile.Current && index + 7 < currentFile.Total) {
-        if (index - 3 > -1) {
-            webDiv.childNodes[index - 8].src = "";
-            webDiv.childNodes[index - 8].style.display = "none";
+
+    if (index < currentFile.Current) {
+        if (index + high < currentFile.Total) {
+            webDiv.childNodes[index + high].src = "#";
+            webDiv.childNodes[index + high].style.display = "none";
         }
-        
-        webDiv.childNodes[index + 7].src = getImage(index + 7);
-        webDiv.childNodes[index + 7].style.display = "block";
-        console.log("Down")
+        if (index - low > -1) {
+            webDiv.childNodes[index - low].src = getImage(index - low);
+            webDiv.childNodes[index - low].style.display = "block";
+        }
     }
 
-    if (index < currentFile.Current && index - 7 > -1) {
-        if (index + 7 < currentFile.Total) {
-            webDiv.childNodes[index + 8].src = "";
-            webDiv.childNodes[index + 8].style.display = "none";
+    if (index > currentFile.Current) {
+        if (index - high > -1) {
+            webDiv.childNodes[index - high].src = "#";
+            webDiv.childNodes[index - high].style.display = "none";
         }
-
-        webDiv.childNodes[index - 7].src = getImage(index - 7);
-        webDiv.childNodes[index - 7].style.display = "block";
-        console.log("Up")
+        if (index + low < totalPage) {
+            webDiv.childNodes[index + low].src = getImage(index + low);
+            webDiv.childNodes[index + low].style.display = "block";
+        }
     }
+
     currentFile.Current = index;
 }
 
+
 lazyLoadWebToon = async () => {
-    var lazyToon = document.querySelectorAll('#webtoon-content img');
     var lazyImageObserver = new IntersectionObserver((entries, observer) => {
         entries.forEach((entry) => {
             if (entry.isIntersecting) {
@@ -462,9 +471,11 @@ lazyLoadWebToon = async () => {
                 loadToon(index);
             }
         });
-    });
+    }, {
+            root: document.getElementById("img-viewer")
+        });
 
-    lazyToon.forEach((lazyImg) => {
+    webDiv.childNodes.forEach((lazyImg) => {
         lazyImageObserver.observe(lazyImg);
     });
 }
