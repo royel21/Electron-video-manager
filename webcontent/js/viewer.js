@@ -350,6 +350,7 @@ function imageViewerCleanUp() {
                 $viewer.focus();
             }
         });
+        webDiv.innerHTML = "";
     }
 }
 

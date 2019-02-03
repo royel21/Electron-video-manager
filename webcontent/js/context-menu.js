@@ -51,6 +51,8 @@ showCtxMenu = (name, isfile, e) => {
         }
     });
     cmenu.style.display = "block";
+    
+    console.log("cmenu1");
 }
 
 $('#file-list').on('mousedown', '.items', (e) => {

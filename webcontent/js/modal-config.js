@@ -131,13 +131,14 @@ showConfigModal = (e) => {
 
                 const imgScaleW = $modalconfig.find('#scale-img-w')[0];
                 imgScaleW.oninput = function () {
-                    if (webtoon.checked) {
+                    if (!webtoon.checked) {
                         config.imgScale = this.value
                         $('#img-content img').css("transform", "scaleX(" + config.imgScale + ")");
                     } else {
                         config.webToonScale = this.value
                         $('#webtoon-content img').css("transform", "scale(" + config.webToonScale + ")");
                     }
+                    console.log("Scale")
                 }
                 imgScaleW.value = webtoon.checked ? config.webToonScale : config.imgScale;
                 break;
@@ -165,3 +166,4 @@ positionModal = (e, $modal) => {
 };
 
 $('.tool-img-fb').click(showConfigModal);
+$('#open-img-config').click(showConfigModal);
