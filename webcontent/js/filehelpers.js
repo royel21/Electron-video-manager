@@ -28,12 +28,12 @@ processDelete = (file, showloading) => {
         if (videoFilter.includes(file.split('.').pop())) {
             var i = 0;
             while (i < 4) {
-                var cover = path.join("./covers/videos", path.basename(file) + i + ".png");
+                var cover = path.join(__dirname, "covers/videos", path.basename(file) + i + ".png");
                 if (fs.existsSync(cover)) fs.removeSync(cover);
                 i++;
             }
         } else {
-            var cover = path.join("./covers", path.basename(file) + ".jpg");
+            var cover = path.join(__dirname, "covers", path.basename(file) + ".jpg");
             if (fs.existsSync(cover)) fs.removeSync(cover);
         }
         if (showloading) $('#loadingDiv').addClass('d-none');
@@ -204,7 +204,7 @@ function CreateEl(file, diskIcon) {
     var div = document.createElement('div');
     div.innerHTML =
         `<div data-isfile="${isFile}" data-name="${file.FileName}" tabindex="0" data-size="${file.Size}" data-mdate="${file.LastModified}" data-ex="${file.extension}" class="items" >
-                <div class="item-file popup-msg" >
+                <div class="item-file" >
                     <div class="item-btns">
                         <span class="item-del fas fa-trash"></span>
                         <span class="item-fav ${isFav} fa-star ${isImage ? "d-none" : ""}"></span>
@@ -252,7 +252,8 @@ lazyLoad = () => {
                 var icon;
                 if (lazyCover.dataset.src == videoIcon || lazyCover.dataset.src === zipIcon) {
                     var isVideo = videoFilter.includes(ds.ex);
-                    icon = './covers/' + (isVideo ? 'videos/' + ds.name + '-0.png' : ds.name + '.jpg');
+                    icon = 'covers/' + (isVideo ? 'videos/' + ds.name + '-0.png' : ds.name + '.jpg');
+                    icon = path.join(__dirname, icon)
                     if (fs.existsSync(icon)) {
                         lazyCover.dataset.src = icon.replace('#', '%23');
                     }

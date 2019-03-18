@@ -17,7 +17,7 @@
     fileFilter = ['mp4', 'mkv', 'avi', 'webm', 'ogg', 'zip', 'rar', 'cbr'];
 
     var count = 0;
-
+    var appPath = path.join(path.dirname(__dirname));
     var startTime, endTime;
     var currentDir = localStorage.getItem('currentDir');
     Storage.prototype.getObject = function (key) {
@@ -125,7 +125,7 @@
         try {
             for (const file of data.files) {
 
-                var coverP = path.resolve("./", 'covers', file.FileName + ".jpg");
+                var coverP = path.resolve(appPath, 'covers', file.FileName + ".jpg");
                 var state;
                 var isVideo;
                 switch (file.extension.toLocaleLowerCase()) {
@@ -238,7 +238,7 @@
                     timestamps: [time],
                     // count: 4,
                     filename: '%f-' + num,
-                    folder: './covers/videos',
+                    folder: path.join(appPath,'covers','videos'),
                     size: '240x?'
                 }).on('end', () => {
                     resolve(true);

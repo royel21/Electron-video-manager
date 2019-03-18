@@ -1,5 +1,9 @@
 const StreamZip = require('node-stream-zip');
 const rcunrar = require('rcunrar');
+const webtoon = $('#webtoon')[0];
+
+const webDiv = document.getElementById("webtoon-content");
+var toonCount = 3;
 
 var zip = null;
 var rar = null;
@@ -189,7 +193,7 @@ compressFile = async () => {
                         totalimg = Object.values(zip.entries()).sort((a, b) => {
                             return String(a.name).localeCompare(String(b.name));
                         }).filter(imgFilter);
-                    } catch (err) {}
+                    } catch (err) { }
                     resolve();
                 });
             });
@@ -207,6 +211,19 @@ compressFile = async () => {
             setUpRange();
             viewImage(currentFile.Current);
             LoadNextImage = true;
+            webtoon.checked = false;
+            let evt = document.createEvent("HTMLEvents");
+            evt.initEvent("input", false, true);
+            webtoon.dispatchEvent(evt);
+
+            let documentFragment = document.createDocumentFragment();
+            for (i = 0; i < totalPage; i++) {
+                let img = new Image();
+                img.style.display = "none";
+                documentFragment.append(img);
+            }
+            webDiv.innerHTML = "";
+            webDiv.append(documentFragment);
             return true;
         } else {
             $('#loadingDiv').addClass('d-none');
@@ -333,6 +350,7 @@ function imageViewerCleanUp() {
                 $viewer.focus();
             }
         });
+        webDiv.innerHTML = "";
     }
 }
 
@@ -354,41 +372,111 @@ imgViewerInit = () => {
     }
 }
 
+var lastAnimation = config.pageAnimation;
 
-const webtoon = $('#webtoon')[0];
+
 webtoon.oninput = function (e) {
-    console.log("test");
     if (webtoon.checked) {
         $('#img-viewer').css({
             "overflow": "auto"
         });
-        $('#img-content').css({
-            "height": "initial"
-        });
-        $('#img-content img').css({
-            "transform": "scaleX(1)",
-            width: "initial"
-        });
-        config.animDuration = lastAnimation;
+        // $('#img-content').css({
+        //     "height": "initial"
+        // });
+        // $('#img-content img').css({
+        //     "transform": "scale(" + config.webToonScale + ")",
+        //     width: "initial",
+        //     maxHeight: "initial"
+        // });
+        // lastAnimation = config.pageAnimation;
+        // config.pageAnimation = "None";
+        $("#webtoon-content").css("display", "flex");
+        $("#img-content").css("display", "none");
+
+        let pn = currentFile.Current;
+
+        for (var i = pn - 3; i < pn + 4; i++) {
+            console.log("I:", i);
+            if (i > -1 && i < totalPage) {
+                console.log(i)
+                webDiv.childNodes[i].src = getImage(i);
+                webDiv.childNodes[i].style.display = "block";
+            }
+        }
+
+        webDiv.childNodes[pn].onload = () => {
+            webDiv.childNodes[pn].scrollIntoView(true);
+            lazyLoadWebToon();
+        }
     } else {
         $('#img-viewer').css({
             "overflow": "hidden"
         });
-        $('#img-content').css({
-            "height": "100%"
-        });
-        lastAnimation = config.animDuration;
-        config.animDuration = "None";
-        $('#img-content img').css({
-            "transform": "scaleX(" + config.imgScale + ")",
-            width: "100%"
-        });
+        // $('#img-content').css({
+        //     "height": "100%"
+        // });
+        // $('#img-content img').css({
+        //     "transform": "scaleX(" + config.imgScale + ")",
+        //     width: "100%",
+        //     maxHeight: "100%"
+        // });
+        // config.pageAnimation = lastAnimation;
+        $("#webtoon-content").css("display", "none");
+        $("#img-content").css("display", "flex");
+        $("#webtoon-content img").css({
+            "display": "none"
+        }).attr("src", "");
     }
- 
+
     e.stopPropagation();
     e.cancelBubble = true;
     e.preventDefault();
 }
 
-webtoon.onclick = (e) =>{
+const low = 3, high = 4;
+
+loadToon = async (index) => {
+
+    if (index < currentFile.Current) {
+        if (index + high < currentFile.Total) {
+            webDiv.childNodes[index + high].src = "#";
+            webDiv.childNodes[index + high].style.display = "none";
+        }
+        if (index - low > -1) {
+            webDiv.childNodes[index - low].src = getImage(index - low);
+            webDiv.childNodes[index - low].style.display = "block";
+        }
+    }
+
+    if (index > currentFile.Current) {
+        if (index - high > -1) {
+            webDiv.childNodes[index - high].src = "#";
+            webDiv.childNodes[index - high].style.display = "none";
+        }
+        if (index + low < totalPage) {
+            webDiv.childNodes[index + low].src = getImage(index + low);
+            webDiv.childNodes[index + low].style.display = "block";
+        }
+    }
+
+    currentFile.Current = index;
+}
+
+
+lazyLoadWebToon = async () => {
+    var lazyImageObserver = new IntersectionObserver((entries, observer) => {
+        entries.forEach((entry) => {
+            if (entry.isIntersecting) {
+                var index = Array.prototype.indexOf.call(webDiv.children, entry.target);
+                console.log(index);
+                loadToon(index);
+            }
+        });
+    }, {
+            root: document.getElementById("img-viewer")
+        });
+
+    webDiv.childNodes.forEach((lazyImg) => {
+        lazyImageObserver.observe(lazyImg);
+    });
 }

@@ -10,7 +10,7 @@
     height: 100%;
     overflow: hidden;
 }
-
+.center-img,
 #img-content{
     display: flex;
     justify-content: center;
@@ -21,15 +21,48 @@
     position: relative;
 }
 
+.center-img,
 #img-content::-webkit-scrollbar-track {
     margin: 0;
 }
-#img-content img{
+
+.center-img img{
     -webkit-user-drag: none;
     width: 100%;
     max-height: 100%;
     max-width: 100%;
     background-color: white;
+}
+
+.center-img{
+    display: none;
+    position: absolute;
+    top:0;
+    left: 0;
+    pointer-events: none;
+}
+
+#img-content{
+    position: relative;
+    z-index: 1;
+}
+
+#webtoon-content{
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    position: relative;
+    z-index: 0;
+    max-width: 100%;
+}
+
+#webtoon-content img{
+    max-width: 100%;
+}
+
+#animate-image-1{
+    display: flex;
+    pointer-events: all;
 }
 
 #image-viewer .toolbar>div {
@@ -78,6 +111,7 @@ body[viewer="2"]:-webkit-full-screen .clock{
     bottom: 47px;
     left: 2px;
     width: 146px;
+    z-index: 5;
 }
 #webtoon-active label{
     font-size: 12px;
@@ -92,4 +126,9 @@ body[viewer="2"]:-webkit-full-screen .clock{
 #webtoon-active label:after{
     left: 70px;
     font-size: 15px;
+}
+
+#img-viewer::-webkit-scrollbar-thumb{
+    height: 50px;
+    width: 20px;
 }

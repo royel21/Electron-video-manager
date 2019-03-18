@@ -153,6 +153,16 @@
             </div>
         </div>
         <div class="content">
+            <div id="context-menu">
+                <ul>
+                    <li id="cm-open-with-default">Open In Default</li>
+                    <li id="cm-cp-name">Copy Name</li>
+                    <li id="cm-cp-path">Copy Path</li>
+                    <li id="cm-file-rename">Rename</li>
+                    <li id="cm-zip-file">Zip File</li>
+                    <li id="cm-sh-details">Show Details</li>
+                </ul>
+            </div>
             <div id="loadingDiv" class=" d-none">
                 </span><span id="loading-msg">Please Wait</span>
                 <div class="loader"></div>
@@ -228,18 +238,18 @@
                             <span id="next-file">
                                 <i class="fas fa-angle-double-right popup-msg" data-title="Next File"></i>
                             </span>
-                            <span class="tool-config">
+                            <span id="open-img-config" class="tool-config">
                                 <label for="hide-tools">
                                     <i class="fas fa-cog popup-msg" data-title="Open Tools"></i>
                                 </label>
-                                <input id="hide-tools" type="checkbox">
-                                <span class="sub-tools">
+                                <!-- <input id="hide-tools" type="checkbox"> -->
+                                <!-- <span class="sub-tools">
                                     <span id="tool-img" class="tool-img-fb">
                                         <i class="fas fa-image">
                                             <i class="fas fa-cog popup-msg" data-title="Image Viewer Config"></i>
                                         </i>
                                     </span>
-                                </span>
+                                </span> -->
                             </span>
                             <span class="btn-fullscr">
                                 <i class="fas fa-expand-arrows-alt popup-msg" data-title="Full Screen"></i>
@@ -247,8 +257,14 @@
                         </div>
                     </div>
                     <div id="img-content">
-                        <img id="myimg">
-                        <img id="temp-img">
+                        <div id="animate-image-1" class="center-img">
+                            <img id="myimg">
+                        </div>
+                        <div id="animate-image-2" class="center-img">
+                            <img id="temp-img">
+                        </div>
+                    </div>
+                    <div id="webtoon-content">
                     </div>
                     <div id="webtoon-active" class="input-group mt-2">
                         <div class="input-group-prepend">
@@ -263,16 +279,6 @@
                 <span class="total-files"></span></span>
             </div>
             <div id="file-viewer">
-                <div id="context-menu">
-                    <ul>
-                        <li id="cm-open-with-default">Open In Default</li>
-                        <li id="cm-cp-name">Copy Name</li>
-                        <li id="cm-cp-path">Copy Path</li>
-                        <li id="cm-file-rename">Rename</li>
-                        <li id="cm-zip-file">Zip File</li>
-                        <li id="cm-sh-details">Show Details</li>
-                    </ul>
-                </div>
                 <div id="file-list">
                 </div>
                 <span class="total-files"></span>

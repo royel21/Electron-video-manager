@@ -15,8 +15,8 @@ $('.list-file-content').on('dblclick', '#delete-list', consumeEvent);
 
 $('.list-file-content').on('mousedown', 'ul li', (e) => {
     if (e.which === 3) {
-        if ($(e.target).closest('#recent')[0] == undefined && $(e.target).closest('#current-list')[0] == undefined &&
-         $(e.target).is("li")) {
+        var id = $(e.target).closest('ul')[0].id;
+        if ( $(e.target).is("li") && !id.includes("recent") && !id.includes("current")) {
             var $li = $(e.target.closest('li'));
             showCtxMenu($li.data('title'), $li.data('isfile'), e);
         }
@@ -24,7 +24,6 @@ $('.list-file-content').on('mousedown', 'ul li', (e) => {
         selectListRow(e.target, e.ctrlKey);
         hideCMenu();
     }
-    console.log(e.which)
 });
 
 processRow = (event) => {

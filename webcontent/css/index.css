@@ -137,6 +137,12 @@ body,
     overflow: hidden;
 }
 
+.item-cover:hover{
+    transform: scale(1.1);
+    position: relative;
+    z-index: 99;
+}
+
 .file-page:after{
     content: attr(data-pages);
     position: absolute;
@@ -153,6 +159,10 @@ body,
     outline: none;
     background-color: rgba(0,123,255,0.1) !important;
     box-shadow: 0 0 10px; 
+    overflow: visible;
+}
+.item-file:hover > .item-name{
+    background-color: rgba(0,0,0,0.4);
 }
 .item-btns{
     min-height: 25px;
@@ -196,6 +206,7 @@ body,
     position: relative;
     text-align: center;
     pointer-events: none;
+    z-index: 5;
 }
 .item-name span {
     top: 0;
@@ -359,14 +370,6 @@ input[type=number]:focus {
     color: white;
     background-color: rgba(0, 0, 0, 0.2);
 }
-
- #temp-img{
-     display: none;
-     position: absolute;
-     top:0;
-     left: 0;
-     pointer-events: none;
- }
 
  /**************** Loading Animation***********************/
 .loader,

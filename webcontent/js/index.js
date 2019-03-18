@@ -18,13 +18,12 @@ var setUp = true;
 var totalToConvert = 0;
 var colNum = 0;
 
-
 ipcRenderer.on('thumb-create', (event, name, isVideo) => {
     totalToConvert--;
     $('#conv-progress').text(totalToConvert + '/' + backgroundImage.length);
     var item = $('.items:textequalto(' + name + ')')[0];
     if (item != undefined) {
-        var icon = './covers/' + (isVideo ? 'videos/' + name + '-0.png' : name + '.jpg').replace('#', '%23');
+        var icon = path.join(__dirname,'covers/' + (isVideo ? 'videos/' + name + '-0.png' : name + '.jpg').replace('#', '%23'));
 
         item.querySelector('img').dataset.src = icon;
         item.querySelector('img').src = icon;
@@ -120,7 +119,8 @@ loadDirectory = async (folder, id) => {
 
                 var tFiles = files.filter(f => {
                     var isVideo = videoFilter.includes(f.extension);
-                    var icon = (isVideo ? './covers/videos/' + f.FileName + '-1.png' : './covers/' + f.FileName + '.jpg');
+                    var icon = (isVideo ? 'covers/videos/' + f.FileName + '-1.png' : 'covers/' + f.FileName + '.jpg');
+                    icon = path.join(__dirname, icon);
                     return compressFilter.concat(videoFilter).includes(f.extension) &&
                         !fs.existsSync(icon) && backgroundImage.find(f2 => f2.FileName === f.FileName) == undefined
                 });

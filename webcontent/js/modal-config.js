@@ -40,10 +40,10 @@ sortBy = (a, b) => {
             Size: Number(dataA.size),
             LastModified: dataA.mdate
         }, {
-            FileName: dataB.name,
-            Size: Number(dataB.size),
-            LastModified: dataB.mdate
-        });
+                FileName: dataB.name,
+                Size: Number(dataB.size),
+                LastModified: dataB.mdate
+            });
     } else {
         return sortFileBy(a, b);
     }
@@ -60,9 +60,9 @@ sortElements = () => {
     items.filter((el) => !$(el).data('isfile'))
         .concat(items.filter((el) => $(el)
             .data('isfile'))).forEach(function (p, i) {
-            flist.appendChild(p);
-            fileL[i] = p.dataset.name;
-        });
+                flist.appendChild(p);
+                fileL[i] = p.dataset.name;
+            });
     filesList = fileL;
     lazyLoad();
 }
@@ -131,10 +131,16 @@ showConfigModal = (e) => {
 
                 const imgScaleW = $modalconfig.find('#scale-img-w')[0];
                 imgScaleW.oninput = function () {
-                    config.imgScale = this.value;
-                    $('#img-content img').css("transform", "scaleX(" + config.imgScale + ")");
+                    if (!webtoon.checked) {
+                        config.imgScale = this.value
+                        $('#img-content img').css("transform", "scaleX(" + config.imgScale + ")");
+                    } else {
+                        config.webToonScale = this.value
+                        $('#webtoon-content img').css("transform", "scale(" + config.webToonScale + ")");
+                    }
+                    console.log("Scale")
                 }
-                imgScaleW.value = config.imgScale;
+                imgScaleW.value = webtoon.checked ? config.webToonScale : config.imgScale;
                 break;
             }
         case 3:
@@ -160,3 +166,4 @@ positionModal = (e, $modal) => {
 };
 
 $('.tool-img-fb').click(showConfigModal);
+$('#open-img-config').click(showConfigModal);

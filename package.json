@@ -1,7 +1,9 @@
 {
-  "name": "mangaviewer",
+  "productName": "MangaVideoPlayer",
+  "name": "mangavideoplayer",
+  "appId": "rc.manga-video-player",
   "version": "1.0.0",
-  "description": "A Manga Viewer",
+  "description": "A Manga And Video Viewer",
   "main": "main.js",
   "scripts": {
     "start": "electron main.js",
@@ -11,6 +13,7 @@
   "author": "Royel Consoro",
   "license": "MIT",
   "dependencies": {
+    "electron-squirrel-startup": "^1.0.0",
     "ffmpeg-static": "^2.4.0",
     "ffprobe-static": "^3.0.0",
     "fluent-ffmpeg": "^2.1.2",
@@ -24,15 +27,11 @@
     "win-explorer": "file:../local_modules/win-explorer",
     "zip-local": "^0.3.4"
   },
-  "build": {
-    "appId": "rc.manga.download",
-    "win": {
-      "target": "nsis"
-    }
-  },
   "devDependencies": {
     "electron": "^3.0.12",
+    "electron-packager": "^13.1.1",
     "electron-rebuild": "^1.8.2",
+    "electron-winstaller": "^3.0.4",
     "node-abi": "^2.4.4"
   }
 }
