@@ -136,6 +136,11 @@ body,
     margin: 5px;
     overflow: hidden;
 }
+.item-cover:hover{
+    transform: scale(1.1);
+    position: relative;
+    z-index: 99;
+}
 
 .item-cover:hover{
     transform: scale(1.1);
