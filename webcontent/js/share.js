@@ -19,6 +19,7 @@ var config = {
     paused: true,
     hidecontrolduration: 1,
     showDeleteDialog: true,
+    showHidden: false,
     playerkey: {
         nextfile: {
             name: "PageDown",
@@ -245,8 +246,6 @@ updateItemProgress = (file) => {
                 } else {
                     $itemf.find('.file-page').removeClass('bg-primary').addClass('bg-danger');
                 }
-
-
             }
             index = $('.items').index($item[0]);
         }
@@ -299,6 +298,7 @@ dropFile = function (e) {
 };
 
 document.ondrop = dropFile;
+
 $(document).on('dragover', (e) => {
     e.preventDefault();
     e.stopPropagation();

@@ -110,6 +110,14 @@ showConfigModal = (e) => {
                 showDelDialog.onchange = (e) => {
                     config.showDeleteDialog = !showDelDialog.checked;
                 }
+
+                let showHiddenFiles = $modalconfig.find('#show-hidden')[0];
+                showHiddenFiles.checked = config.showHidden;
+                showHiddenFiles.onchange = (e) => {
+                    config.showHidden = e.target.checked;
+                    console.log(e.target.checked)
+                    loadDirectory("");
+                }
                 break;
             }
         case 2:

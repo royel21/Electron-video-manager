@@ -9,14 +9,16 @@ var favs = [];
 var folderId = null;
 var backgroundImage = [];
 var compressingCount = 0;
-var $flist = $('#file-list');
 var filesList = [];
 var fileFound = [];
 var currentDir = "";
-var $loading = $('#folder-reloading');
 var setUp = true;
 var totalToConvert = 0;
 var colNum = 0;
+
+var $flist = $('#file-list');
+var $loading = $('#folder-reloading');
+var showHidden = false;
 
 ipcRenderer.on('thumb-create', (event, name, isVideo) => {
     totalToConvert--;
@@ -91,16 +93,20 @@ loadDirectory = async (folder, id) => {
             var folders = [];
 
             WinDrive.ListFiles(dir).forEach((f) => {
+
+                if (f.isHidden){
+                     if(config.showHidden)
+                    return;
+                } 
                 var name = f.FileName.toLocaleLowerCase();
-                if (!f.isHidden) {
-                    if (f.isDirectory && name.includes(boxFilter)) {
+
+                 if (f.isDirectory && name.includes(boxFilter)) {
                         folders.push(f);
                     } else {
                         if (supportedFiles.includes(f.extension) &&
                             name.includes(boxFilter))
                             files.push(f);
                     }
-                }
             });
 
             totalitem = folders.length + files.length;
@@ -262,14 +268,17 @@ keyboardHandler = (e) => {
 }
 
 openDir = () => {
-    var dir = dialog.showOpenDialog(mainWindow, {
+    dialog.showOpenDialog(mainWindow, {
         title: "Select the folder",
         properties: ['openDirectory', 'openFile']
+    }).then(result=>{
+        if(result.filePaths[0]){
+            if (result.filePaths[0]) {
+                currentDir = result.filePaths[0];
+                loadDirectory('');
+            }
+        }
     });
-    if (dir) {
-        currentDir = dir[0];
-        loadDirectory('');
-    }
 };
 dblclick = (e) => {
     if (['item-del', 'item-fav'].includes(e.target.classList[0])) return;

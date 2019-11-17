@@ -134,12 +134,12 @@ addToFav = async ($item, event) => {
         if (!favs.includes(name)) {
 
             if (!isFile) {
-                f[0].updateAttributes({
+                f[0].update({
                     folderId: folderId,
                     favoritefileId: 1
                 });
             } else {
-                f[0].updateAttributes({
+                f[0].update({
                     Current: 0,
                     folderId: folderId,
                     favoritefileId: config.favId
@@ -149,7 +149,7 @@ addToFav = async ($item, event) => {
             $('#list-favs').append(createEntry(f[0], isFile));
             favs.push(name);
         } else {
-            f[0].updateAttributes({
+            f[0].update({
                 favoritefileId: null
             });
             $('#list-favs').find('#file-' + f[0].Id).remove();

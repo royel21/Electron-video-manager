@@ -137,7 +137,7 @@ removeFavFromList = async (event) => {
             }
         });
     }
-    f.updateAttributes({
+    f.update({
         favoritefileId: null
     }).then(() => {
         $(li).fadeOut('fast', () => {

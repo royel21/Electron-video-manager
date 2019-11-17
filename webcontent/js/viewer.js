@@ -31,6 +31,11 @@ function imgFilter(entry) {
 function getRandomNum() {
     return Math.random() * (1 - 99999) + 1;
 }
+
+
+function calPage(){
+    $('.pages').text(String(currentFile.Current + 1).padStart(totalPage > 99 ? 3 : 2, '0') + "/" + totalPage);
+}
 /***********************************************************/
 prevImg = () => {
     if (!loadingNext) {
@@ -99,7 +104,7 @@ $('#page-n').on('click', function () {
         });
         $input.focusout(() => {
             $input = undefined;
-            $('.pages').text(String(currentFile.Current + 1).padStart(totalPage > 99 ? 3 : 2, '0') + "/" + totalPage);
+            calPage();
         })
         $input.keydown((e) => {
             e.stopPropagation()
@@ -113,7 +118,7 @@ $('#page-n').on('click', function () {
 viewImage = (pn) => {
     viewerImg.src = getImage(pn);
     $filescount.text('Files: ' + (fileN + 1) + '/' + filesList.length);
-    $('.pages').text(String(currentFile.Current + 1).padStart(totalPage > 99 ? 3 : 2, '0') + "/" + totalPage);
+    calPage();
 }
 /***********************************************************/
 setUpRange = () => {
@@ -380,30 +385,16 @@ webtoon.oninput = function (e) {
         $('#img-viewer').css({
             "overflow": "auto"
         });
-        // $('#img-content').css({
-        //     "height": "initial"
-        // });
-        // $('#img-content img').css({
-        //     "transform": "scale(" + config.webToonScale + ")",
-        //     width: "initial",
-        //     maxHeight: "initial"
-        // });
-        // lastAnimation = config.pageAnimation;
-        // config.pageAnimation = "None";
         $("#webtoon-content").css("display", "flex");
         $("#img-content").css("display", "none");
 
         let pn = currentFile.Current;
-
-        for (var i = pn - 3; i < pn + 4; i++) {
-            console.log("I:", i);
+        for (let i = pn - 3; i < pn + 4; i++) {
             if (i > -1 && i < totalPage) {
-                console.log(i)
                 webDiv.childNodes[i].src = getImage(i);
                 webDiv.childNodes[i].style.display = "block";
             }
         }
-
         webDiv.childNodes[pn].onload = () => {
             webDiv.childNodes[pn].scrollIntoView(true);
             lazyLoadWebToon();
@@ -412,20 +403,12 @@ webtoon.oninput = function (e) {
         $('#img-viewer').css({
             "overflow": "hidden"
         });
-        // $('#img-content').css({
-        //     "height": "100%"
-        // });
-        // $('#img-content img').css({
-        //     "transform": "scaleX(" + config.imgScale + ")",
-        //     width: "100%",
-        //     maxHeight: "100%"
-        // });
-        // config.pageAnimation = lastAnimation;
         $("#webtoon-content").css("display", "none");
         $("#img-content").css("display", "flex");
         $("#webtoon-content img").css({
             "display": "none"
         }).attr("src", "");
+        showImage(currentFile.Current)
     }
 
     e.stopPropagation();
@@ -459,7 +442,8 @@ loadToon = async (index) => {
         }
     }
 
-    currentFile.Current = index;
+    imageSlider.value = currentFile.Current = index;
+    calPage();
 }
 
 
@@ -468,7 +452,6 @@ lazyLoadWebToon = async () => {
         entries.forEach((entry) => {
             if (entry.isIntersecting) {
                 var index = Array.prototype.indexOf.call(webDiv.children, entry.target);
-                console.log(index);
                 loadToon(index);
             }
         });

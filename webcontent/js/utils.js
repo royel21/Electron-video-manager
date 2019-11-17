@@ -23,7 +23,8 @@ createBackgroundWin = (event, data) => {
         var win = new BrowserWindow({
             width: 1,
             height: 1,
-            show: false
+            show: false,
+            webPreferences:{ nodeIntegration: true }
             // width: 1000,
             // height: 1000,
             // show: true

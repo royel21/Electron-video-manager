@@ -10,7 +10,7 @@ var totalFiles = 0;
 loadNewPage = async (page) => {
     var val = $('#files-filter').val().toLowerCase();
     var begin = ((page - 1) * numberPerPage);
-    var files = await db.File.findAndCount({
+    var files = await db.File.findAndCountAll({
         order: ['Name'],
         offset: begin,
         limit: numberPerPage,
