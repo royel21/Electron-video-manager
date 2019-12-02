@@ -91,8 +91,8 @@ File.findOrCreateNew = (file) => {
                 Size: file.Size
             }).then(f => {
                 resolve(f);
-            }).catch(err=>{console.log(err)});
-        }).catch(err=>{console.log(err)});
+            }).catch(err => { console.log(err) });
+        }).catch(err => { console.log(err) });
     });
 }
 
@@ -116,7 +116,7 @@ Folder.hasMany(Folder);
 FavoriteFile.hasMany(File);
 FavoriteFile.hasMany(Folder);
 
-init = async (isforce) => {
+init = async(isforce) => {
     if (!fs.existsSync(dbPath) || isforce) {
         await db.sync({
             logging: console.log,

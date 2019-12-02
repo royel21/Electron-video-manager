@@ -84,20 +84,21 @@ $('#scan-list-show').click(() => {
 });
 
 $('#list-add-folder').click(() => {
-    var dir = dialog.showOpenDialog(mainWindow, {
+    dialog.showOpenDialog(mainWindow, {
         title: "Select folder",
         properties: ['openDirectory']
-    });
-    if (dir) {
-        if (scanList.find((f) => { return f.dir == dir[0] }) == undefined) {
-            id = 0;
-            if (scanList.length > 0) id = scanList.last.id + 1;
-            scanList.push({ id, dir: dir[0] });
-            scanOneDir(dir[0]).then(() => {
-                $scanList.append(template('./template/folder-row.html', { id, dir: dir[0] }));
-            })
+    }).then(dir => {
+        if (dir) {
+            if (scanList.find((f) => { return f.dir == dir[0] }) == undefined) {
+                id = 0;
+                if (scanList.length > 0) id = scanList.last.id + 1;
+                scanList.push({ id, dir: dir[0] });
+                scanOneDir(dir[0]).then(() => {
+                    $scanList.append(template('./template/folder-row.html', { id, dir: dir[0] }));
+                })
+            }
         }
-    }
+    }); //end dialog
 });
 
 $('#current-page').on('click', function () {
@@ -159,7 +160,7 @@ $list_modal.on('dblclick', 'ul li', (event) => {
     var li = event.target.closest('li')
     console.log(li);
     var id = li.id.replace("file-", "");
-    db.File.findOne({ where: { id: id }, include: { model: db.Folder } }).then(f=>{
+    db.File.findOne({ where: { id: id }, include: { model: db.Folder } }).then(f => {
         console.log(f);
         loadZip(path.join(f.folder.Name, f.Name));
     });

@@ -66,7 +66,7 @@
             });
 
             if (id) {
-                f1[0].updateAttributes({
+                f1[0].update({
                     folderId: id
                 });
             }
@@ -90,7 +90,7 @@
                             });
                         } else {
                             if (f.Size === 0) {
-                                file.updateAttributes({
+                                file.update({
                                     Size: f.Size
                                 });
                             }

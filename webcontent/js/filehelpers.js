@@ -1,25 +1,22 @@
-deleteFile = (file, showloading) => {
+deleteFile = async(file, showloading) => {
     if (config.showDeleteDialog) {
-        return new Promise((resolve, rejected) => {
-            dialog.showMessageBox(mainWindow, {
-                type: 'warning',
-                buttons: ['Yes', 'No'],
-                message: 'Are you sure you want to delete ' + file + ' ?',
-                checkboxLabel: 'Never ask me again',
-                checkboxChecked: false,
+        let result = await dialog.showMessageBox(mainWindow, {
+            type: 'warning',
+            buttons: ['Yes', 'No'],
+            message: 'Are you sure you want to delete ' + file + ' ?',
+            checkboxLabel: 'Never ask me again',
+            checkboxChecked: false,
 
-            }, (resp, checkboxChecked) => {
-                config.showDeleteDialog = !checkboxChecked;
-                processDelete(file, showloading);
-                resolve(resp);
-            });
         });
-    } else {
-        return new Promise((resolve, rejected) => {
+        console.log(result);
+        if (result.response === 0) {
+            config.showDeleteDialog = result.checkboxChecked;
             processDelete(file, showloading);
-            resolve(0);
-        });
+        }
+    } else {
+        processDelete(file, showloading);
     }
+    return 0;
 }
 processDelete = (file, showloading) => {
     if (fs.existsSync(file)) {
@@ -40,7 +37,7 @@ processDelete = (file, showloading) => {
     }
 }
 
-selectItem = async (index) => {
+selectItem = async(index) => {
     selectedIndex = index;
     var nextEl = $('.items').get(index);
     var tout = setTimeout(() => {
@@ -77,7 +74,7 @@ itemClick = (event) => {
         switch (event.target.classList[0]) {
             case 'item-del':
                 {
-                    deleteFile(path.join(currentDir, $item.data('name')+""), true)
+                    deleteFile(path.join(currentDir, $item.data('name') + ""), true)
                     .then(resp => {
                         if (resp == 0) {
                             $item.fadeOut('slow', () => {
@@ -102,7 +99,7 @@ itemClick = (event) => {
     }
 }
 
-addToFav = async ($item, event) => {
+addToFav = async($item, event) => {
 
     var name = $item.data('name');
     var isFile = $item.data('isfile');
@@ -218,7 +215,7 @@ function CreateEl(file, diskIcon) {
     return div.firstElementChild;
 }
 
-loadFavs = async () => {
+loadFavs = async() => {
     var fos = await db.Folder.findAll({
         where: {
             folderId: folderId

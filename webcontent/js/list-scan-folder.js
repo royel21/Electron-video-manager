@@ -1,6 +1,6 @@
 var $modalScnList;
 
-createFRow = (id, dir) =>{
+createFRow = (id, dir) => {
     return `<li id="f-${id}" data-dir="{dir}" class="list-group-item">
     <span class="f-delete">
         <i class="fas fa-trash-alt"></i>
@@ -21,42 +21,44 @@ $('#scan-list-show').click((e) => {
             $('#scan-list').append(createFRow(fd.Id, fd.dir));
         }
         $modalScnList.find('#list-add-folder').click(() => {
-            var dir = dialog.showOpenDialog(mainWindow, {
+            dialog.showOpenDialog(mainWindow, {
                 title: "Select folder",
                 properties: ['openDirectory']
-            });
-            if (dir) {
-                if (config.scanFolder.find((f) => {
-                    return f.dir == dir[0];
-                }) == undefined) {
-                    var id = 0;
-                    var lastId = config.scanFolder.last.Id
-                    if (config.scanFolder.length > 0) id =  lastId ? lastId + 1 : 0;
+            }).then(result => {
+                console.log(result)
+                if (!result.canceled) {
+                    if (!config.scanFolder.find((f) => { return f.dir == result.filePaths[0]; })) {
+                        var id = 0;
+                        var lastId = config.scanFolder.last;
+                        let dir = result.filePaths[0];
+                        if (config.scanFolder.length > 0) id = lastId ? lastId.Id + 1 : 0;
 
-                    config.scanFolder.push({
-                        Id: id,
-                        dir: dir[0]
-                    });
-
-                    createBackgroundWin('reload-Db', {
-                        folders: [{
+                        config.scanFolder.push({
                             Id: id,
-                            dir: dir[0]
-                        }]
-                    });
-                    var fRow = `<li id="f-${id}" data-dir="{dir}" class="list-group-item">
-                                    <span class="f-delete">
-                                        <i class="fas fa-trash-alt"></i>
-                                    </span>
-                                    <span class="f-reload">
-                                        <i class="fas fa-fa-sync"></i>
-                                    </span>
-                                    <span>${dir}</span>
-                                </li>`
-                    $('#scan-list').append(fRow);
-                    $('#folder-reloading .fa-database').removeClass('d-none');
+                            dir
+                        });
+
+                        createBackgroundWin('reload-Db', {
+                            folders: [{
+                                Id: id,
+                                dir
+                            }]
+                        });
+                        var fRow = `<li id="f-${id}" data-dir="{dir}" class="list-group-item">
+                                        <span class="f-delete">
+                                            <i class="fas fa-trash-alt"></i>
+                                        </span>
+                                        <span class="f-reload">
+                                            <i class="fas fa-fa-sync"></i>
+                                        </span>
+                                        <span>${dir}</span>
+                                    </li>`
+                        $('#scan-list').append(fRow);
+                        $('#folder-reloading .fa-database').removeClass('d-none');
+                    }
                 }
-            }
+            });
+
         });
 
         $modalScnList.find('#list-sync-folder').click(() => {
@@ -67,7 +69,7 @@ $('#scan-list-show').click((e) => {
             });
         });
         $modalScnList.find('.f-reload').click((e) => {
-            var id = e.target.closest('li').id.replace("f-","")
+            var id = e.target.closest('li').id.replace("f-", "")
             $('#folder-reloading .fa-database').removeClass('d-none');
             console.log(config.scanFolder[id], id)
             createBackgroundWin('reload-Db', {
