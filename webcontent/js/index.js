@@ -25,7 +25,7 @@ ipcRenderer.on('thumb-create', (event, name, isVideo) => {
     $('#conv-progress').text(totalToConvert + '/' + backgroundImage.length);
     var item = $('.items:textequalto(' + name + ')')[0];
     if (item != undefined) {
-        var icon = path.join(__dirname,'covers/' + (isVideo ? 'videos/' + name + '-0.png' : name + '.jpg').replace('#', '%23'));
+        var icon = path.join(__dirname, 'covers/' + (isVideo ? 'videos/' + name + '-0.png' : name + '.jpg').replace('#', '%23'));
 
         item.querySelector('img').dataset.src = icon;
         item.querySelector('img').src = icon;
@@ -36,13 +36,13 @@ ipcRenderer.on('error', (event, msg) => {
     if (String(msg).includes("Scan")) {
         $loading.find('.fa-database').addClass('d-none');
     } else
-        if (String(msg).includes("Thumbnail Create")) {
-            --processRunning;
-            if (processRunning == 0) {
-                $loading.find('.fa-folder').addClass('d-none');
-                backgroundImage = [];
-            }
+    if (String(msg).includes("Thumbnail Create")) {
+        --processRunning;
+        if (processRunning == 0) {
+            $loading.find('.fa-folder').addClass('d-none');
+            backgroundImage = [];
         }
+    }
 });
 
 ipcRenderer.on('files-removed', (e, index) => {
@@ -67,7 +67,7 @@ ipcRenderer.on('zip-done', (e, result) => {
     }
 });
 
-loadDirectory = async (folder, id) => {
+loadDirectory = async(folder, id) => {
     var dir = folder != '' ? path.join(currentDir, folder + "") : currentDir;
     var fol = await db.Folder.findOne({
         where: {
@@ -94,19 +94,19 @@ loadDirectory = async (folder, id) => {
 
             WinDrive.ListFiles(dir).forEach((f) => {
 
-                if (f.isHidden){
-                     if(config.showHidden)
-                    return;
-                } 
+                if (f.isHidden) {
+                    if (config.showHidden)
+                        return;
+                }
                 var name = f.FileName.toLocaleLowerCase();
 
-                 if (f.isDirectory && name.includes(boxFilter)) {
-                        folders.push(f);
-                    } else {
-                        if (supportedFiles.includes(f.extension) &&
-                            name.includes(boxFilter))
-                            files.push(f);
-                    }
+                if (f.isDirectory && name.includes(boxFilter)) {
+                    folders.push(f);
+                } else {
+                    if (supportedFiles.includes(f.extension) &&
+                        name.includes(boxFilter))
+                        files.push(f);
+                }
             });
 
             totalitem = folders.length + files.length;
@@ -138,7 +138,7 @@ loadDirectory = async (folder, id) => {
                     backgroundImage = backgroundImage.concat(tFiles);
                     processRunning++;
                     totalToConvert = backgroundImage.length;
-                    
+
                     $('#conv-progress').text(totalToConvert + '/' + backgroundImage.length);
                     $loading.find('.fa-folder').removeClass('d-none');
                 }
@@ -156,7 +156,7 @@ loadDirectory = async (folder, id) => {
 };
 
 
-returnFolder = async () => {
+returnFolder = async() => {
     if (currentDir.length === 0) return;
     var dir = path.parse(currentDir).base
     currentDir = path.parse(currentDir).dir
@@ -173,7 +173,7 @@ jumpToFile = (e) => {
     if (currentView === 1 && !e.ctrlKey) {
         var char = String.fromCharCode(e.charCode);
         if (char.match(/^[0-9a-zA-Z|\[|(]+$/ig)) {
-            var $firstEl = $('.items').filter(function () {
+            var $firstEl = $('.items').filter(function() {
                 return $(this).text().trim()[0].toLocaleUpperCase() === char.toLocaleUpperCase();
             });
             if ($firstEl[0] != undefined)
@@ -185,6 +185,7 @@ jumpToFile = (e) => {
 keyboardHandler = (e) => {
     if (currentView === 1) {
         var wasProcesed = false;
+        console.log(e.keyCode)
         switch (e.keyCode) {
             case 13:
                 {
@@ -196,7 +197,7 @@ keyboardHandler = (e) => {
 
                         if ($el.data('isfile')) {
                             processFile(name);
-                         } else {
+                        } else {
                             loadDirectory(name);
                         }
                     }
@@ -271,8 +272,8 @@ openDir = () => {
     dialog.showOpenDialog(mainWindow, {
         title: "Select the folder",
         properties: ['openDirectory', 'openFile']
-    }).then(result=>{
-        if(result.filePaths[0]){
+    }).then(result => {
+        if (result.filePaths[0]) {
             if (result.filePaths[0]) {
                 currentDir = result.filePaths[0];
                 loadDirectory('');
@@ -280,6 +281,7 @@ openDir = () => {
         }
     });
 };
+
 dblclick = (e) => {
     if (['item-del', 'item-fav'].includes(e.target.classList[0])) return;
 
@@ -332,8 +334,8 @@ $('#tool-folderNext').click(() => {
     JumpFolder(1)
 });
 
-goToRoots = async () => {
-    if(currentView > 1){
+goToRoots = async() => {
+    if (currentView > 1) {
         imageViewerCleanUp();
         playerCleanUp();
     }

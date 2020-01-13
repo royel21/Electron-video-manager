@@ -1,4 +1,3 @@
-
 const app = require('electron').remote;
 const mainWindow = app.getCurrentWindow();
 var isMaximized = false;
@@ -48,3 +47,14 @@ $('#btn-sys-max').on('click', maxWindow);
 $('.btn-sys-close').on('click', closeWindow);
 $('.btn-fullscr').on('click', setfullscreen);
 
+$(window).on('keydown', (e) => {
+    console.log("test")
+    switch (e.keyCode) {
+
+        case 123:
+            {
+                mainWindow.toggleDevTools();
+                break;
+            }
+    }
+});

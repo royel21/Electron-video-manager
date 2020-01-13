@@ -1,7 +1,8 @@
 const {
     app,
     BrowserWindow,
-    ipcMain
+    ipcMain,
+    Menu
 } = require('electron');
 
 const os = require('os');
@@ -22,6 +23,7 @@ if (handleSquirrelEvent(app)) {
 
 let win;
 var closeNow = false;
+
 function createWin() {
     win = new BrowserWindow({
         title: "MangaViewer",
@@ -31,7 +33,7 @@ function createWin() {
         transparent: true,
         frame: false,
         icon: path.join(__dirname, 'assets/icons/myicon-256.png'),
-        webPreferences:{ nodeIntegration: true }
+        webPreferences: { nodeIntegration: true }
     });
     win.setMenu(null);
     win.loadURL('file://' + __dirname + '/index.html');
@@ -39,7 +41,7 @@ function createWin() {
         win.show();
     });
 
-
+    Menu.setApplicationMenu(null);
     win.on('close', (e) => {
         if (closeNow) {
             app.quit();
@@ -63,7 +65,7 @@ function createWin() {
             app.quit();
         }
     });
-    win.openDevTools();
+    //win.openDevTools();
 }
 
 ipcMain.on('console-log', (event, msg) => {
@@ -115,19 +117,19 @@ function handleSquirrelEvent(application) {
     const updateDotExe = path.resolve(path.join(rootAtomFolder, 'Update.exe'));
     const exeName = path.basename(process.execPath);
 
-    const spawn = function (command, args) {
+    const spawn = function(command, args) {
         let spawnedProcess, error;
 
         try {
             spawnedProcess = ChildProcess.spawn(command, args, {
                 detached: true
             });
-        } catch (error) { }
+        } catch (error) {}
 
         return spawnedProcess;
     };
 
-    const spawnUpdate = function (args) {
+    const spawnUpdate = function(args) {
         return spawn(updateDotExe, args);
     };
 

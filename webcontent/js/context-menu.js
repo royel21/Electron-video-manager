@@ -51,7 +51,7 @@ showCtxMenu = (name, isfile, e) => {
         }
     });
     cmenu.style.display = "block";
-    
+
     console.log("cmenu1");
 }
 
@@ -66,7 +66,7 @@ $('#file-list').on('mousedown', '.items', (e) => {
 });
 
 $('#cm-open-with-default').click((e) => {
-    shell.openItem(cpyFile.fullPath);
+    shell.showItemInFolder(cpyFile.fullPath);
     hideCMenu();
 });
 $('#cm-cp-name').click((e) => {
@@ -102,7 +102,8 @@ $('#cm-sh-details').click((e) => {
     var date = new Date(tempf.LastModified);
     tempf.Date = date.toLocaleDateString("en-US") + " " + date.toLocaleTimeString("en-US");
     let div = document.createElement('div');
-    div.innerHTML = `<div id="modal-details" class="modal bg-dark card">
+    div.innerHTML =
+        `<div id="modal-details" class="modal bg-dark card">
                             <div class="dialog-header text-center move">
                                 <span class="m-title">Details</span>
                                 <span id="modal-close" class="btn-hide"><i class="far fa-times-circle"></i></span>
@@ -261,4 +262,4 @@ dialogBox = (data, cb) => {
     });
 }
 
-$(document).on("click",(e)=>{ hideCMenu(); })
+$(document).on("click", (e) => { hideCMenu(); })

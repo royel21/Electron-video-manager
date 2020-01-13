@@ -7,17 +7,25 @@ var totalFiles = 0;
 
 /**************************************/
 
-loadNewPage = async (page) => {
+loadNewPage = async(page) => {
     var val = $('#files-filter').val().toLowerCase();
     var begin = ((page - 1) * numberPerPage);
+
+    let searchs = [];
+    for (let s of val.split('|')) {
+        searchs.push({
+            Name: {
+                [db.Op.like]: "%" + s + "%"
+            }
+        });
+    }
+
     var files = await db.File.findAndCountAll({
         order: ['Name'],
         offset: begin,
         limit: numberPerPage,
         where: {
-            Name: {
-                [db.Op.like]: "%" + val + "%"
-            }
+            [db.Op.or]: searchs
         }
     });
     loadList('list-files', files.rows, true);
@@ -47,13 +55,15 @@ $('#files-filter').keyup((e) => {
 });
 
 
-$('#current-page').on('click', function () {
+$('#current-page').on('click', function() {
 
     if (numberOfPages !== 1) {
         this.textContent = "";
-        var $input = $(`<input type="number" value=${currentPage}
+        var $input = $(
+                `<input type="number" value=${currentPage}
                          style="width:70px; padding:0; font-size:15px; color: black;" min=1 
-                         max=${numberOfPages}>`)
+                         max=${numberOfPages}>`
+            )
             .appendTo($(this)).focus();
 
         $input.on('focusout', (e) => {
