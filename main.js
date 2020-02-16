@@ -42,6 +42,7 @@ function createWin() {
     });
 
     Menu.setApplicationMenu(null);
+
     win.on('close', (e) => {
         if (closeNow) {
             app.quit();
