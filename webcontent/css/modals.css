@@ -215,8 +215,8 @@ label {
 
 #btn-search-clear {
     position: absolute;
-    top: 8px;
-    right: 10px;
+    top: 10px;
+    right: 114px;
     z-index: 99;
 }
 
