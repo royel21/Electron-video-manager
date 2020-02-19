@@ -298,7 +298,7 @@ async function backToFileBrowser() {
 
 /****Viewer Config****/
 ViewerKeyUp = (event) => {
-
+console.log(event.keyCode)
     switch (event.keyCode) {
         case 13:
             {

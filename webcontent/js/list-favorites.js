@@ -77,7 +77,7 @@ $selFav.change(e => {
 
 loadFav = function () {
     if ($selFav.children().length == 0) {
-        db.FavoriteFile.findAll().then(favs => {
+        db.FavoriteFile.findAll({order:['Name']}).then(favs => {
             for (var f of favs) {
                 var selected = '';
                 if (f.Id == config.favId) {
