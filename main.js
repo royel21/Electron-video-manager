@@ -2,14 +2,14 @@ const {
     app,
     BrowserWindow,
     ipcMain,
-    Menu
+    Menu,
+    dialog
 } = require('electron');
 
 const os = require('os');
 const fs = require('fs-extra');
 const path = require('path');
 const db = require('./webcontent/models/models');
-
 
 // this should be placed at top of main.js to handle setup events quickly
 if (handleSquirrelEvent(app)) {

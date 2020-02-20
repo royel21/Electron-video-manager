@@ -177,7 +177,7 @@ label {
 
 .list-footer .select-list {
     font-weight: 700;
-    height: 38px !important;
+    height: 40px !important;
 }
 
 .modal .m-title {
@@ -443,6 +443,10 @@ label {
 
 .select-style span{
     margin: 0 5px;
+}
+
+#fav-remove i{
+    font-size: 21px;
 }
 
 #modal-config{

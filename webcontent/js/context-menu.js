@@ -23,7 +23,6 @@ keepIn = (e, el) => {
 showCtxMenu = (name, isfile, e) => {
     cmenu.style.top = e.clientY + 4 + "px";
     cmenu.style.left = e.clientX + 4 + "px";
-    keepIn(e, cmenu);
 
     $('#cm-zip-file').css({
         display: isfile ? "none" : "block"
@@ -53,6 +52,7 @@ showCtxMenu = (name, isfile, e) => {
     cmenu.style.display = "block";
 
     console.log("cmenu1");
+    keepIn(e, cmenu);
 }
 
 $('#file-list').on('mousedown', '.items', (e) => {

@@ -136,13 +136,8 @@ body,
     margin: 5px;
     overflow: hidden;
 }
-.item-cover:hover{
-    transform: scale(1.1);
-    position: relative;
-    z-index: 99;
-}
 
-.item-cover:hover{
+.item-cover img:hover{
     transform: scale(1.1);
     position: relative;
     z-index: 90;
@@ -202,10 +197,10 @@ body,
     align-items: center;
     height: 170px;
     margin: 6px 0;
+    overflow: hidden;
 }
 .item-cover img{
-    pointer-events: none;
-    
+    user-select: none;
 }
 .item-name{
     position: relative;

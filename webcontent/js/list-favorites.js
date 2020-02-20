@@ -2,6 +2,7 @@ var $favList = $('#list-favs');
 var $selFav = $('#fav-select');
 var $fav_dialog;
 var $deleteFav = $('#fav-remove');
+const os = require('os');
 
 $('#fav-create').click((e) => {
     if ($fav_dialog == undefined) {
@@ -147,5 +148,23 @@ removeFavFromList = async (event) => {
         });
     });
 }
+
+$('#fav-save').click(async (e)=>{
+    let $currentFav = $('#fav-select option:selected');
+    let result = dialog.showSaveDialogSync(mainWindow, {
+        defaultPath: path.join(os.homedir(), 'documents', $currentFav.text()+'.json'),
+        filters: [{name: "json", extensions: ["json"]}]
+    });
+    if(result){
+        let foundFav = await db.FavoriteFile.findOne({where: {Id: $currentFav.val()}, include:{model: db.File}});
+        if(foundFav){
+            let tempFav = {
+                name: $currentFav.text(),
+                files: foundFav.files.map(f=> f.Name )
+                }
+            fs.writeJSONSync(result, tempFav);
+        } 
+    }
+});
 
 $('.list-file-content').on('click', '#list-favs #delete-list', removeFavFromList);

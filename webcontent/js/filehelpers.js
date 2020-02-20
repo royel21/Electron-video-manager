@@ -116,7 +116,7 @@ addToFav = async($item, event) => {
         if (isFile) {
             // files can't be without parent folder;
             if (folderId == null)
-                folderId = (await db.Folder.Create({
+                folderId = (await db.Folder.create({
                     Name: currentDir
                 })).Id;
 
