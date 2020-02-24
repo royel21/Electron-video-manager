@@ -215,7 +215,7 @@ function CreateEl(file, diskIcon) {
     return div.firstElementChild;
 }
 
-loadFavs = async() => {
+const loadFavs = async() => {
     var fos = await db.Folder.findAll({
         where: {
             folderId: folderId
@@ -238,7 +238,7 @@ loadFavs = async() => {
     });
 }
 
-lazyLoad = () => {
+const lazyLoad = () => {
     var lazyCovers = document.querySelectorAll('.items');
     var lazyImageObserver = new IntersectionObserver((entries, observer) => {
         entries.forEach((entry) => {

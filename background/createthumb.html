@@ -20,13 +20,13 @@
     var appPath = path.join(path.dirname(__dirname));
     var startTime, endTime;
     var currentDir = localStorage.getItem('currentDir');
-    Storage.prototype.getObject = function (key) {
+    Storage.prototype.getObject = function(key) {
         var value = this.getItem(key);
         if (value == "undefined") return [];
         return value && JSON.parse(value);
     }
 
-    ipc.on('remove-files', function (event, data, fromWindowId) {
+    ipc.on('remove-files', function(event, data, fromWindowId) {
         let fromWindow = BrowserWindow.fromId(fromWindowId)
         fs.removeSync(data.dir);
         fromWindow.webContents.send('files-removed', data.index);
@@ -34,17 +34,17 @@
         window.close();
     });
     var timer = 0;
-    ipc.on('reload-Db', function (event, data, fromWindowId) {
+    ipc.on('reload-Db', function(event, data, fromWindowId) {
         let fromWindow = BrowserWindow.fromId(fromWindowId);
 
-        scanOneDir = async (f) => {
+        scanOneDir = async(f) => {
             var fis = WinDrive.ListFilesRO(f.dir);
             await PopulateDB(f.dir, fis);
         }
 
-        scanDirs = async () => {
+        scanDirs = async() => {
             timer = new Date();
-            if(data.resetDb){
+            if (data.resetDb) {
                 await db.init(true);
             }
             for (var f of data.folders) {
@@ -54,7 +54,7 @@
             window.close();
         }
 
-        PopulateDB = async (folder, files, id) => {
+        PopulateDB = async(folder, files, id) => {
             var fis = files.filter((f) => {
                 return f.isDirectory || fileFilter.includes(f.extension.toLocaleLowerCase()) &&
                     !f.isHidden
@@ -79,7 +79,8 @@
                     if (!f.isDirectory) {
                         file = await db.File.findOne({
                             where: {
-                                Name: f.FileName, folderId: f1[0].Id
+                                Name: f.FileName,
+                                folderId: f1[0].Id
                             }
                         });
                         if (file == null) {
@@ -115,11 +116,11 @@
         scanDirs();
     });
 
-    ipc.on('create-cover', function (event, data, fromWindowId) {
+    ipc.on('create-cover', function(event, data, fromWindowId) {
         createThumb(data, fromWindowId);
     });
 
-    createThumb = async (data, fromWindowId) => {
+    createThumb = async(data, fromWindowId) => {
         let fromWindow = BrowserWindow.fromId(fromWindowId);
         timer = new Date();
         try {
@@ -224,21 +225,21 @@
     ffmpeg.setFfmpegPath(ffmstatic.path) //Argument path is a string with the full path to the ffmpeg binary.
     ffmpeg.setFfprobePath(ffpstatic.path) //Argument path is a string with the full path to the ffprobe binary.
 
-    VideoThumb = async (vfile) => {
+    VideoThumb = async(vfile) => {
         await takeScreenShot(vfile, "20%", 0);
         await takeScreenShot(vfile, "40%", 1);
         await takeScreenShot(vfile, "60%", 2);
         await takeScreenShot(vfile, "80%", 3);
         return true;
     }
-    takeScreenShot = async (vfile, time, num) => {
+    takeScreenShot = async(vfile, time, num) => {
         await new Promise((resolve, rejected) => {
             try {
                 ffmpeg(vfile).screenshots({
                     timestamps: [time],
                     // count: 4,
                     filename: '%f-' + num,
-                    folder: path.join(appPath,'covers','videos'),
+                    folder: path.join(appPath, 'covers', 'videos'),
                     size: '240x?'
                 }).on('end', () => {
                     resolve(true);
@@ -258,7 +259,7 @@
         }
     });
 
-    zip = async (data, fromWindow) => {
+    zip = async(data, fromWindow) => {
         zipper.sync.zip(data.dir).compress().save(data.dir + '.zip');
         //fs.removeSync(data.dir);
         fromWindow.webContents.send('zip-done', {
