@@ -21,7 +21,7 @@
     "node-ssdp": "^4.0.0",
     "node-stream-zip": "^1.7.0",
     "rcunrar": "file:../local_modules/rcunrar",
-    "sequelize": "^4.44.3",
+    "sequelize": "^5.15.1",
     "sharp": "^0.24.1",
     "sqlite3": "^4.1.1",
     "win-explorer": "file:../local_modules/win-explorer",
